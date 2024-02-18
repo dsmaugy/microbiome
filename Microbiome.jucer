@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="ZLZPq7" name="Microbiome" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginFormats="buildAU,buildLV2,buildVST3"
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginFormats="buildAU,buildLV2,buildStandalone,buildVST3"
               companyWebsite="www.darwindo.com" companyName="Darwin Do" lv2Uri="https://github.com/dsmaugy/microbiome"
               pluginName="Microbiome" pluginManufacturer="Darwin Do" pluginDesc="Exploring the evolutionary nature of sound">
   <MAINGROUP id="HVHVHe" name="Microbiome">
