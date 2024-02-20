@@ -22,6 +22,11 @@ MicrobiomeAudioProcessor::MicrobiomeAudioProcessor()
                        )
 #endif
 {
+    testVerbParams.damping = 1.0f;
+    testVerbParams.dryLevel = 0.5f;
+    testVerbParams.wetLevel = .8f;
+    testVerbParams.roomSize = 1.0f;
+    testVerb.setParameters(testVerbParams);
 }
 
 MicrobiomeAudioProcessor::~MicrobiomeAudioProcessor()
@@ -95,6 +100,7 @@ void MicrobiomeAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    testVerb.setSampleRate(sampleRate);
 }
 
 void MicrobiomeAudioProcessor::releaseResources()
@@ -150,12 +156,14 @@ void MicrobiomeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
+    //buffer.applyGain(0.5);
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
-        auto* channelData = buffer.getWritePointer (channel);
-
+        //auto* channelData = buffer.getWritePointer (channel);
         // ..do something to the data...
     }
+    testVerb.processStereo(buffer.getWritePointer(0), buffer.getWritePointer(1), buffer.getNumSamples());
+    //testVerb.reset();
 }
 
 //==============================================================================
