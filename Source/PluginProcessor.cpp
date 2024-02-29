@@ -22,11 +22,7 @@ MicrobiomeAudioProcessor::MicrobiomeAudioProcessor()
                        )
 #endif
 {
-    testVerbParams.damping = 1.0f;
-    testVerbParams.dryLevel = 0.5f;
-    testVerbParams.wetLevel = .8f;
-    testVerbParams.roomSize = 1.0f;
-    testVerb.setParameters(testVerbParams);
+    reverbWet = .8f;
 }
 
 MicrobiomeAudioProcessor::~MicrobiomeAudioProcessor()
@@ -100,7 +96,7 @@ void MicrobiomeAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    testVerb.setSampleRate(sampleRate);
+    testVerb.setSampleRate(getSampleRate());
 }
 
 void MicrobiomeAudioProcessor::releaseResources()
@@ -150,6 +146,9 @@ void MicrobiomeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+
+    DBG("Wet Level: " << reverbWet);
+
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
     // Make sure to reset the state if your inner loop is processing
@@ -189,6 +188,18 @@ void MicrobiomeAudioProcessor::setStateInformation (const void* data, int sizeIn
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+void MicrobiomeAudioProcessor::setReverbWet(float wet)
+{
+    if (wet >= 0.0 && wet <= 1.0) {
+        reverbWet = wet;
+        testVerbParams.damping = 0.8f;
+        testVerbParams.dryLevel = 0.3;
+        testVerbParams.wetLevel = reverbWet;
+        testVerbParams.roomSize = 0.65f;
+        testVerb.setParameters(testVerbParams);
+    }
 }
 
 //==============================================================================
