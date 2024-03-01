@@ -62,5 +62,8 @@ private:
     juce::Reverb testVerb;
     juce::Reverb::Parameters testVerbParams;
 
+    juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> testDelay;
+    juce::dsp::ProcessSpec procSpec;
+
     float reverbWet;
 };

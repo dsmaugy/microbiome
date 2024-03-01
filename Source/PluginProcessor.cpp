@@ -96,13 +96,22 @@ void MicrobiomeAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    testVerb.setSampleRate(getSampleRate());
+    DBG("Preparing to Play...");
+    testVerb.setSampleRate(sampleRate);
+
+    testDelay.setMaximumDelayInSamples(sampleRate * 3);
+    testDelay.setDelay(sampleRate * 0.5);
+    procSpec.sampleRate = sampleRate;
+    procSpec.numChannels = 2; // TODO: figure this out
+    procSpec.maximumBlockSize = samplesPerBlock;
+    testDelay.prepare(procSpec);
 }
 
 void MicrobiomeAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
+    DBG("Releasing Resources...");
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -146,8 +155,7 @@ void MicrobiomeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-
-    DBG("Wet Level: " << reverbWet);
+    //DBG("Wet Level: " << reverbWet);
 
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
@@ -158,9 +166,16 @@ void MicrobiomeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     //buffer.applyGain(0.5);
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
-        //auto* channelData = buffer.getWritePointer (channel);
-        // ..do something to the data...
+        auto* channelData = buffer.getWritePointer (channel);
+        
+        for (int i = 0; i < buffer.getNumSamples(); i++) {
+            auto inVal = channelData[i];
+            channelData[i] = channelData[i] + 0.5 * testDelay.popSample(channel);
+            testDelay.pushSample(channel, channelData[i]); // switch this to *channelData to do feedback
+        }
     }
+
+
     testVerb.processStereo(buffer.getWritePointer(0), buffer.getWritePointer(1), buffer.getNumSamples());
     //testVerb.reset();
 }
