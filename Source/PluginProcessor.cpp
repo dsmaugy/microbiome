@@ -97,14 +97,20 @@ void MicrobiomeAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     DBG("Preparing to Play...");
+    DBG("Sample Rate: " << sampleRate << "\nBlock Size: " << samplesPerBlock);
     testVerb.setSampleRate(sampleRate);
 
-    testDelay.setMaximumDelayInSamples(sampleRate * 3);
-    testDelay.setDelay(sampleRate * 0.5);
+    testDelay.setMaximumDelayInSamples(sampleRate * 20);
+    testDelay.setDelay(sampleRate * 15);
+    juce::dsp::ProcessSpec procSpec;
     procSpec.sampleRate = sampleRate;
     procSpec.numChannels = 2; // TODO: figure this out
     procSpec.maximumBlockSize = samplesPerBlock;
     testDelay.prepare(procSpec);
+
+    EngineParams engineParams;
+    engineParams.blockSize = samplesPerBlock;
+    engine.prepare(engineParams);
 }
 
 void MicrobiomeAudioProcessor::releaseResources()
@@ -175,9 +181,7 @@ void MicrobiomeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         }
     }
 
-
-    testVerb.processStereo(buffer.getWritePointer(0), buffer.getWritePointer(1), buffer.getNumSamples());
-    //testVerb.reset();
+    // testVerb.processStereo(buffer.getWritePointer(0), buffer.getWritePointer(1), buffer.getNumSamples());
 }
 
 //==============================================================================

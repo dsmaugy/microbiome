@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "MicrobiomeEngine.h"
 
 //==============================================================================
 /**
@@ -59,11 +60,11 @@ private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MicrobiomeAudioProcessor)
 
+    MicrobiomeEngine engine;
+
     juce::Reverb testVerb;
     juce::Reverb::Parameters testVerbParams;
 
     juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> testDelay;
-    juce::dsp::ProcessSpec procSpec;
-
     float reverbWet;
 };
