@@ -15,7 +15,9 @@
 
 struct ColonyParams
 {
-    int blockSize;
+    juce::dsp::ProcessSpec procSpec;
+    int delayInSamples = 0;
+    float gain = 0.5;
 };
 
 class Colony
@@ -25,11 +27,15 @@ class Colony
 
         void prepare(const ColonyParams& params);
 
+
         void setActive(bool value);
         bool getActiveStatus();
+        float getGain();
 
     private:
         juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> delay;
         std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;
         bool isActive;
+
+        ColonyParams params;
 };

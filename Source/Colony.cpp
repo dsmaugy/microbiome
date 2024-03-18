@@ -17,10 +17,13 @@ Colony::Colony()
 
 void Colony::prepare(const ColonyParams& params)
 {
-    colonyBuffer = std::make_unique<juce::AudioBuffer<float>>(MAX_CHANNELS, params.blockSize);
+    this->params = params;
+
+    colonyBuffer = std::make_unique<juce::AudioBuffer<float>>(MAX_CHANNELS, params.procSpec.maximumBlockSize);
     std::stringstream bufferAddr;
     bufferAddr << std::hex << reinterpret_cast<std::uintptr_t>(colonyBuffer.get());
-    DBG("Colony buffer created at: 0x" << bufferAddr.str());
+    DBG("Colony buffer created at: 0x" << bufferAddr.str() << "\tdelay (samples)=" << params.delayInSamples << "\tdelay (sec)=" << (double) params.delayInSamples/params.procSpec.sampleRate << " sec");
+    
 }
 
 void Colony::setActive(bool value)
@@ -31,4 +34,9 @@ void Colony::setActive(bool value)
 bool Colony::getActiveStatus()
 {
     return isActive;
+}
+
+float Colony::getGain()
+{
+    return params.gain;
 }

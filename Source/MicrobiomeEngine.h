@@ -16,7 +16,7 @@
 
 struct EngineParams
 {
-    int blockSize;
+    juce::dsp::ProcessSpec procSpec;
 };
 
 class MicrobiomeEngine 
@@ -30,5 +30,5 @@ class MicrobiomeEngine
     private:
         Colony colony[MAX_COLONY];
         int activeColonies;
-        int blockSize;
+        EngineParams params;
 };

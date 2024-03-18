@@ -109,7 +109,8 @@ void MicrobiomeAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     testDelay.prepare(procSpec);
 
     EngineParams engineParams;
-    engineParams.blockSize = samplesPerBlock;
+    engineParams.procSpec = procSpec;
+
     engine.prepare(engineParams);
 }
 
