@@ -28,12 +28,12 @@ void Colony::prepare(const ColonyParams& params)
 
 void Colony::setActive(bool value)
 {
-    isActive = value;
+    active = value;
 }
 
-bool Colony::getActiveStatus()
+bool Colony::isActive()
 {
-    return isActive;
+    return active;
 }
 
 float Colony::getGain()

@@ -26,16 +26,16 @@ class Colony
         Colony();
 
         void prepare(const ColonyParams& params);
-
+        float getSampleN(int channel, int n);
 
         void setActive(bool value);
-        bool getActiveStatus();
+        bool isActive();
         float getGain();
 
     private:
         juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> delay;
         std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;
-        bool isActive;
+        bool active;
 
         ColonyParams params;
 };

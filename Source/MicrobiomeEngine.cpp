@@ -43,10 +43,14 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
     for (int channel = 0; channel < buffer.getNumChannels() && channel < MAX_CHANNELS; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
-        
+        int appliedColonies = 0;
+
         for (int i = 0; i < buffer.getNumSamples(); i++) {
-            for (int j = 0; j < activeColonies; j++) {
-                
+            for (int j = 0; j < MAX_COLONY && appliedColonies < activeColonies; j++) {
+                if (colony[j].isActive()) {
+                    appliedColonies++;
+                    // channelData[i] += colony[j].getGain()
+                }
             }
         }
     }
