@@ -10,6 +10,8 @@
 
 #include "Colony.h"
 
+
+
 Colony::Colony() 
 {
 }
@@ -48,14 +50,18 @@ float Colony::getSampleN(int channel, int n)
     return colonyBuffer->getSample(channel, n);
 }
 
-void Colony::setActive(bool value)
+void Colony::toggleState(bool value)
 {
-    active = value;
+    if (value && !isActive()) {
+
+    } else if (!value && isActive()) {
+
+    }
 }
 
 bool Colony::isActive()
 {
-    return active;
+    return (currentState != Colony::State::DEAD);
 }
 
 float Colony::getGain()

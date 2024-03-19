@@ -27,7 +27,7 @@ void MicrobiomeEngine::prepare(const EngineParams& params)
 
         if (i < DEFAULT_COLONIES) {
             colonyParams.delayInSamples = 10 * params.procSpec.sampleRate * (1.0/(i+1));
-            colony[i].setActive(true);
+            colony[i].toggleState(true);
         }
         colony[i].prepare(colonyParams);
     }   
@@ -62,7 +62,7 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
 void MicrobiomeEngine::disableColony(int n)
 {
     if (colony[n].isActive()) {
-        colony[n].setActive(false);
+        colony[n].toggleState(false);
         activeColonies--;
 
         DBG("Active Colonies: " << activeColonies);
@@ -72,7 +72,7 @@ void MicrobiomeEngine::disableColony(int n)
 void MicrobiomeEngine::enableColony(int n)
 {
     if (!colony[n].isActive()) {
-        colony[n].setActive(true);
+        colony[n].toggleState(true);
         activeColonies++;
     }
 }

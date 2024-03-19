@@ -31,14 +31,25 @@ class Colony
         void processAudio(const juce::AudioBuffer<float>& buffer);
         float getSampleN(int channel, int n);
 
-        void setActive(bool value);
+        // set true to activate colony, false to kill it
+        void toggleState(bool value);
         bool isActive();
         float getGain();
 
     private:
+        enum class State
+        {
+            ALIVE,
+            RAMP_UP,
+            RAMP_DOWN,
+            DEAD
+        };
+
         juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> delay;
         std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;
-        bool active;
+        Colony::State currentState;
 
         ColonyParams params;
+
+
 };
