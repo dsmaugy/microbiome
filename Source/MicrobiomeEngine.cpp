@@ -37,8 +37,10 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
 {
     int appliedColonies = 0;
     for (int i = 0; i < MAX_COLONY && appliedColonies < activeColonies; i++) {
-        appliedColonies++;
-        colony[i].processAudio(buffer);
+        if (colony[i].isActive()) {
+            appliedColonies++;
+            colony[i].processAudio(buffer);
+        }
     }
 
     for (int channel = 0; channel < buffer.getNumChannels() && channel < MAX_CHANNELS; channel++)
@@ -53,6 +55,46 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
                     channelData[i] += colony[j].getGain() * colony[j].getSampleN(channel, i);
                 }
             }
+        }
+    }
+}
+
+void MicrobiomeEngine::disableColony(int n)
+{
+    if (colony[n].isActive()) {
+        colony[n].setActive(false);
+        activeColonies--;
+
+        DBG("Active Colonies: " << activeColonies);
+    }
+}
+
+void MicrobiomeEngine::enableColony(int n)
+{
+    if (!colony[n].isActive()) {
+        colony[n].setActive(true);
+        activeColonies++;
+    }
+}
+
+void MicrobiomeEngine::removeColony()
+{
+    for (int i = MAX_COLONY-1; i >= 0; i--) {
+        if (colony[i].isActive()) {
+            disableColony(i);
+            DBG("Active Colonies: " << activeColonies);
+            break;
+        }
+    }
+}
+
+void MicrobiomeEngine::addColony()
+{
+    for (int i = 0; i < MAX_COLONY; i++) {
+        if (!colony[i].isActive()) {
+            enableColony(i);
+            DBG("Active Colonies: " << activeColonies);
+            break;
         }
     }
 }

@@ -76,7 +76,9 @@ void MicrobiomeAudioProcessorEditor::buttonClicked(juce::Button* button)
 {
     if (button == &addColony) {
         DBG("Adding Colony...");
+        audioProcessor.getEngine().addColony();
     } else if (button == &removeColony) {
         DBG("Removing Colony...");
+        audioProcessor.getEngine().removeColony();
     }
 }

@@ -28,6 +28,11 @@ class MicrobiomeEngine
         void processAudio(juce::AudioBuffer<float>& buffer);
 
         void disableColony(int n);
+        void enableColony(int n );
+
+        // removes from end of colony array to beginning
+        void removeColony();
+        // adds from beginning of colony array to end
         void addColony();
 
     private:
