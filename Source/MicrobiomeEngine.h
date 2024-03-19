@@ -27,6 +27,9 @@ class MicrobiomeEngine
         void prepare(const EngineParams& params);
         void processAudio(juce::AudioBuffer<float>& buffer);
 
+        void disableColony(int n);
+        void addColony();
+
     private:
         Colony colony[MAX_COLONY];
         int activeColonies;

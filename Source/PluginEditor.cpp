@@ -8,6 +8,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "Constants.h"
 
 //==============================================================================
 MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor (MicrobiomeAudioProcessor& p)
@@ -25,8 +26,16 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor (MicrobiomeAudioP
     
     reverbWet.setPopupDisplayEnabled(true, true, this);
     reverbWet.addListener(this);
+
+    addColony.setButtonText("+ Colony");
+    removeColony.setButtonText("- Colony");
+
+    addColony.addListener(this);
+    removeColony.addListener(this);
   
     addAndMakeVisible(reverbWet);
+    addAndMakeVisible(addColony);
+    addAndMakeVisible(removeColony);
 }
 
 MicrobiomeAudioProcessorEditor::~MicrobiomeAudioProcessorEditor()
@@ -50,8 +59,24 @@ void MicrobiomeAudioProcessorEditor::resized()
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
     reverbWet.setBounds(200-35, 100, 70, 70);
+
+    addColony.setBounds(50, 50, 70, 35);
+    removeColony.setBounds(150, 50, 70, 35);
 }
 
-void MicrobiomeAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) {
-    audioProcessor.setReverbWet(slider->getValue());
+void MicrobiomeAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) 
+{
+    // if (slider == &numColonies) {
+
+    // }
+    // audioProcessor.setReverbWet(slider->getValue());
+}
+
+void MicrobiomeAudioProcessorEditor::buttonClicked(juce::Button* button)
+{
+    if (button == &addColony) {
+        DBG("Adding Colony...");
+    } else if (button == &removeColony) {
+        DBG("Removing Colony...");
+    }
 }

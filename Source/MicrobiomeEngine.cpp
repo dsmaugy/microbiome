@@ -9,8 +9,7 @@
 */
 
 #include "MicrobiomeEngine.h"
-
-#define DEFAULT_COLONIES 3
+#include "Constants.h"
 
 MicrobiomeEngine::MicrobiomeEngine() 
 {
@@ -52,9 +51,6 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
                 if (colony[j].isActive()) {
                     appliedColonies++;
                     channelData[i] += colony[j].getGain() * colony[j].getSampleN(channel, i);
-                    // colony[j].getSampleN(channel, i);
-                    // DBG(colony[j].getSampleN(channel, i));
-                    // DBG(channelData[i]);
                 }
             }
         }
