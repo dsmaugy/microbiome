@@ -36,20 +36,25 @@ void MicrobiomeEngine::prepare(const EngineParams& params)
 
 void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
 {
-    for (int i = 0; i < activeColonies; i++) {
-
+    int appliedColonies = 0;
+    for (int i = 0; i < MAX_COLONY && appliedColonies < activeColonies; i++) {
+        appliedColonies++;
+        colony[i].processAudio(buffer);
     }
 
-    for (int channel = 0; channel < buffer.getNumChannels() && channel < MAX_CHANNELS; ++channel)
+    for (int channel = 0; channel < buffer.getNumChannels() && channel < MAX_CHANNELS; channel++)
     {
         auto* channelData = buffer.getWritePointer (channel);
-        int appliedColonies = 0;
-
+    
         for (int i = 0; i < buffer.getNumSamples(); i++) {
+            appliedColonies = 0;
             for (int j = 0; j < MAX_COLONY && appliedColonies < activeColonies; j++) {
                 if (colony[j].isActive()) {
                     appliedColonies++;
-                    // channelData[i] += colony[j].getGain()
+                    channelData[i] += colony[j].getGain() * colony[j].getSampleN(channel, i);
+                    // colony[j].getSampleN(channel, i);
+                    // DBG(colony[j].getSampleN(channel, i));
+                    // DBG(channelData[i]);
                 }
             }
         }

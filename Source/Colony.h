@@ -26,6 +26,9 @@ class Colony
         Colony();
 
         void prepare(const ColonyParams& params);
+
+        // copies buffer data into local colony buffer and applies colony processing on that local buffer
+        void processAudio(const juce::AudioBuffer<float>& buffer);
         float getSampleN(int channel, int n);
 
         void setActive(bool value);

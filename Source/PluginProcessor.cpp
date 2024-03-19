@@ -171,17 +171,18 @@ void MicrobiomeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
     //buffer.applyGain(0.5);
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
+    // for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    // {
+    //     auto* channelData = buffer.getWritePointer (channel);
         
-        for (int i = 0; i < buffer.getNumSamples(); i++) {
-            auto inVal = channelData[i];
-            channelData[i] = channelData[i] + 0.5 * testDelay.popSample(channel);
-            testDelay.pushSample(channel, channelData[i]); // switch this to *channelData to do feedback
-        }
-    }
+    //     for (int i = 0; i < buffer.getNumSamples(); i++) {
+    //         auto inVal = channelData[i];
+    //         channelData[i] = channelData[i] + 0.5 * testDelay.popSample(channel);
+    //         testDelay.pushSample(channel, channelData[i]); // switch this to *channelData to do feedback
+    //     }
+    // }
 
+    engine.processAudio(buffer);
     // testVerb.processStereo(buffer.getWritePointer(0), buffer.getWritePointer(1), buffer.getNumSamples());
 }
 
