@@ -11,6 +11,7 @@
 #include "Colony.h"
 
 #define FADE_TIME 0.5
+#define MAX_DELAY_SEC 20
 
 Colony::Colony() 
 {
@@ -26,7 +27,8 @@ void Colony::prepare(const ColonyParams& params)
     bufferAddr << std::hex << reinterpret_cast<std::uintptr_t>(colonyBuffer.get());
     DBG("Colony buffer created at: 0x" << bufferAddr.str());
     
-    delay.setMaximumDelayInSamples(params.delayInSamples);
+    // TODO: very inefficient here, could probably spend some time thinking of a way to optimize
+    delay.setMaximumDelayInSamples(MAX_DELAY_SEC * params.procSpec.sampleRate);
     delay.setDelay(params.delayInSamples);
     delay.prepare(params.procSpec);
 
@@ -48,13 +50,13 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
     juce::dsp::AudioBlock<float> localBlock(*colonyBuffer);
     juce::dsp::ProcessContextReplacing<float> procCtx(localBlock);
 
-    // DBG(gain.getNextValue());
     if (!gain.isSmoothing() && currentState == Colony::State::RAMP_DOWN) {
         // gain should be 0 here anyways
         DBG("Setting colony to DEAD");
         currentState = Colony::State::DEAD;
     }
 
+    // TODO: modulate delay size
     delay.process(procCtx);
 }
 

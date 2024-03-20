@@ -50,7 +50,9 @@ class Colony
 
         juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> delay;
         std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;
+
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gain;
+        juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> delayInSamples;
 
         ColonyParams params;
 
