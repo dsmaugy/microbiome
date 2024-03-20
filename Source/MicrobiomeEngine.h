@@ -37,6 +37,7 @@ class MicrobiomeEngine
 
     private:
         Colony colony[MAX_COLONY];
+        // TODO: should probably be renamed to aliveColonies with current use case
         int activeColonies;
         EngineParams params;
 };

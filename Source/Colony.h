@@ -17,7 +17,7 @@ struct ColonyParams
 {
     juce::dsp::ProcessSpec procSpec;
     int delayInSamples = 0;
-    float gain = 0.5;
+    float initialGain = 0.5;
 };
 
 class Colony
@@ -34,6 +34,8 @@ class Colony
         // set true to activate colony, false to kill it
         void toggleState(bool value);
         bool isActive();
+        // colonies ramping down are not alive anymore
+        bool isAlive();
         float getGain();
 
     private:
@@ -44,10 +46,11 @@ class Colony
             RAMP_DOWN,
             DEAD
         };
+        Colony::State currentState = Colony::State::DEAD;
 
         juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> delay;
         std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;
-        Colony::State currentState;
+        juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gain;
 
         ColonyParams params;
 

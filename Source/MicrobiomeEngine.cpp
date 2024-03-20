@@ -35,10 +35,8 @@ void MicrobiomeEngine::prepare(const EngineParams& params)
 
 void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
 {
-    int appliedColonies = 0;
-    for (int i = 0; i < MAX_COLONY && appliedColonies < activeColonies; i++) {
+    for (int i = 0; i < MAX_COLONY; i++) {
         if (colony[i].isActive()) {
-            appliedColonies++;
             colony[i].processAudio(buffer);
         }
     }
@@ -48,11 +46,10 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
         auto* channelData = buffer.getWritePointer (channel);
     
         for (int i = 0; i < buffer.getNumSamples(); i++) {
-            appliedColonies = 0;
-            for (int j = 0; j < MAX_COLONY && appliedColonies < activeColonies; j++) {
+            for (int j = 0; j < MAX_COLONY; j++) {
+                // can't break out early from checking appliedColonies because some colonies may be ramping down
                 if (colony[j].isActive()) {
-                    appliedColonies++;
-                    channelData[i] += colony[j].getGain() * colony[j].getSampleN(channel, i);
+                    channelData[i] += colony[j].getSampleN(channel, i);
                 }
             }
         }
@@ -61,7 +58,7 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
 
 void MicrobiomeEngine::disableColony(int n)
 {
-    if (colony[n].isActive()) {
+    if (colony[n].isAlive()) {
         colony[n].toggleState(false);
         activeColonies--;
 
@@ -71,7 +68,7 @@ void MicrobiomeEngine::disableColony(int n)
 
 void MicrobiomeEngine::enableColony(int n)
 {
-    if (!colony[n].isActive()) {
+    if (!colony[n].isAlive()) {
         colony[n].toggleState(true);
         activeColonies++;
     }
@@ -80,7 +77,7 @@ void MicrobiomeEngine::enableColony(int n)
 void MicrobiomeEngine::removeColony()
 {
     for (int i = MAX_COLONY-1; i >= 0; i--) {
-        if (colony[i].isActive()) {
+        if (colony[i].isAlive()) {
             disableColony(i);
             DBG("Active Colonies: " << activeColonies);
             break;
@@ -91,7 +88,7 @@ void MicrobiomeEngine::removeColony()
 void MicrobiomeEngine::addColony()
 {
     for (int i = 0; i < MAX_COLONY; i++) {
-        if (!colony[i].isActive()) {
+        if (!colony[i].isAlive()) {
             enableColony(i);
             DBG("Active Colonies: " << activeColonies);
             break;
