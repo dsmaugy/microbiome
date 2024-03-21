@@ -26,7 +26,7 @@ void MicrobiomeEngine::prepare(const EngineParams& params)
         colonyParams.procSpec = params.procSpec;
 
         if (i < DEFAULT_COLONIES) {
-            colonyParams.delayInSamples = 10 * params.procSpec.sampleRate * (1.0/(i+1));
+            colonyParams.initialDelayInSamples = 10 * params.procSpec.sampleRate * (1.0/(i+1));
             colony[i].toggleState(true);
         }
         colony[i].prepare(colonyParams);
@@ -49,7 +49,7 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
             for (int j = 0; j < MAX_COLONY; j++) {
                 // can't break out early from checking appliedColonies because some colonies may be ramping down
                 if (colony[j].isActive()) {
-                    // channelData[i] += colony[j].getSampleN(channel, i);
+                    channelData[i] += colony[j].getSampleN(channel, i);
                 }
             }
         }
@@ -59,16 +59,16 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
 void MicrobiomeEngine::disableColony(int n)
 {
     if (colony[n].isAlive()) {
+        DBG("Disabling Colony: " << n);
         colony[n].toggleState(false);
         activeColonies--;
-
-        DBG("Active Colonies: " << activeColonies);
     }
 }
 
 void MicrobiomeEngine::enableColony(int n)
 {
     if (!colony[n].isAlive()) {
+        DBG("Enabling Colony: " << n);
         colony[n].toggleState(true);
         activeColonies++;
     }
@@ -79,10 +79,10 @@ void MicrobiomeEngine::removeColony()
     for (int i = MAX_COLONY-1; i >= 0; i--) {
         if (colony[i].isAlive()) {
             disableColony(i);
-            DBG("Active Colonies: " << activeColonies);
             break;
         }
     }
+    DBG("Active Colonies: " << activeColonies);
 }
 
 void MicrobiomeEngine::addColony()
@@ -90,8 +90,13 @@ void MicrobiomeEngine::addColony()
     for (int i = 0; i < MAX_COLONY; i++) {
         if (!colony[i].isAlive()) {
             enableColony(i);
-            DBG("Active Colonies: " << activeColonies);
             break;
         }
     }
+    DBG("Active Colonies: " << activeColonies);
+}
+
+void MicrobiomeEngine::setColonyDelayTime(int n, float sec)
+{
+    colony[n].setDelayTime(sec);
 }

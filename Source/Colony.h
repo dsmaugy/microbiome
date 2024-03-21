@@ -16,7 +16,7 @@
 struct ColonyParams
 {
     juce::dsp::ProcessSpec procSpec;
-    int delayInSamples = 0;
+    int initialDelayInSamples = 44100;
     float initialGain = 0.5;
 };
 
@@ -36,6 +36,8 @@ class Colony
         bool isActive();
         // colonies ramping down are not alive anymore
         bool isAlive();
+
+        void setDelayTime(float sec);
         float getGain();
 
     private:

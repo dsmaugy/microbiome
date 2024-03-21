@@ -19,7 +19,7 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor (MicrobiomeAudioP
     setSize (400, 300);
 
     reverbWet.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    reverbWet.setRange(0.0, 1.0, 0.1);
+    reverbWet.setRange(0.1, 20.0, 0.1);
     reverbWet.setValue(0.5);
     reverbWet.setRotaryParameters(3 * juce::MathConstants<float>::pi / 2, 5*juce::MathConstants<float>::pi / 2, true);
     reverbWet.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
@@ -66,9 +66,10 @@ void MicrobiomeAudioProcessorEditor::resized()
 
 void MicrobiomeAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) 
 {
-    // if (slider == &numColonies) {
-
-    // }
+    if (slider == &reverbWet) {
+        // TODO: set this based off of currently selected colony
+        audioProcessor.getEngine().setColonyDelayTime(0, slider->getValue());
+    }
     // audioProcessor.setReverbWet(slider->getValue());
 }
 

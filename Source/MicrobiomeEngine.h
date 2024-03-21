@@ -35,6 +35,8 @@ class MicrobiomeEngine
         // adds from beginning of colony array to end
         void addColony();
 
+        void setColonyDelayTime(int n, float sec);
+
     private:
         Colony colony[MAX_COLONY];
         // TODO: should probably be renamed to aliveColonies with current use case
