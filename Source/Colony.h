@@ -15,9 +15,23 @@
 
 struct ColonyParams
 {
+    // TODO: could prob make this a tiny more efficient by making this a reference but whatever
     juce::dsp::ProcessSpec procSpec;
-    int initialDelayInSamples = 44100;
+    juce::AudioBuffer<float>* delayBuffer; // global delay buffer, should be only READING samples
+
     float initialGain = 0.5;
+    float initialResampleRatio = 0.6;
+
+    ColonyParams(juce::dsp::ProcessSpec spec, juce::AudioBuffer<float>* buffer) : procSpec(spec), delayBuffer(buffer) {}
+    ColonyParams() {}
+    // ColonyParams& operator=(const ColonyParams& other) {
+    //     if (this != &other) {
+    //         procSpec = other.procSpec;
+    //         initialGain = other.initialGain;
+    //         delayBuffer = other.delayBuffer;
+    //     }
+    //     return *this;
+    // }
 };
 
 class Colony
@@ -37,7 +51,6 @@ class Colony
         // colonies ramping down are not alive anymore
         bool isAlive();
 
-        void setDelayTime(float sec);
         float getGain();
 
     private:
@@ -52,15 +65,18 @@ class Colony
         Colony::State currentState = Colony::State::DEAD;
         
         // TODO: change this back to linear if its not doing anything
-        juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Lagrange3rd> delay;
         juce::Interpolators::Lagrange resampler[MAX_CHANNELS];
         std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;
-        
-        // holds leftover samples from downsampling techniques 
-        std::unique_ptr<juce::AudioBuffer<float>> resampleBuffer;
-        // index into the END of leftover samples section
-        int resampleIndex = 0;
 
+        int colonyBufferWriteIdx = 0;
+        int colonyBufferReadIdx = 0;
+        int colonyBufferReadStart = 0;
+        int colonyBufferReadLength = 132300;
+
+        int resampleStart;
+        int resampleLength;
+        float resampleRatio;
+        
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gain;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> delayInSamples;
 

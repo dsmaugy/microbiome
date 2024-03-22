@@ -21,12 +21,13 @@ void MicrobiomeEngine::prepare(const EngineParams& params)
 {
     this->params = params;
 
+    delayBuffer = std::make_unique<juce::AudioBuffer<float>>(MAX_CHANNELS, MAX_DELAY_SECONDS * params.procSpec.sampleRate);
+
     for (int i = 0; i < MAX_COLONY; i++) {
-        ColonyParams colonyParams;
-        colonyParams.procSpec = params.procSpec;
+        ColonyParams colonyParams(params.procSpec, delayBuffer.get());
 
         if (i < DEFAULT_COLONIES) {
-            colonyParams.initialDelayInSamples = 10 * params.procSpec.sampleRate * (1.0/(i+1));
+            // colonyParams.initialDelayInSamples = 10 * params.procSpec.sampleRate * (1.0/(i+1));
             colony[i].toggleState(true);
         }
         colony[i].prepare(colonyParams);
@@ -41,18 +42,31 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
         }
     }
 
+    int delayWriteStart = delayWriteIdx;
+    int delayReadStart = delayReadIdx;
     for (int channel = 0; channel < buffer.getNumChannels() && channel < MAX_CHANNELS; channel++)
     {
         auto* channelData = buffer.getWritePointer (channel);
-    
+        delayWriteIdx = delayWriteStart;
+        delayReadIdx = delayReadStart;
+
         for (int i = 0; i < buffer.getNumSamples(); i++) {
+            float originalSample = channelData[i];
             for (int j = 0; j < MAX_COLONY; j++) {
                 // can't break out early from checking appliedColonies because some colonies may be ramping down
                 if (colony[j].isActive()) {
                     // channelData[i] += colony[j].getSampleN(channel, i);
                     channelData[i] = colony[j].getSampleN(channel, i);
+                    // channelData[i] += delayBuffer->getSample(channel, delayReadIdx);
                 }
             }
+            delayReadIdx = (delayReadIdx+1) % 22050;// ((int) params.procSpec.sampleRate) * 5;
+            // we update the delay after the current output sample has already been updated
+            delayBuffer->setSample(channel, delayWriteIdx, originalSample);
+            delayWriteIdx = (delayWriteIdx+1) % delayBuffer->getNumSamples();
+
+            // DBG("Read Idx: " << delayReadIdx << "\tWrite Idx: " << delayWriteIdx);
+            // DBG(delayBuffer->getSample(channel, delayReadIdx));
         }
     }
 }
@@ -99,5 +113,5 @@ void MicrobiomeEngine::addColony()
 
 void MicrobiomeEngine::setColonyDelayTime(int n, float sec)
 {
-    colony[n].setDelayTime(sec);
+    // colony[n].setDelayTime(sec);
 }

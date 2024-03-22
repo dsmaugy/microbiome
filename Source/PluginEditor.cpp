@@ -68,7 +68,7 @@ void MicrobiomeAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)
 {
     if (slider == &reverbWet) {
         // TODO: set this based off of currently selected colony
-        audioProcessor.getEngine().setColonyDelayTime(0, slider->getValue());
+        // audioProcessor.getEngine().setColonyDelayTime(0, slider->getValue());
     }
     // audioProcessor.setReverbWet(slider->getValue());
 }

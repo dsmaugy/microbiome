@@ -11,8 +11,7 @@
 #include "Colony.h"
 
 #define GAIN_FADE_TIME 0.5
-#define DELAY_FADE_TIME 1
-#define MAX_DELAY_SEC 20
+#define COLONY_BUFFER_LENGTH_SEC 5
 
 Colony::Colony() 
 {
@@ -23,29 +22,21 @@ void Colony::prepare(const ColonyParams& params)
 {
     this->params = params;
 
-    colonyBuffer = std::make_unique<juce::AudioBuffer<float>>(MAX_CHANNELS, params.procSpec.maximumBlockSize);
-    // TODO: might need to be 2x block size to fit all resample ratios
-    resampleBuffer = std::make_unique<juce::AudioBuffer<float>>(MAX_CHANNELS, params.procSpec.maximumBlockSize);
+    colonyBuffer = std::make_unique<juce::AudioBuffer<float>>(MAX_CHANNELS, params.procSpec.sampleRate * COLONY_BUFFER_LENGTH_SEC);
     std::stringstream bufferAddr;
     bufferAddr << std::hex << reinterpret_cast<std::uintptr_t>(colonyBuffer.get());
     DBG("Colony buffer created at: 0x" << bufferAddr.str());
     
-    // TODO: very inefficient here, could probably spend some time thinking of a way to optimize
-    delayInSamples.reset(params.procSpec.sampleRate, DELAY_FADE_TIME);
-    delayInSamples.setCurrentAndTargetValue(params.initialDelayInSamples);
-    delay.setMaximumDelayInSamples(MAX_DELAY_SEC * params.procSpec.sampleRate);
-    delay.setDelay(params.initialDelayInSamples);
-    delay.prepare(params.procSpec);
-
     gain.reset(params.procSpec.sampleRate, GAIN_FADE_TIME);
     gain.setCurrentAndTargetValue(0);
     gain.setTargetValue(params.initialGain);
+
+    resampleRatio = params.initialResampleRatio;
 
     // perform all channel-dependent init operations
     for (int i = 0; i < params.procSpec.numChannels; i++) {
         resampler[i].reset();
     }
-    DBG("Colony delay created:" << "\tdelay (samples)=" << params.initialDelayInSamples << "\tdelay (sec)=" << (double) params.initialDelayInSamples/params.procSpec.sampleRate << " sec");
 }
 
 void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
@@ -55,19 +46,18 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
     int numInSamples = buffer.getNumSamples();
     for (int i = 0; i < numChannels; i++) {
         // pure copy
-        // colonyBuffer->copyFrom(i, 0, buffer, i, 0, buffer.getNumSamples());
+        colonyBuffer->copyFrom(i, colonyBufferWriteIdx, buffer, i, 0, numInSamples);
         
         // resample copy
-        auto readIn = buffer.getReadPointer(i);
-        float ratio = 0.5;
         // take the input 
-        resampleBuffer->copyFrom(i, resampleIndex, readIn, numInSamples-resampleIndex);
-        int used = resampler[i].process(ratio, resampleBuffer->getReadPointer(i), colonyBuffer->getWritePointer(i), colonyBuffer->getNumSamples(), resampleBuffer->getNumSamples(), resampleBuffer->getNumSamples());
-        DBG(used << "/" << buffer.getNumSamples() << " samples used");
+        // resampleBuffer->copyFrom(i, resampleIndex, readIn, numInSamples-resampleIndex);
+        // int used = resampler[i].process(resampleRatio, params.delayBuffer->getReadPointer(i) + resampleStart, colonyBuffer->getWritePointer(i), colonyBuffer->getNumSamples());
+        // DBG(used << "/" << buffer.getNumSamples() << " samples used");
 
         // resampleBuffer->clear(i, 0, resampleBuffer->getNumSamples());
         // resampleBuffer->copyFrom(i, 0)
     }
+    colonyBufferWriteIdx = (colonyBufferWriteIdx + numInSamples) % (colonyBuffer->getNumSamples()-params.procSpec.maximumBlockSize);
 
     // set up local buffer effects chain processing
     juce::dsp::AudioBlock<float> localBlock(*colonyBuffer);
@@ -87,12 +77,13 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
     // delay.process(procCtx);
 }
 
+// TODO: get rid of the n
+// TODO: implement multichannel interleaving
 float Colony::getSampleN(int channel, int n)
 {
-    // delay.setDelay(delayInSamples.getNextValue());
-    delay.pushSample(channel, colonyBuffer->getSample(channel, n));
-    return delay.popSample(channel, delayInSamples.getNextValue()) * gain.getNextValue();
-    // return colonyBuffer->getSample(channel, n) * gain.getNextValue();
+    float ret = colonyBuffer->getSample(channel, colonyBufferReadIdx) * gain.getNextValue();
+    colonyBufferReadIdx = ((colonyBufferReadIdx+1) % colonyBufferReadLength) + colonyBufferReadStart;
+    return ret;
 }
 
 void Colony::toggleState(bool value)
@@ -120,11 +111,4 @@ bool Colony::isAlive()
 float Colony::getGain()
 {
     return gain.getCurrentValue();
-}
-
-void Colony::setDelayTime(float sec)
-{   
-    // TODO: ramp down gain here to minimize audible delay modulation effect
-    DBG("Setting delay to: " << sec << " seconds");
-    delayInSamples.setTargetValue(sec * params.procSpec.sampleRate);
 }

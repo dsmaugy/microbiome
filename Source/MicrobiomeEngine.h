@@ -42,4 +42,9 @@ class MicrobiomeEngine
         // TODO: should probably be renamed to aliveColonies with current use case
         int activeColonies;
         EngineParams params;
+
+        std::unique_ptr<juce::AudioBuffer<float>> delayBuffer;
+        int delayWriteIdx = 0;
+        // TODO: this is just for debuggin
+        int delayReadIdx = 0;
 };
