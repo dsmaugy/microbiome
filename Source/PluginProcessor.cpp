@@ -182,6 +182,7 @@ void MicrobiomeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     //     }
     // }
 
+    // TODO: return immediately if no samples
     engine.processAudio(buffer);
     // testVerb.processStereo(buffer.getWritePointer(0), buffer.getWritePointer(1), buffer.getNumSamples());
 }

@@ -46,15 +46,25 @@ class Colony
             ALIVE,
             RAMP_UP,
             RAMP_DOWN,
+            RAMP_DOWN_MODIFY, // when the colony is tuning down its gain to modulate some parameters
             DEAD
         };
         Colony::State currentState = Colony::State::DEAD;
-
-        juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> delay;
+        
+        // TODO: change this back to linear if its not doing anything
+        juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Lagrange3rd> delay;
+        juce::Interpolators::Lagrange resampler[MAX_CHANNELS];
         std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;
+        
+        // holds leftover samples from downsampling techniques 
+        std::unique_ptr<juce::AudioBuffer<float>> resampleBuffer;
+        // index into the END of leftover samples section
+        int resampleIndex = 0;
 
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gain;
-        juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> delayInSamples;
+        juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> delayInSamples;
+
+        juce::Random rng;
 
         ColonyParams params;
 
