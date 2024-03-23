@@ -55,8 +55,8 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
             for (int j = 0; j < MAX_COLONY; j++) {
                 // can't break out early from checking appliedColonies because some colonies may be ramping down
                 if (colony[j].isActive()) {
-                     //channelData[i] += colony[j].getSampleN(channel, i);
-                    channelData[i] = colony[j].getSampleN(channel, i);
+                     channelData[i] += colony[j].getSampleN(channel, i);
+                    // channelData[i] = colony[j].getSampleN(channel, i);
                     // channelData[i] += delayBuffer->getSample(channel, delayReadIdx);
                 }
             }

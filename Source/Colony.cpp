@@ -12,6 +12,7 @@
 
 #define GAIN_FADE_TIME 0.5
 #define COLONY_BUFFER_LENGTH_SEC 5
+#define RESAMPLE_FADE 0.5
 
 Colony::Colony() 
 {
@@ -31,6 +32,7 @@ void Colony::prepare(const ColonyParams& params)
     gain.setCurrentAndTargetValue(0);
     gain.setTargetValue(params.initialGain);
 
+    resampleRatio.reset(params.procSpec.sampleRate, RESAMPLE_FADE);
     resampleRatio.setCurrentAndTargetValue(params.initialResampleRatio);
 
     // perform all channel-dependent init operations
@@ -53,15 +55,19 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         //colonyBufferWriteIdx[i] = (colonyBufferWriteIdx[i] + numInSamples) % (colonyBuffer->getNumSamples() - params.procSpec.maximumBlockSize);
 
         // resample copy
-        auto numOutputSamples = numInSamples; // TODO: this could be an arbitrary number as long as its above block size
+        int numOutputSamples = numInSamples; // TODO: this could be an arbitrary number as long as its above block size
+        // int numConsumedSamples = numOutputSamples * resampleRatio.getCurrentValue();
+        int sampleLimit = std::max(params.delayBuffer->getNumSamples(), resampleStart + resampleLength);
+
         int used = resampler[i].process(resampleRatio.getCurrentValue(),
             params.delayBuffer->getReadPointer(i) + resampleIdx[i],
             colonyBuffer->getWritePointer(i) + colonyBufferWriteIdx[i], 
-            numOutputSamples);
+            numOutputSamples, 
+            sampleLimit - resampleIdx[i], 
+            0);
         resampleIdx[i] += used;
-        if (resampleIdx[i] > resampleStart + resampleLength) {
+        if (resampleIdx[i] >= sampleLimit) {
             resampleIdx[i] = resampleStart;
-            // TODO: keep track of overflow here?
         }
         colonyBufferWriteIdx[i] = (colonyBufferWriteIdx[i] + numOutputSamples) % (colonyBuffer->getNumSamples() - params.procSpec.maximumBlockSize);
         
