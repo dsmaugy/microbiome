@@ -31,7 +31,7 @@ void Colony::prepare(const ColonyParams& params)
     gain.setCurrentAndTargetValue(0);
     gain.setTargetValue(params.initialGain);
 
-    resampleRatio = params.initialResampleRatio;
+    resampleRatio.setCurrentAndTargetValue(params.initialResampleRatio);
 
     // perform all channel-dependent init operations
     for (int i = 0; i < MAX_CHANNELS; i++) {
@@ -54,20 +54,23 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
 
         // resample copy
         auto numOutputSamples = numInSamples; // TODO: this could be an arbitrary number as long as its above block size
-
-        //resampleIdx[i] = resampleIdx[i] % params.delayBuffer->getNumSamples();
-        int used = resampler[i].process(resampleRatio, 
-            params.delayBuffer->getReadPointer(i) + resampleStart + resampleIdx[i],
+        int used = resampler[i].process(resampleRatio.getCurrentValue(),
+            params.delayBuffer->getReadPointer(i) + resampleIdx[i],
             colonyBuffer->getWritePointer(i) + colonyBufferWriteIdx[i], 
             numOutputSamples);
-         resampleIdx[i] = (resampleIdx[i] + used) % (params.delayBuffer->getNumSamples() - params.procSpec.maximumBlockSize);
-         colonyBufferWriteIdx[i] = (colonyBufferWriteIdx[i] + numOutputSamples) % (colonyBuffer->getNumSamples() - params.procSpec.maximumBlockSize);
+        resampleIdx[i] += used;
+        if (resampleIdx[i] > resampleStart + resampleLength) {
+            resampleIdx[i] = resampleStart;
+            // TODO: keep track of overflow here?
+        }
+        colonyBufferWriteIdx[i] = (colonyBufferWriteIdx[i] + numOutputSamples) % (colonyBuffer->getNumSamples() - params.procSpec.maximumBlockSize);
         
-        // DBG(used << "/" << buffer.getNumSamples() << " samples used");
+         DBG(used << "/" << resampleLength << " samples used");
 
         // resampleBuffer->clear(i, 0, resampleBuffer->getNumSamples());
         // resampleBuffer->copyFrom(i, 0)
     }
+    resampleRatio.skip(numInSamples);
 
     // set up local buffer effects chain processing
     juce::dsp::AudioBlock<float> localBlock(*colonyBuffer);
@@ -88,7 +91,6 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
 }
 
 // TODO: get rid of the n
-// TODO: implement multichannel interleaving
 float Colony::getSampleN(int channel, int n)
 {
     float ret = colonyBuffer->getSample(channel, colonyBufferReadIdx[channel]) * gain.getNextValue();
@@ -122,4 +124,9 @@ bool Colony::isAlive()
 float Colony::getGain()
 {
     return gain.getCurrentValue();
+}
+
+void Colony::setResampleRatio(float ratio)
+{
+    resampleRatio.setTargetValue(ratio);
 }

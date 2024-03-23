@@ -115,3 +115,8 @@ void MicrobiomeEngine::setColonyDelayTime(int n, float sec)
 {
     // colony[n].setDelayTime(sec);
 }
+
+void MicrobiomeEngine::setColonyResampleRatio(int n, float ratio)
+{
+    colony[n].setResampleRatio(ratio);
+}

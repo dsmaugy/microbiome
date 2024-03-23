@@ -36,6 +36,7 @@ class MicrobiomeEngine
         void addColony();
 
         void setColonyDelayTime(int n, float sec);
+        void setColonyResampleRatio(int n, float ratio);
 
     private:
         Colony colony[MAX_COLONY];
