@@ -20,7 +20,7 @@ struct ColonyParams
     juce::AudioBuffer<float>* delayBuffer; // global delay buffer, should be only READING samples
 
     float initialGain = 0.5;
-    float initialResampleRatio = 0.6;
+    float initialResampleRatio = 0.65;
 
     ColonyParams(juce::dsp::ProcessSpec spec, juce::AudioBuffer<float>* buffer) : procSpec(spec), delayBuffer(buffer) {}
     ColonyParams() {}
@@ -68,13 +68,14 @@ class Colony
         juce::Interpolators::Lagrange resampler[MAX_CHANNELS];
         std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;
 
-        int colonyBufferWriteIdx = 0;
-        int colonyBufferReadIdx = 0;
+        int colonyBufferWriteIdx[MAX_CHANNELS];
+        int colonyBufferReadIdx[MAX_CHANNELS];
         int colonyBufferReadStart = 0;
         int colonyBufferReadLength = 132300;
-
-        int resampleStart;
-        int resampleLength;
+        
+        int resampleIdx[MAX_CHANNELS];
+        int resampleStart = 0;
+        int resampleLength = 132300;
         float resampleRatio;
         
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gain;
