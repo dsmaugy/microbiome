@@ -37,6 +37,7 @@ class MicrobiomeEngine
 
         void setColonyDelayTime(int n, float sec);
         void setColonyResampleRatio(int n, float ratio);
+        void setBPM(double bpm);
 
     private:
         Colony colony[MAX_COLONY];
@@ -48,4 +49,6 @@ class MicrobiomeEngine
         int delayWriteIdx = 0;
         // TODO: this is just for debuggin
         int delayReadIdx = 0;
+
+        double currentBpm = 0;
 };

@@ -65,10 +65,11 @@ class Colony
             DEAD
         };
         Colony::State currentState = Colony::State::DEAD;
-        
+        std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;
+
         // TODO: change this back to linear if its not doing anything
         juce::Interpolators::Lagrange resampler[MAX_CHANNELS];
-        std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;
+        juce::dsp::LadderFilter<float> ladder;
 
         int colonyBufferWriteIdx[MAX_CHANNELS];
         int colonyBufferReadIdx[MAX_CHANNELS];
@@ -78,9 +79,9 @@ class Colony
         int resampleIdx[MAX_CHANNELS];
         int resampleStart = 0;
         int resampleLength = 132300;
-        //float resampleRatio;
         
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gain;
+        juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> loopFade;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> resampleRatio;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> delayInSamples;
 

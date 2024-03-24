@@ -32,8 +32,15 @@ void Colony::prepare(const ColonyParams& params)
     gain.setCurrentAndTargetValue(0);
     gain.setTargetValue(params.initialGain);
 
+    loopFade.reset(params.procSpec.sampleRate, 0.15);
+    loopFade.setCurrentAndTargetValue(0);
+
     resampleRatio.reset(params.procSpec.sampleRate, RESAMPLE_FADE);
     resampleRatio.setCurrentAndTargetValue(params.initialResampleRatio);
+
+    ladder.setMode(juce::dsp::LadderFilterMode::LPF12);
+    ladder.prepare(params.procSpec);
+    ladder.setCutoffFrequencyHz(1000);
 
     // perform all channel-dependent init operations
     for (int i = 0; i < MAX_CHANNELS; i++) {
@@ -49,15 +56,14 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
     // copy data to local colony buffer so we don't modify the original signal
     int numChannels = buffer.getNumChannels();
     int numInSamples = buffer.getNumSamples();
+    int numOutputSamples = std::min(numInSamples, colonyBuffer->getNumSamples() - colonyBufferWriteIdx[0]); // TODO: this could be an arbitrary number as long as its above block size
     for (int i = 0; i < numChannels; i++) {
         // pure copy
         //colonyBuffer->copyFrom(i, colonyBufferWriteIdx[i], buffer, i, 0, numInSamples);
         //colonyBufferWriteIdx[i] = (colonyBufferWriteIdx[i] + numInSamples) % (colonyBuffer->getNumSamples() - params.procSpec.maximumBlockSize);
 
         // resample copy
-        int numOutputSamples = numInSamples; // TODO: this could be an arbitrary number as long as its above block size
-        // int numConsumedSamples = numOutputSamples * resampleRatio.getCurrentValue();
-        int sampleLimit = std::max(params.delayBuffer->getNumSamples(), resampleStart + resampleLength);
+        int sampleLimit = std::max(params.delayBuffer->getNumSamples()-1, resampleStart + resampleLength);
 
         int used = resampler[i].process(resampleRatio.getCurrentValue(),
             params.delayBuffer->getReadPointer(i) + resampleIdx[i],
@@ -69,18 +75,10 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         if (resampleIdx[i] >= sampleLimit) {
             resampleIdx[i] = resampleStart;
         }
-        colonyBufferWriteIdx[i] = (colonyBufferWriteIdx[i] + numOutputSamples) % (colonyBuffer->getNumSamples() - params.procSpec.maximumBlockSize);
         
-         DBG(used << "/" << resampleLength << " samples used");
-
-        // resampleBuffer->clear(i, 0, resampleBuffer->getNumSamples());
-        // resampleBuffer->copyFrom(i, 0)
+        DBG(used << "/" << resampleLength << " samples used");
     }
     resampleRatio.skip(numInSamples);
-
-    // set up local buffer effects chain processing
-    juce::dsp::AudioBlock<float> localBlock(*colonyBuffer);
-    juce::dsp::ProcessContextReplacing<float> procCtx(localBlock);
 
     if (!gain.isSmoothing() && currentState == Colony::State::RAMP_DOWN) {
         // gain should be 0 here anyways
@@ -88,20 +86,36 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         currentState = Colony::State::DEAD;
     }
 
+    // set up local buffer effects chain processing
+    juce::dsp::AudioBlock<float> localBlock(colonyBuffer->getArrayOfWritePointers(), colonyBuffer->getNumChannels(), colonyBufferWriteIdx[0], numOutputSamples);
+    juce::dsp::ProcessContextReplacing<float> procCtx(localBlock);
+
+    //ladder.process(procCtx);
+
     // if (rng.nextFloat() < 0.005) {
     //     DBG("Setting new random delay!");
     //     delayInSamples.setTargetValue(rng.nextInt(params.procSpec.sampleRate * 15) + params.procSpec.sampleRate);
     // }
-    // delay.setDelay(delayInSamples.skip(buffer.getNumSamples()));
-    // delay.process(procCtx);
+
+    // update write indices
+    for (int i = 0; i < MAX_CHANNELS; i++) {
+        colonyBufferWriteIdx[i] = (colonyBufferWriteIdx[i] + numOutputSamples) % colonyBuffer->getNumSamples();
+    }
 }
 
 // TODO: get rid of the n
 float Colony::getSampleN(int channel, int n)
 {
-    float ret = colonyBuffer->getSample(channel, colonyBufferReadIdx[channel]) * gain.getNextValue();
-    colonyBufferReadIdx[channel] = ((colonyBufferReadIdx[channel] + 1) % colonyBufferReadLength) + colonyBufferReadStart;
+    // TODO: fade gain when approaching end/start of sample loop
+    float ret = colonyBuffer->getSample(channel, colonyBufferReadIdx[channel]) * gain.getNextValue();// *loopFade.getNextValue();
+    colonyBufferReadIdx[channel] = ((colonyBufferReadIdx[channel] + 1) % (colonyBufferReadLength + colonyBufferReadStart)) + colonyBufferReadStart;
 
+    if (colonyBufferReadIdx[channel] == colonyBufferReadStart) {
+        // playing from beginning of loop, need to fade in
+        loopFade.setTargetValue(1);
+    } else if (colonyBufferReadIdx[channel] == (colonyBufferReadLength + colonyBufferReadStart) * 0.85) {
+        loopFade.setTargetValue(0);
+    }
     return ret;
 }
 
