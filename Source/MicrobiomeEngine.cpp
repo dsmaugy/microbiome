@@ -21,7 +21,10 @@ void MicrobiomeEngine::prepare(const EngineParams& params)
 {
     this->params = params;
 
+    // TODO: prepare might get called more than once, we need to only reset things if sampleRate changed
     delayBuffer = std::make_unique<juce::AudioBuffer<float>>(MAX_CHANNELS, MAX_DELAY_SECONDS * params.procSpec.sampleRate);
+    // without clearing there are audible pops at initialization with using IIR filters
+    delayBuffer->clear();
 
     for (int i = 0; i < MAX_COLONY; i++) {
         ColonyParams colonyParams(params.procSpec, delayBuffer.get());

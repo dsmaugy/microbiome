@@ -24,7 +24,10 @@ void Colony::prepare(const ColonyParams& params)
 {
     this->params = params;
 
+    // TODO: prepare might get called more than once, we need to only reset things if sampleRate changed
     colonyBuffer = std::make_unique<juce::AudioBuffer<float>>(MAX_CHANNELS, params.procSpec.sampleRate * COLONY_BUFFER_LENGTH_SEC);
+    colonyBuffer->clear();
+
     std::stringstream bufferAddr;
     bufferAddr << std::hex << reinterpret_cast<std::uintptr_t>(colonyBuffer.get());
     DBG("Colony buffer created at: 0x" << bufferAddr.str());
@@ -92,10 +95,9 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         resampleRatio.skip(numInSamples);
 
         // set up local buffer effects chain processing
-        juce::dsp::AudioBlock<float> localBlock(colonyBuffer->getArrayOfWritePointers(), colonyBuffer->getNumChannels(), colonyBufferWriteIdx[0], numOutputSamples);
+        juce::dsp::AudioBlock<float> localBlock(colonyBuffer->getArrayOfWritePointers(), colonyBuffer->getNumChannels(), colonyBufferWriteProcStart, numOutputSamples);
         juce::dsp::ProcessContextReplacing<float> procCtx(localBlock);
 
-        // TODO: solve clicking on empty sound
         ladder.process(procCtx);
 
         // if (rng.nextFloat() < 0.005) {
@@ -118,7 +120,6 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
 // TODO: get rid of the n
 float Colony::getSampleN(int channel, int n)
 {
-    // TODO: don't play when processing not done?!?
     float ret = colonyBuffer->getSample(channel, colonyBufferReadIdx[channel]) * gain.getNextValue() * loopFade.getNextValue();
     colonyBufferReadIdx[channel] = ((colonyBufferReadIdx[channel] + 1) % colonyBufferReadLimit) + colonyBufferReadStart;
 
