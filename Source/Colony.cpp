@@ -9,10 +9,11 @@
 */
 
 #include "Colony.h"
+#include "Constants.h"
 
 #define GAIN_FADE_TIME 0.5
-#define COLONY_BUFFER_LENGTH_SEC 5
 #define RESAMPLE_FADE 0.5
+#define LOOP_FADE_TIME 0.4
 
 Colony::Colony() 
 {
@@ -32,11 +33,12 @@ void Colony::prepare(const ColonyParams& params)
     gain.setCurrentAndTargetValue(0);
     gain.setTargetValue(params.initialGain);
 
-    loopFade.reset(params.procSpec.sampleRate, 0.15);
+    loopFade.reset(params.procSpec.sampleRate, LOOP_FADE_TIME);
     loopFade.setCurrentAndTargetValue(0);
 
     resampleRatio.reset(params.procSpec.sampleRate, RESAMPLE_FADE);
     resampleRatio.setCurrentAndTargetValue(params.initialResampleRatio);
+    resampleLength = colonyBuffer->getNumSamples();
 
     ladder.setMode(juce::dsp::LadderFilterMode::LPF12);
     ladder.prepare(params.procSpec);
@@ -53,69 +55,81 @@ void Colony::prepare(const ColonyParams& params)
 
 void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
 {
-    // copy data to local colony buffer so we don't modify the original signal
-    int numChannels = buffer.getNumChannels();
-    int numInSamples = buffer.getNumSamples();
-    int numOutputSamples = std::min(numInSamples, colonyBuffer->getNumSamples() - colonyBufferWriteIdx[0]); // TODO: this could be an arbitrary number as long as its above block size
-    for (int i = 0; i < numChannels; i++) {
-        // pure copy
-        //colonyBuffer->copyFrom(i, colonyBufferWriteIdx[i], buffer, i, 0, numInSamples);
-        //colonyBufferWriteIdx[i] = (colonyBufferWriteIdx[i] + numInSamples) % (colonyBuffer->getNumSamples() - params.procSpec.maximumBlockSize);
-
-        // resample copy
-        int sampleLimit = std::max(params.delayBuffer->getNumSamples()-1, resampleStart + resampleLength);
-
-        int used = resampler[i].process(resampleRatio.getCurrentValue(),
-            params.delayBuffer->getReadPointer(i) + resampleIdx[i],
-            colonyBuffer->getWritePointer(i) + colonyBufferWriteIdx[i], 
-            numOutputSamples, 
-            sampleLimit - resampleIdx[i], 
-            0);
-        resampleIdx[i] += used;
-        if (resampleIdx[i] >= sampleLimit) {
-            resampleIdx[i] = resampleStart;
-        }
-        
-        DBG(used << "/" << resampleLength << " samples used");
-    }
-    resampleRatio.skip(numInSamples);
-
+    // update states
     if (!gain.isSmoothing() && currentState == Colony::State::RAMP_DOWN) {
         // gain should be 0 here anyways
         DBG("Setting colony to DEAD");
         currentState = Colony::State::DEAD;
     }
 
-    // set up local buffer effects chain processing
-    juce::dsp::AudioBlock<float> localBlock(colonyBuffer->getArrayOfWritePointers(), colonyBuffer->getNumChannels(), colonyBufferWriteIdx[0], numOutputSamples);
-    juce::dsp::ProcessContextReplacing<float> procCtx(localBlock);
+    if (!doneProcessing) {
+        // copy data to local colony buffer so we don't modify the original signal
+        int numChannels = buffer.getNumChannels();
+        int numInSamples = buffer.getNumSamples();
+        int numOutputSamples = std::min(numInSamples, colonyBuffer->getNumSamples() - colonyBufferWriteIdx[0]); // TODO: this could be an arbitrary number as long as its above block size
+        int colonyBufferWriteProcStart = colonyBufferWriteIdx[0];
+        for (int i = 0; i < numChannels; i++) {
+            // pure copy
+            //colonyBuffer->copyFrom(i, colonyBufferWriteIdx[i], buffer, i, 0, numInSamples);
+            //colonyBufferWriteIdx[i] = (colonyBufferWriteIdx[i] + numInSamples) % (colonyBuffer->getNumSamples() - params.procSpec.maximumBlockSize);
 
-    //ladder.process(procCtx);
+            // resample copy
+            int sampleLimit = std::max(params.delayBuffer->getNumSamples() - 1, resampleStart + resampleLength);
 
-    // if (rng.nextFloat() < 0.005) {
-    //     DBG("Setting new random delay!");
-    //     delayInSamples.setTargetValue(rng.nextInt(params.procSpec.sampleRate * 15) + params.procSpec.sampleRate);
-    // }
+            int used = resampler[i].process(resampleRatio.getCurrentValue(),
+                params.delayBuffer->getReadPointer(i) + resampleIdx[i],
+                colonyBuffer->getWritePointer(i) + colonyBufferWriteIdx[i],
+                numOutputSamples,
+                sampleLimit - resampleIdx[i],
+                0);
+            resampleIdx[i] += used;
+            if (resampleIdx[i] >= sampleLimit) {
+                resampleIdx[i] = resampleStart;
+            }
 
-    // update write indices
-    for (int i = 0; i < MAX_CHANNELS; i++) {
-        colonyBufferWriteIdx[i] = (colonyBufferWriteIdx[i] + numOutputSamples) % colonyBuffer->getNumSamples();
+            //DBG(used << "/" << resampleLength << " samples used");
+        }
+        resampleRatio.skip(numInSamples);
+
+        // set up local buffer effects chain processing
+        juce::dsp::AudioBlock<float> localBlock(colonyBuffer->getArrayOfWritePointers(), colonyBuffer->getNumChannels(), colonyBufferWriteIdx[0], numOutputSamples);
+        juce::dsp::ProcessContextReplacing<float> procCtx(localBlock);
+
+        // TODO: solve clicking on empty sound
+        ladder.process(procCtx);
+
+        // if (rng.nextFloat() < 0.005) {
+        //     DBG("Setting new random delay!");
+        //     delayInSamples.setTargetValue(rng.nextInt(params.procSpec.sampleRate * 15) + params.procSpec.sampleRate);
+        // }
+
+        // update write indices
+        for (int i = 0; i < MAX_CHANNELS; i++) {
+            colonyBufferWriteIdx[i] = (colonyBufferWriteIdx[i] + numOutputSamples) % colonyBuffer->getNumSamples();
+        }
+
+        if (colonyBufferWriteIdx[0] < colonyBufferWriteProcStart) {
+            DBG("Done processing colony!");
+            doneProcessing = true;
+        }
     }
 }
 
 // TODO: get rid of the n
 float Colony::getSampleN(int channel, int n)
 {
-    // TODO: fade gain when approaching end/start of sample loop
-    float ret = colonyBuffer->getSample(channel, colonyBufferReadIdx[channel]) * gain.getNextValue();// *loopFade.getNextValue();
-    colonyBufferReadIdx[channel] = ((colonyBufferReadIdx[channel] + 1) % (colonyBufferReadLength + colonyBufferReadStart)) + colonyBufferReadStart;
+    // TODO: don't play when processing not done?!?
+    float ret = colonyBuffer->getSample(channel, colonyBufferReadIdx[channel]) * gain.getNextValue() * loopFade.getNextValue();
+    colonyBufferReadIdx[channel] = ((colonyBufferReadIdx[channel] + 1) % colonyBufferReadLimit) + colonyBufferReadStart;
 
+    // fade loops in/out
     if (colonyBufferReadIdx[channel] == colonyBufferReadStart) {
-        // playing from beginning of loop, need to fade in
         loopFade.setTargetValue(1);
-    } else if (colonyBufferReadIdx[channel] == (colonyBufferReadLength + colonyBufferReadStart) * 0.85) {
-        loopFade.setTargetValue(0);
     }
+    else if (colonyBufferReadIdx[channel] == (colonyBufferReadLength + colonyBufferReadStart) * 0.75) {
+        loopFade.setTargetValue(0.35);
+    }
+
     return ret;
 }
 
@@ -124,6 +138,7 @@ void Colony::toggleState(bool value)
     if (value && !isActive()) {
         currentState = Colony::State::ALIVE;
         gain.setTargetValue(params.initialGain);
+        doneProcessing = false; // if we revive this colony again it should start processing right away
     } else if (!value && isActive()) {
         currentState = Colony::State::RAMP_DOWN;
         DBG("Ramping down colony");
@@ -149,4 +164,37 @@ float Colony::getGain()
 void Colony::setResampleRatio(float ratio)
 {
     resampleRatio.setTargetValue(ratio);
+    doneProcessing = false;
+}
+
+// TODO: this shit does not work
+void Colony::setColonyBufferReadStart(float startSec)
+{
+    //colonyBufferReadStart = (int) (startSec * params.procSpec.sampleRate);
+    //colonyBufferReadLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples());
+    //DBG("New Read Start: " << colonyBufferReadStart << " (sec= " << startSec << ")");
+
+    //for (int i = 0; i < MAX_CHANNELS; i++) {
+    //    colonyBufferReadIdx[i] = colonyBufferReadStart;
+    //}
+}
+
+void Colony::setColonyBufferReadLength(float lengthSec)
+{
+    colonyBufferReadLength = (int) (lengthSec * params.procSpec.sampleRate);
+    colonyBufferReadLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples());
+    DBG("New Read Limit: " << colonyBufferReadLimit << " (sec= " << lengthSec << ")");
+    doneProcessing = false;
+}
+
+// TODO: this prob has to be locked somehow
+void Colony::setResampleStart(float startSec)
+{
+    resampleStart = (int) (startSec * params.procSpec.sampleRate);
+    doneProcessing = false;
+}
+
+void Colony::setResampleLength(float length)
+{
+
 }

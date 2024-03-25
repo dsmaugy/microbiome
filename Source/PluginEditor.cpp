@@ -18,14 +18,29 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor (MicrobiomeAudioP
     // editor's size to whatever you need it to be.
     setSize (400, 300);
 
-    reverbWet.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    reverbWet.setRange(0.5, 1.3, 0.01);
-    reverbWet.setValue(1);
-    reverbWet.setRotaryParameters(3 * juce::MathConstants<float>::pi / 2, 5*juce::MathConstants<float>::pi / 2, true);
-    reverbWet.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
-    
-    reverbWet.setPopupDisplayEnabled(true, true, this);
-    reverbWet.addListener(this);
+    resampleRatio.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    resampleRatio.setRange(0.5, 1.3, 0.01);
+    resampleRatio.setValue(1);
+    resampleRatio.setRotaryParameters(3 * juce::MathConstants<float>::pi / 2, 5*juce::MathConstants<float>::pi / 2, true);
+    resampleRatio.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
+    resampleRatio.setPopupDisplayEnabled(true, true, this);
+    resampleRatio.addListener(this);
+
+    colonyBufferReadLength.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    colonyBufferReadLength.setRange(0.5, COLONY_BUFFER_LENGTH_SEC, 0.01);
+    colonyBufferReadLength.setValue(1);
+    colonyBufferReadLength.setRotaryParameters(3 * juce::MathConstants<float>::pi / 2, 5 * juce::MathConstants<float>::pi / 2, true);
+    colonyBufferReadLength.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
+    colonyBufferReadLength.setPopupDisplayEnabled(true, true, this);
+    colonyBufferReadLength.addListener(this);
+
+    colonyBufferReadStart.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    colonyBufferReadStart.setRange(0.5, COLONY_BUFFER_LENGTH_SEC, 0.01);
+    colonyBufferReadStart.setValue(1);
+    colonyBufferReadStart.setRotaryParameters(3 * juce::MathConstants<float>::pi / 2, 5 * juce::MathConstants<float>::pi / 2, true);
+    colonyBufferReadStart.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
+    colonyBufferReadStart.setPopupDisplayEnabled(true, true, this);
+    colonyBufferReadStart.addListener(this);
 
     addColony.setButtonText("+ Colony");
     removeColony.setButtonText("- Colony");
@@ -33,9 +48,11 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor (MicrobiomeAudioP
     addColony.addListener(this);
     removeColony.addListener(this);
   
-    addAndMakeVisible(reverbWet);
+    addAndMakeVisible(resampleRatio);
     addAndMakeVisible(addColony);
     addAndMakeVisible(removeColony);
+    addAndMakeVisible(colonyBufferReadLength);
+    addAndMakeVisible(colonyBufferReadStart);
 }
 
 MicrobiomeAudioProcessorEditor::~MicrobiomeAudioProcessorEditor()
@@ -58,7 +75,9 @@ void MicrobiomeAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-    reverbWet.setBounds(200-35, 100, 70, 70);
+    resampleRatio.setBounds(200-35, 100, 70, 70);
+    colonyBufferReadLength.setBounds(100, 100, 70, 70);
+    colonyBufferReadStart.setBounds(250, 100, 70, 70);
 
     addColony.setBounds(50, 50, 70, 35);
     removeColony.setBounds(150, 50, 70, 35);
@@ -66,9 +85,15 @@ void MicrobiomeAudioProcessorEditor::resized()
 
 void MicrobiomeAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) 
 {
-    if (slider == &reverbWet) {
+    if (slider == &resampleRatio) {
         // TODO: set this based off of currently selected colony
         audioProcessor.getEngine().setColonyResampleRatio(0, slider->getValue());
+    }
+    else if (slider == &colonyBufferReadLength) {
+        audioProcessor.getEngine().setColonyBufferLength(0, slider->getValue());
+    }
+    else if (slider == &colonyBufferReadStart) {
+        audioProcessor.getEngine().setColonyBufferStart(0, slider->getValue());
     }
     // audioProcessor.setReverbWet(slider->getValue());
 }

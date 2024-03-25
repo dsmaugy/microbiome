@@ -32,7 +32,9 @@ private:
     // access the processor object that created it.
     MicrobiomeAudioProcessor& audioProcessor;
 
-    juce::Slider reverbWet;
+    juce::Slider resampleRatio;
+    juce::Slider colonyBufferReadLength;
+    juce::Slider colonyBufferReadStart;
     juce::TextButton addColony = juce::TextButton("Add Colony");
     juce::TextButton removeColony = juce::TextButton("Remove Colony");
 

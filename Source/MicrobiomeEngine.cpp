@@ -125,3 +125,18 @@ void MicrobiomeEngine::setBPM(double bpm)
 {
     currentBpm = bpm;
 }
+
+void MicrobiomeEngine::setColonyResampleStart(int n, float start)
+{
+    colony[n].setResampleStart(start);
+}
+
+void MicrobiomeEngine::setColonyBufferStart(int n, float startSec)
+{
+    colony[n].setColonyBufferReadStart(startSec);
+}
+
+void MicrobiomeEngine::setColonyBufferLength(int n, float lengthSec)
+{
+    colony[n].setColonyBufferReadLength(lengthSec);
+}

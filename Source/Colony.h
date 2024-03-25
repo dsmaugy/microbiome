@@ -54,6 +54,10 @@ class Colony
         float getGain();
 
         void setResampleRatio(float ratio);
+        void setColonyBufferReadStart(float startSec);
+        void setColonyBufferReadLength(float lengthSec);
+        void setResampleStart(float startSec);
+        void setResampleLength(float lengthSec);
 
     private:
         enum class State
@@ -67,18 +71,20 @@ class Colony
         Colony::State currentState = Colony::State::DEAD;
         std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;
 
-        // TODO: change this back to linear if its not doing anything
         juce::Interpolators::Lagrange resampler[MAX_CHANNELS];
         juce::dsp::LadderFilter<float> ladder;
+
+        bool doneProcessing = false;
 
         int colonyBufferWriteIdx[MAX_CHANNELS];
         int colonyBufferReadIdx[MAX_CHANNELS];
         int colonyBufferReadStart = 0;
         int colonyBufferReadLength = 132300;
+        int colonyBufferReadLimit = 132300;
         
         int resampleIdx[MAX_CHANNELS];
         int resampleStart = 0;
-        int resampleLength = 132300;
+        int resampleLength = 132300; // TODO: this doesn't really do anything
         
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gain;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> loopFade;

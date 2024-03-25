@@ -183,7 +183,7 @@ void MicrobiomeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     // }
 
     // TODO: return immediately if no samples
-
+    // TODO: solve ableton maxing out at beginning
     engine.setBPM(getPlayHead()->getPosition()->getBpm().orFallback(0));
     engine.processAudio(buffer);
     // testVerb.processStereo(buffer.getWritePointer(0), buffer.getWritePointer(1), buffer.getNumSamples());
