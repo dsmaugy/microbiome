@@ -123,6 +123,8 @@ float Colony::getSampleN(int channel, int n)
     float ret = colonyBuffer->getSample(channel, colonyBufferReadIdx[channel]) * gain.getNextValue() * loopFade.getNextValue();
     colonyBufferReadIdx[channel] = ((colonyBufferReadIdx[channel] + 1) % colonyBufferReadLimit) + colonyBufferReadStart;
 
+
+    DBG("[CH= " << channel << "] Read Idx: " << colonyBufferReadIdx[channel] << "\tRead Limit: " << colonyBufferReadLimit << "\tRead Start: " << colonyBufferReadStart);
     // fade loops in/out
     if (colonyBufferReadIdx[channel] == colonyBufferReadStart) {
         loopFade.setTargetValue(1);
@@ -171,8 +173,8 @@ void Colony::setResampleRatio(float ratio)
 // TODO: this shit does not work
 void Colony::setColonyBufferReadStart(float startSec)
 {
-    //colonyBufferReadStart = (int) (startSec * params.procSpec.sampleRate);
-    //colonyBufferReadLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples());
+    colonyBufferReadStart = (int) (startSec * params.procSpec.sampleRate);
+    colonyBufferReadLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples());
     //DBG("New Read Start: " << colonyBufferReadStart << " (sec= " << startSec << ")");
 
     //for (int i = 0; i < MAX_CHANNELS; i++) {
