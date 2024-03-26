@@ -120,9 +120,9 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
 // TODO: get rid of the n
 float Colony::getSampleN(int channel, int n)
 {
-    DBG("[CH= " << channel << "] Read Idx: " << colonyBufferReadOffset[channel] << "\tRead Limit: " << colonyBufferReadLimit << "\tRead Start: " << colonyBufferReadStart);
-    float ret = colonyBuffer->getSample(channel, colonyBufferReadOffset[channel + colonyBufferReadStart]) * gain.getNextValue() * loopFade.getNextValue();
-    colonyBufferReadOffset[channel] = ((colonyBufferReadOffset[channel] + 1) % colonyBufferReadLimit);
+    //DBG("[CH= " << channel << "] Read Idx: " << colonyBufferReadOffset[channel] << "\tRead Limit: " << colonyBufferReadLimit << "\tRead Start: " << colonyBufferReadStart);
+    float ret = colonyBuffer->getSample(channel, colonyBufferReadOffset[channel] + colonyBufferReadStart) * gain.getNextValue() * loopFade.getNextValue();
+    colonyBufferReadOffset[channel] = ((colonyBufferReadOffset[channel] + 1) % colonyBufferReadOffsetLimit);
 
     // fade loops in/out
     if (colonyBufferReadOffset[channel] == colonyBufferReadStart) {
@@ -170,22 +170,19 @@ void Colony::setResampleRatio(float ratio)
 }
 
 // TODO: this shit does not work
+// TODO: need a lock here
 void Colony::setColonyBufferReadStart(float startSec)
 {
     colonyBufferReadStart = (int) (startSec * params.procSpec.sampleRate);
-    colonyBufferReadLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples());
-    //DBG("New Read Start: " << colonyBufferReadStart << " (sec= " << startSec << ")");
-
-    for (int i = 0; i < MAX_CHANNELS; i++) {
-       colonyBufferReadOffset[i] = colonyBufferReadStart;
-    }
+    colonyBufferReadOffsetLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples()) - colonyBufferReadStart;
+    DBG("New Read Start: " << colonyBufferReadStart << " (sec= " << startSec << ")");
 }
 
 void Colony::setColonyBufferReadLength(float lengthSec)
 {
     colonyBufferReadLength = (int) (lengthSec * params.procSpec.sampleRate);
-    colonyBufferReadLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples());
-    DBG("New Read Limit: " << colonyBufferReadLimit << " (sec= " << lengthSec << ")");
+    colonyBufferReadOffsetLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples()) - colonyBufferReadStart;
+    DBG("New Read Limit: " << colonyBufferReadOffsetLimit << " (sec= " << lengthSec << ")");
     doneProcessing = false;
 }
 
