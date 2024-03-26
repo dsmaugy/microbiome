@@ -77,7 +77,7 @@ class Colony
         bool doneProcessing = false;
 
         int colonyBufferWriteIdx[MAX_CHANNELS];
-        int colonyBufferReadIdx[MAX_CHANNELS];
+        int colonyBufferReadOffset[MAX_CHANNELS];
         int colonyBufferReadStart = 0;
         int colonyBufferReadLength = 132300;
         int colonyBufferReadLimit = 132300;

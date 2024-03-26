@@ -51,7 +51,7 @@ void Colony::prepare(const ColonyParams& params)
     for (int i = 0; i < MAX_CHANNELS; i++) {
         resampler[i].reset();
         colonyBufferWriteIdx[i] = 0;
-        colonyBufferReadIdx[i] = 0;
+        colonyBufferReadOffset[i] = 0;
         resampleIdx[i] = 0;
     }
 }
@@ -90,7 +90,7 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
                 resampleIdx[i] = resampleStart;
             }
 
-            //DBG(used << "/" << resampleLength << " samples used");
+            DBG(used << "/" << resampleLength << " samples used");
         }
         resampleRatio.skip(numInSamples);
 
@@ -120,16 +120,15 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
 // TODO: get rid of the n
 float Colony::getSampleN(int channel, int n)
 {
-    float ret = colonyBuffer->getSample(channel, colonyBufferReadIdx[channel]) * gain.getNextValue() * loopFade.getNextValue();
-    colonyBufferReadIdx[channel] = ((colonyBufferReadIdx[channel] + 1) % colonyBufferReadLimit) + colonyBufferReadStart;
+    DBG("[CH= " << channel << "] Read Idx: " << colonyBufferReadOffset[channel] << "\tRead Limit: " << colonyBufferReadLimit << "\tRead Start: " << colonyBufferReadStart);
+    float ret = colonyBuffer->getSample(channel, colonyBufferReadOffset[channel + colonyBufferReadStart]) * gain.getNextValue() * loopFade.getNextValue();
+    colonyBufferReadOffset[channel] = ((colonyBufferReadOffset[channel] + 1) % colonyBufferReadLimit);
 
-
-    DBG("[CH= " << channel << "] Read Idx: " << colonyBufferReadIdx[channel] << "\tRead Limit: " << colonyBufferReadLimit << "\tRead Start: " << colonyBufferReadStart);
     // fade loops in/out
-    if (colonyBufferReadIdx[channel] == colonyBufferReadStart) {
+    if (colonyBufferReadOffset[channel] == colonyBufferReadStart) {
         loopFade.setTargetValue(1);
     }
-    else if (colonyBufferReadIdx[channel] == (colonyBufferReadLength + colonyBufferReadStart) * 0.75) {
+    else if (colonyBufferReadOffset[channel] == (colonyBufferReadLength + colonyBufferReadStart) * 0.75) {
         loopFade.setTargetValue(0.35);
     }
 
@@ -177,9 +176,9 @@ void Colony::setColonyBufferReadStart(float startSec)
     colonyBufferReadLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples());
     //DBG("New Read Start: " << colonyBufferReadStart << " (sec= " << startSec << ")");
 
-    //for (int i = 0; i < MAX_CHANNELS; i++) {
-    //    colonyBufferReadIdx[i] = colonyBufferReadStart;
-    //}
+    for (int i = 0; i < MAX_CHANNELS; i++) {
+       colonyBufferReadOffset[i] = colonyBufferReadStart;
+    }
 }
 
 void Colony::setColonyBufferReadLength(float lengthSec)
