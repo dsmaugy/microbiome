@@ -85,10 +85,11 @@ class Colony
         int resampleIdx[MAX_CHANNELS];
         int resampleStart = 0;
         int resampleLength = 132300; // TODO: this doesn't really do anything
-        
+        juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> resampleRatio;
+
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gain;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> loopFade;
-        juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> resampleRatio;
+        
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> delayInSamples;
 
         juce::Random rng;

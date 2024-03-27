@@ -120,17 +120,17 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
 // TODO: get rid of the n
 float Colony::getSampleN(int channel, int n)
 {
+    // fade loops in/out
+    if (colonyBufferReadOffset[channel] == 0) {
+        loopFade.setTargetValue(1);
+    }
+    else if (colonyBufferReadOffset[channel] == (colonyBufferReadOffsetLimit * 0.75)) {
+        loopFade.setTargetValue(0.35);
+    }
+
     //DBG("[CH= " << channel << "] Read Idx: " << colonyBufferReadOffset[channel] << "\tRead Limit: " << colonyBufferReadLimit << "\tRead Start: " << colonyBufferReadStart);
     float ret = colonyBuffer->getSample(channel, colonyBufferReadOffset[channel] + colonyBufferReadStart) * gain.getNextValue() * loopFade.getNextValue();
     colonyBufferReadOffset[channel] = ((colonyBufferReadOffset[channel] + 1) % colonyBufferReadOffsetLimit);
-
-    // fade loops in/out
-    if (colonyBufferReadOffset[channel] == colonyBufferReadStart) {
-        loopFade.setTargetValue(1);
-    }
-    else if (colonyBufferReadOffset[channel] == (colonyBufferReadLength + colonyBufferReadStart) * 0.75) {
-        loopFade.setTargetValue(0.35);
-    }
 
     return ret;
 }
@@ -169,13 +169,18 @@ void Colony::setResampleRatio(float ratio)
     doneProcessing = false;
 }
 
-// TODO: this shit does not work
-// TODO: need a lock here
+// TODO: need a lock here???
 void Colony::setColonyBufferReadStart(float startSec)
 {
-    colonyBufferReadStart = (int) (startSec * params.procSpec.sampleRate);
+    colonyBufferReadStart = (int)(startSec * params.procSpec.sampleRate);
+    colonyBufferReadStart = std::min(colonyBufferReadStart, colonyBuffer->getNumSamples() - 1); // clamp down start value
     colonyBufferReadOffsetLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples()) - colonyBufferReadStart;
-    DBG("New Read Start: " << colonyBufferReadStart << " (sec= " << startSec << ")");
+    DBG("New Read Start Set: " << colonyBufferReadStart << " (sec= " << startSec << ")");
+    loopFade.setCurrentAndTargetValue(0);
+
+    for (int i = 0; i < MAX_CHANNELS; i++) {
+        colonyBufferReadOffset[i] = 0;
+    }
 }
 
 void Colony::setColonyBufferReadLength(float lengthSec)
