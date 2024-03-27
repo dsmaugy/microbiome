@@ -68,7 +68,14 @@ class Colony
             RAMP_DOWN_MODIFY, // when the colony is tuning down its gain to modulate some parameters
             DEAD
         };
+
+        enum class ProcessMode
+        {
+            LOOP,
+            REGENERATE
+        };
         Colony::State currentState = Colony::State::DEAD;
+        Colony::ProcessMode currentMode = Colony::ProcessMode::REGENERATE;
         std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;
 
         juce::Interpolators::Lagrange resampler[MAX_CHANNELS];

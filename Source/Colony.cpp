@@ -120,6 +120,8 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
 // TODO: get rid of the n
 float Colony::getSampleN(int channel, int n)
 {
+    //DBG("[CH= " << channel << "] Read Idx: " << colonyBufferReadOffset[channel] << "\tRead Limit: " << colonyBufferReadLimit << "\tRead Start: " << colonyBufferReadStart);
+
     // fade loops in/out
     if (colonyBufferReadOffset[channel] == 0) {
         loopFade.setTargetValue(1);
@@ -127,12 +129,19 @@ float Colony::getSampleN(int channel, int n)
     else if (colonyBufferReadOffset[channel] == (colonyBufferReadOffsetLimit * 0.75)) {
         loopFade.setTargetValue(0.35);
     }
-
-    //DBG("[CH= " << channel << "] Read Idx: " << colonyBufferReadOffset[channel] << "\tRead Limit: " << colonyBufferReadLimit << "\tRead Start: " << colonyBufferReadStart);
-    float ret = colonyBuffer->getSample(channel, colonyBufferReadOffset[channel] + colonyBufferReadStart) * gain.getNextValue() * loopFade.getNextValue();
+    //float ret = colonyBuffer->getSample(channel, colonyBufferReadOffset[channel] + colonyBufferReadStart) * gain.getNextValue() * loopFade.getNextValue();
+    //colonyBuffer->applyGain(channel, n, 1, 0.5);
+    int sampleIndex = colonyBufferReadOffset[channel] + colonyBufferReadStart;
+    float sample = colonyBuffer->getSample(channel, sampleIndex);
+    float delaySample = 1;
+    if (sampleIndex > 5000) {
+        delaySample = colonyBuffer->getSample(channel, sampleIndex - 5000) + colonyBuffer->getSample(channel, sampleIndex - 4999) + colonyBuffer->getSample(channel, sampleIndex - 4998);
+    }
+    //colonyBuffer->setSample(channel, sampleIndex, sample * 0.4);
     colonyBufferReadOffset[channel] = ((colonyBufferReadOffset[channel] + 1) % colonyBufferReadOffsetLimit);
-
-    return ret;
+    //colonyBuffer->setSample(channel, sampleIndex, sample + delaySample * 0.4);
+    return sample + delaySample*0.95 * gain.getNextValue() * loopFade.getNextValue();
+    //return ret;
 }
 
 void Colony::toggleState(bool value)
