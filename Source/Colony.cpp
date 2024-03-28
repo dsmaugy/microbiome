@@ -15,6 +15,8 @@
 #define RESAMPLE_FADE 0.5
 #define LOOP_FADE_TIME 0.4
 
+#define COLONY_LIFE_THRESH 0.05
+
 Colony::Colony() 
 {
 }
@@ -47,6 +49,13 @@ void Colony::prepare(const ColonyParams& params)
     ladder.prepare(params.procSpec);
     ladder.setCutoffFrequencyHz(1000);
 
+    reverb.prepare(params.procSpec);
+    reverb.setParameters(reverbParameters);
+
+    colonyLifeVol.reset(params.procSpec.sampleRate, 10);
+    colonyLifeVol.setCurrentAndTargetValue(1);
+    
+
     // perform all channel-dependent init operations
     for (int i = 0; i < MAX_CHANNELS; i++) {
         resampler[i].reset();
@@ -55,7 +64,7 @@ void Colony::prepare(const ColonyParams& params)
         resampleIdx[i] = 0;
 
         for (int j = 0; j < MAX_GHOSTS; j++) {
-            ghostDelays[j][i].reset(params.procSpec.sampleRate, 5);
+            ghostDelays[j][i].reset(params.procSpec.sampleRate, 0.5);
             ghostDelays[j][i].setCurrentAndTargetValue(1000 + i*100);
         }
     }
@@ -71,18 +80,28 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
     }
 
     // update ghost delays per processing block for efficiency
-
     for (int j = 0; j < MAX_GHOSTS; j++) {
-        if (!ghostDelays[j][0].isSmoothing() && rng.nextFloat() < 0.001) {
-            int newGhost = rng.nextInt(1000);
+        if (!ghostDelays[j][0].isSmoothing() && rng.nextFloat() < 0.01) {
+            int newGhost = rng.nextInt(4000);
             for (int i = 0; i < MAX_CHANNELS; i++) {
                 ghostDelays[j][i].setTargetValue(newGhost);
             }
-            DBG("Re-generating ghost delay #" << j << " to " << newGhost);
+            //DBG("Re-generating ghost delay #" << j << " to " << newGhost);
         }
     }
 
-
+    if (currentMode == Colony::ProcessMode::REGENERATE) {
+        if (doneProcessing && colonyLifeVol.getCurrentValue() <= COLONY_LIFE_THRESH+0.01) {
+            // colony has faded out enough to be killed and replaced by new snippet
+            doneProcessing = false;
+            DBG("Re-generating colony");
+        }
+        else if (doneProcessing && colonyLifeVol.getCurrentValue() >= 0.95 && rng.nextFloat() < 0.01) {
+            // begin process of killing colony
+            colonyLifeVol.setTargetValue(COLONY_LIFE_THRESH);
+            DBG("Starting re-generation process");
+        }
+    }
 
     if (!doneProcessing) {
         // copy data to local colony buffer so we don't modify the original signal
@@ -109,7 +128,7 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
                 resampleIdx[i] = resampleStart;
             }
 
-            DBG(used << "/" << resampleLength << " samples used");
+            //DBG(used << "/" << resampleLength << " samples used");
         }
         resampleRatio.skip(numInSamples);
 
@@ -118,6 +137,7 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         juce::dsp::ProcessContextReplacing<float> procCtx(localBlock);
 
         ladder.process(procCtx);
+        reverb.process(procCtx);
 
         // if (rng.nextFloat() < 0.005) {
         //     DBG("Setting new random delay!");
@@ -131,6 +151,10 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
 
         if (colonyBufferWriteIdx[0] < colonyBufferWriteProcStart) {
             DBG("Done processing colony!");
+
+            if (currentMode == Colony::ProcessMode::REGENERATE) {
+                colonyLifeVol.setTargetValue(1);
+            }
             doneProcessing = true;
         }
     }
@@ -162,7 +186,7 @@ float Colony::getSampleN(int channel, int n)
             float fr = ghostDelays[i][channel].getCurrentValue() - delayInt;
             float x0 = *(sample - delayInt);
             float x1 = *(sample - ((delayInt+1) % 5000));
-            delaySample += ((1-fr)*x0 + fr*x1) * 1/MAX_GHOSTS; // TODO: hardcode this number
+            delaySample += ((1-fr)*x0 + fr*x1) * 0.50; // TODO: hardcode this number
             // delaySample = *(sample-1000);
         }
         //delaySample = colonyBuffer->getSample(channel, sampleIndex - 5000) + colonyBuffer->getSample(channel, sampleIndex - 4999) + colonyBuffer->getSample(channel, sampleIndex - 4998);
@@ -170,7 +194,7 @@ float Colony::getSampleN(int channel, int n)
     //colonyBuffer->setSample(channel, sampleIndex, sample * 0.4);
     colonyBufferReadOffset[channel] = ((colonyBufferReadOffset[channel] + 1) % colonyBufferReadOffsetLimit);
     //colonyBuffer->setSample(channel, sampleIndex, sample + delaySample * 0.4);
-    return (*sample + delaySample) * gain.getNextValue() * loopFade.getNextValue();
+    return (*sample + delaySample) * gain.getNextValue() * loopFade.getNextValue() * colonyLifeVol.getNextValue();
     //return ret;
 }
 

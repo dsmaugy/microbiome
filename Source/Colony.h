@@ -80,6 +80,8 @@ class Colony
 
         juce::Interpolators::Lagrange resampler[MAX_CHANNELS];
         juce::dsp::LadderFilter<float> ladder;
+        juce::dsp::Reverb reverb;
+        juce::dsp::Reverb::Parameters reverbParameters;
 
         bool doneProcessing = false;
 
@@ -98,6 +100,7 @@ class Colony
 
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gain;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> loopFade;
+        juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> colonyLifeVol;
         
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> delayInSamples;
 
