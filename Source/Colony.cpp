@@ -54,6 +54,10 @@ void Colony::prepare(const ColonyParams& params)
         colonyBufferReadOffset[i] = 0;
         resampleIdx[i] = 0;
     }
+
+    for (int i = 0; i < MAX_GHOSTS; i++) {
+        ghostDelays[i] = 1000 + i*100;
+    }
 }
 
 void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
@@ -63,6 +67,14 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         // gain should be 0 here anyways
         DBG("Setting colony to DEAD");
         currentState = Colony::State::DEAD;
+    }
+
+    // update ghost delays per processing block for efficiency
+    if (rng.nextFloat() < 0.01) {
+        for (int i = 0; i < MAX_GHOSTS; i++) {
+            ghostDelays[i] = rng.nextInt(5000);
+            DBG("Re-generating ghost delay #" << i << " to " << ghostDelays[i]);
+        }
     }
 
     if (!doneProcessing) {
@@ -132,15 +144,21 @@ float Colony::getSampleN(int channel, int n)
     //float ret = colonyBuffer->getSample(channel, colonyBufferReadOffset[channel] + colonyBufferReadStart) * gain.getNextValue() * loopFade.getNextValue();
     //colonyBuffer->applyGain(channel, n, 1, 0.5);
     int sampleIndex = colonyBufferReadOffset[channel] + colonyBufferReadStart;
-    float sample = colonyBuffer->getSample(channel, sampleIndex);
-    float delaySample = 1;
+    //float sample = colonyBuffer->getSample(channel, sampleIndex);
+    float* sample = colonyBuffer->getWritePointer(channel, sampleIndex);
+    float delaySample = 0;
+
+
     if (sampleIndex > 5000) {
-        delaySample = colonyBuffer->getSample(channel, sampleIndex - 5000) + colonyBuffer->getSample(channel, sampleIndex - 4999) + colonyBuffer->getSample(channel, sampleIndex - 4998);
+        for (int i = 0; i < MAX_GHOSTS; i++) {
+            delaySample += *(sample - ghostDelays[i]) * 0.95;
+        }
+        //delaySample = colonyBuffer->getSample(channel, sampleIndex - 5000) + colonyBuffer->getSample(channel, sampleIndex - 4999) + colonyBuffer->getSample(channel, sampleIndex - 4998);
     }
     //colonyBuffer->setSample(channel, sampleIndex, sample * 0.4);
     colonyBufferReadOffset[channel] = ((colonyBufferReadOffset[channel] + 1) % colonyBufferReadOffsetLimit);
     //colonyBuffer->setSample(channel, sampleIndex, sample + delaySample * 0.4);
-    return sample + delaySample*0.95 * gain.getNextValue() * loopFade.getNextValue();
+    return (*sample + delaySample) * gain.getNextValue() * loopFade.getNextValue();
     //return ret;
 }
 

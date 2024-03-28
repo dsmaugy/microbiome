@@ -88,6 +88,8 @@ class Colony
         int colonyBufferReadStart = 0;
         int colonyBufferReadLength = 132300;
         int colonyBufferReadOffsetLimit = 132300;
+
+        int ghostDelays[MAX_GHOSTS];
         
         int resampleIdx[MAX_CHANNELS];
         int resampleStart = 0;
