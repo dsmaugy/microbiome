@@ -16,4 +16,4 @@
 #define MAX_CHANNELS 2
 #define MAX_DELAY_SECONDS 10
 #define COLONY_BUFFER_LENGTH_SEC 5
-#define MAX_GHOSTS 5 // TODO: play around with this value
+#define MAX_GHOSTS 4 // TODO: play around with this value

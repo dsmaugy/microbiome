@@ -53,10 +53,11 @@ void Colony::prepare(const ColonyParams& params)
         colonyBufferWriteIdx[i] = 0;
         colonyBufferReadOffset[i] = 0;
         resampleIdx[i] = 0;
-    }
 
-    for (int i = 0; i < MAX_GHOSTS; i++) {
-        ghostDelays[i] = 1000 + i*100;
+        for (int j = 0; j < MAX_GHOSTS; j++) {
+            ghostDelays[j][i].reset(params.procSpec.sampleRate, 5);
+            ghostDelays[j][i].setCurrentAndTargetValue(1000 + i*100);
+        }
     }
 }
 
@@ -70,12 +71,18 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
     }
 
     // update ghost delays per processing block for efficiency
-    if (rng.nextFloat() < 0.01) {
-        for (int i = 0; i < MAX_GHOSTS; i++) {
-            ghostDelays[i] = rng.nextInt(5000);
-            DBG("Re-generating ghost delay #" << i << " to " << ghostDelays[i]);
+
+    for (int j = 0; j < MAX_GHOSTS; j++) {
+        if (!ghostDelays[j][0].isSmoothing() && rng.nextFloat() < 0.001) {
+            int newGhost = rng.nextInt(1000);
+            for (int i = 0; i < MAX_CHANNELS; i++) {
+                ghostDelays[j][i].setTargetValue(newGhost);
+            }
+            DBG("Re-generating ghost delay #" << j << " to " << newGhost);
         }
     }
+
+
 
     if (!doneProcessing) {
         // copy data to local colony buffer so we don't modify the original signal
@@ -151,7 +158,12 @@ float Colony::getSampleN(int channel, int n)
 
     if (sampleIndex > 5000) {
         for (int i = 0; i < MAX_GHOSTS; i++) {
-            delaySample += *(sample - ghostDelays[i]) * 0.95;
+            int delayInt = (int) ghostDelays[i][channel].getNextValue();
+            float fr = ghostDelays[i][channel].getCurrentValue() - delayInt;
+            float x0 = *(sample - delayInt);
+            float x1 = *(sample - ((delayInt+1) % 5000));
+            delaySample += ((1-fr)*x0 + fr*x1) * 1/MAX_GHOSTS; // TODO: hardcode this number
+            // delaySample = *(sample-1000);
         }
         //delaySample = colonyBuffer->getSample(channel, sampleIndex - 5000) + colonyBuffer->getSample(channel, sampleIndex - 4999) + colonyBuffer->getSample(channel, sampleIndex - 4998);
     }

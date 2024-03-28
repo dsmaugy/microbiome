@@ -89,7 +89,7 @@ class Colony
         int colonyBufferReadLength = 132300;
         int colonyBufferReadOffsetLimit = 132300;
 
-        int ghostDelays[MAX_GHOSTS];
+        juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> ghostDelays[MAX_GHOSTS][MAX_CHANNELS];
         
         int resampleIdx[MAX_CHANNELS];
         int resampleStart = 0;
