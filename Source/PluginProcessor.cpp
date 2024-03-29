@@ -101,7 +101,8 @@ void MicrobiomeAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     // initialisation that you need..
     DBG("Preparing to Play...");
     DBG("Sample Rate: " << sampleRate << "\nBlock Size: " << samplesPerBlock);
-
+    
+    DBG("Colony 1 Enable Parameter name: " << *parameters.getRawParameterValue("colony_1_enable"));
     juce::dsp::ProcessSpec procSpec;
     procSpec.sampleRate = sampleRate;
     procSpec.numChannels = 2; // TODO: figure this out
@@ -233,6 +234,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout MicrobiomeAudioProcessor::cr
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     for (int i = 1; i <= MAX_COLONY; i++) {
         // TODO
+        auto colony_num = juce::String(i);
+        layout.add(std::make_unique<juce::AudioParameterBool>("colony_" + colony_num + "_enable", "Colony " + colony_num + " Enable", false));
     }
 
     return layout;
