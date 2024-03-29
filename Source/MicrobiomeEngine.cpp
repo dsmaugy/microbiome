@@ -60,7 +60,6 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
                 if (colony[j].isActive()) {
                      //channelData[i] += colony[j].getSampleN(channel, i);
                      channelData[i] = colony[j].getSampleN(channel, i);
-                    // channelData[i] += delayBuffer->getSample(channel, delayReadIdx);
                 }
             }
             delayReadIdx = (delayReadIdx+1) % 22050;// ((int) params.procSpec.sampleRate) * 5;

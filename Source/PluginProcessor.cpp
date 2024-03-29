@@ -9,6 +9,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#define PARAMETER_VT_ID "root_parameters"
+
 //==============================================================================
 MicrobiomeAudioProcessor::MicrobiomeAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -19,10 +21,11 @@ MicrobiomeAudioProcessor::MicrobiomeAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),
+        parameters(*this, nullptr, PARAMETER_VT_ID, createParameterLayout())
 #endif
 {
-    reverbWet = .8f;
+    
 }
 
 MicrobiomeAudioProcessor::~MicrobiomeAudioProcessor()
@@ -98,16 +101,13 @@ void MicrobiomeAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     // initialisation that you need..
     DBG("Preparing to Play...");
     DBG("Sample Rate: " << sampleRate << "\nBlock Size: " << samplesPerBlock);
-    testVerb.setSampleRate(sampleRate);
 
-    testDelay.setMaximumDelayInSamples(sampleRate * 20);
-    testDelay.setDelay(sampleRate * 15);
     juce::dsp::ProcessSpec procSpec;
     procSpec.sampleRate = sampleRate;
     procSpec.numChannels = 2; // TODO: figure this out
     procSpec.maximumBlockSize = samplesPerBlock;
-    testDelay.prepare(procSpec);
 
+    // TODO: if I wanted to make the engine/colonies take in a reference to procSpec, this has to be a member variable
     EngineParams engineParams;
     engineParams.procSpec = procSpec;
 
@@ -214,17 +214,6 @@ void MicrobiomeAudioProcessor::setStateInformation (const void* data, int sizeIn
     // whose contents will have been created by the getStateInformation() call.
 }
 
-void MicrobiomeAudioProcessor::setReverbWet(float wet)
-{
-    if (wet >= 0.0 && wet <= 1.0) {
-        reverbWet = wet;
-        testVerbParams.damping = 0.8f;
-        testVerbParams.dryLevel = 0.3;
-        testVerbParams.wetLevel = reverbWet;
-        testVerbParams.roomSize = 0.65f;
-        testVerb.setParameters(testVerbParams);
-    }
-}
 
 MicrobiomeEngine& MicrobiomeAudioProcessor::getEngine()
 {
@@ -236,4 +225,15 @@ MicrobiomeEngine& MicrobiomeAudioProcessor::getEngine()
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new MicrobiomeAudioProcessor();
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout MicrobiomeAudioProcessor::createParameterLayout()
+{
+    // returning this is OK because APVST takes in parameters by value instead of by reference
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+    for (int i = 1; i <= MAX_COLONY; i++) {
+        // TODO
+    }
+
+    return layout;
 }

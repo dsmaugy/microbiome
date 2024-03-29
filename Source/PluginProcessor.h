@@ -54,7 +54,6 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    void setReverbWet(float wet);
     MicrobiomeEngine& getEngine();
 
 private:
@@ -63,9 +62,7 @@ private:
 
     MicrobiomeEngine engine;
 
-    juce::Reverb testVerb;
-    juce::Reverb::Parameters testVerbParams;
+    juce::AudioProcessorValueTreeState parameters;
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
-    juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> testDelay;
-    float reverbWet;
 };
