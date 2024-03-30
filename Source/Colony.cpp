@@ -17,8 +17,10 @@
 
 #define COLONY_LIFE_THRESH 0.05
 
-Colony::Colony(int n) : colonyNum(n),
-                        colonyBuffer(std::make_unique<juce::AudioBuffer<float>>(0, 0))
+Colony::Colony(int n, juce::AudioProcessorValueTreeState& p) : colonyNum(n),
+                        parameters(p),
+                        colonyBuffer(std::make_unique<juce::AudioBuffer<float>>(0, 0)),
+                        resampleRatioParamName(PARAMETER_RESAMPLE_RATIO_ID(n))
 {
 }
 
@@ -102,6 +104,9 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
             colonyLifeVol.setTargetValue(COLONY_LIFE_THRESH);
             DBG("Starting re-generation process");
         }
+    } else if (currentMode == Colony::ProcessMode::LOOP) {
+        // restart procesing if any of the audio parameters corresponding to resampling change
+
     }
 
     if (!doneProcessing) {

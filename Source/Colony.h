@@ -37,7 +37,7 @@ struct ColonyParams
 class Colony : public juce::AudioProcessorValueTreeState::Listener
 {
     public:
-        Colony(int n);
+        Colony(int n, juce::AudioProcessorValueTreeState& parameters);
 
         void prepare(const ColonyParams& params);
 
@@ -60,7 +60,6 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
         void setResampleLength(float lengthSec);
 
     private:
-        int colonyNum;
         enum class State
         {
             ALIVE,
@@ -75,6 +74,12 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
             LOOP,
             REGENERATE
         };
+
+        juce::AudioProcessorValueTreeState& parameters;
+        int colonyNum;
+
+        juce::String resampleRatioParamName;
+
         Colony::State currentState = Colony::State::DEAD;
         Colony::ProcessMode currentMode = Colony::ProcessMode::REGENERATE;
         std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;

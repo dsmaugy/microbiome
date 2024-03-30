@@ -19,6 +19,8 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
         enableColonyButtons[i] = std::make_unique<juce::ToggleButton>("Toggle Colony");
         enableAttachments[i] = std::make_unique<ButtonAttachment>(parameters, PARAMETER_ENABLE_ID(i + 1), *enableColonyButtons[i]);
         addChildComponent(*enableColonyButtons[i]);
+
+        
     }
 
     resampleRatio.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -27,7 +29,6 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
     resampleRatio.setRotaryParameters(3 * juce::MathConstants<float>::pi / 2, 5*juce::MathConstants<float>::pi / 2, true);
     resampleRatio.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
     resampleRatio.setPopupDisplayEnabled(true, true, this);
-    resampleRatio.addListener(this);
 
     colonyBufferReadLength.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     colonyBufferReadLength.setRange(0.5, COLONY_BUFFER_LENGTH_SEC, 0.01);
@@ -108,7 +109,7 @@ void MicrobiomeAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)
 {
     if (slider == &resampleRatio) {
         // TODO: set this based off of currently selected colony
-        audioProcessor.getEngine().setColonyResampleRatio(0, slider->getValue());
+        // audioProcessor.getEngine().setColonyResampleRatio(0, slider->getValue());
     }
     else if (slider == &colonyBufferReadLength) {
         audioProcessor.getEngine().setColonyBufferLength(0, slider->getValue());

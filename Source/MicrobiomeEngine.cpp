@@ -16,7 +16,7 @@ MicrobiomeEngine::MicrobiomeEngine(juce::AudioProcessorValueTreeState& p) : para
     activeColonies = DEFAULT_COLONIES;
 
     for (int i = 0; i < MAX_COLONY; i++) {
-        colony[i] = std::make_unique<Colony>(i);
+        colony[i] = std::make_unique<Colony>(i, parameters);
         parameters.addParameterListener(PARAMETER_ENABLE_ID(i+1), colony[i].get());
     }
 }
