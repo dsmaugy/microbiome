@@ -198,7 +198,7 @@ bool MicrobiomeAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* MicrobiomeAudioProcessor::createEditor()
 {
-    return new MicrobiomeAudioProcessorEditor (*this);
+    return new MicrobiomeAudioProcessorEditor (*this, parameters);
 }
 
 //==============================================================================
@@ -234,8 +234,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout MicrobiomeAudioProcessor::cr
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     for (int i = 1; i <= MAX_COLONY; i++) {
         // TODO
-        auto colony_num = juce::String(i);
-        layout.add(std::make_unique<juce::AudioParameterBool>("colony_" + colony_num + "_enable", "Colony " + colony_num + " Enable", false));
+        layout.add(std::make_unique<juce::AudioParameterBool>(PARAMETER_ENABLE_ID(i), PARAMETER_ENABLE_NAME(i), false));
     }
 
     return layout;

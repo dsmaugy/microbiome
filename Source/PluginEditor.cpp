@@ -11,12 +11,14 @@
 #include "Constants.h"
 
 //==============================================================================
-MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor (MicrobiomeAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioProcessor& p, juce::AudioProcessorValueTreeState& apvst)
+    : AudioProcessorEditor(&p), audioProcessor(p), parameters(apvst)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    
+    for (int i = 0; i < MAX_COLONY; i++) {
+        enableColonyButtons[i] = std::make_unique<juce::ToggleButton>("Toggle Colony");
+        enableAttachments[i] = std::make_unique<ButtonAttachment>(parameters, PARAMETER_ENABLE_ID(i + 1), *enableColonyButtons[i]);
+    }
 
     resampleRatio.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     resampleRatio.setRange(0.5, 1.3, 0.01);
@@ -42,17 +44,23 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor (MicrobiomeAudioP
     colonyBufferReadStart.setPopupDisplayEnabled(true, true, this);
     colonyBufferReadStart.addListener(this);
 
+    //enableColony.setButtonText("Toggle On");
+    //enableAttachment.reset(new ButtonAttachment(parameters, PARAMETER_ENABLE_ID(1), enableColony));
+
     addColony.setButtonText("+ Colony");
     removeColony.setButtonText("- Colony");
 
     addColony.addListener(this);
     removeColony.addListener(this);
-  
+    
+    addAndMakeVisible(*enableColonyButtons[0]);
     addAndMakeVisible(resampleRatio);
     addAndMakeVisible(addColony);
     addAndMakeVisible(removeColony);
     addAndMakeVisible(colonyBufferReadLength);
     addAndMakeVisible(colonyBufferReadStart);
+
+    setSize(400, 300);
 }
 
 MicrobiomeAudioProcessorEditor::~MicrobiomeAudioProcessorEditor()
@@ -81,6 +89,8 @@ void MicrobiomeAudioProcessorEditor::resized()
 
     addColony.setBounds(50, 50, 70, 35);
     removeColony.setBounds(150, 50, 70, 35);
+
+    enableColonyButtons[0]->setBounds(240, 200, 60, 40);
 }
 
 void MicrobiomeAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) 
