@@ -12,12 +12,13 @@
 
 //==============================================================================
 MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioProcessor& p, juce::AudioProcessorValueTreeState& apvst)
-    : AudioProcessorEditor(&p), audioProcessor(p), parameters(apvst)
+    : AudioProcessorEditor(&p), audioProcessor(p), parameters(apvst), currentColony(0)
 {
     
     for (int i = 0; i < MAX_COLONY; i++) {
         enableColonyButtons[i] = std::make_unique<juce::ToggleButton>("Toggle Colony");
         enableAttachments[i] = std::make_unique<ButtonAttachment>(parameters, PARAMETER_ENABLE_ID(i + 1), *enableColonyButtons[i]);
+        addChildComponent(*enableColonyButtons[i]);
     }
 
     resampleRatio.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -47,13 +48,12 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
     //enableColony.setButtonText("Toggle On");
     //enableAttachment.reset(new ButtonAttachment(parameters, PARAMETER_ENABLE_ID(1), enableColony));
 
-    addColony.setButtonText("+ Colony");
-    removeColony.setButtonText("- Colony");
+    addColony.setButtonText("->");
+    removeColony.setButtonText("<-");
 
     addColony.addListener(this);
     removeColony.addListener(this);
     
-    addAndMakeVisible(*enableColonyButtons[0]);
     addAndMakeVisible(resampleRatio);
     addAndMakeVisible(addColony);
     addAndMakeVisible(removeColony);
@@ -77,6 +77,15 @@ void MicrobiomeAudioProcessorEditor::paint (juce::Graphics& g)
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
     g.drawFittedText ("microbiome", getLocalBounds(), juce::Justification::centred, 1);
+
+    // TODO: this should go in another component for efficiency
+    for (int i = 0; i < MAX_COLONY; i++) {
+        if (i == currentColony) {
+            enableColonyButtons[i]->setVisible(true);
+        } else {
+            enableColonyButtons[i]->setVisible(false);
+        }
+    }
 }
 
 void MicrobiomeAudioProcessorEditor::resized()
@@ -90,7 +99,9 @@ void MicrobiomeAudioProcessorEditor::resized()
     addColony.setBounds(50, 50, 70, 35);
     removeColony.setBounds(150, 50, 70, 35);
 
-    enableColonyButtons[0]->setBounds(240, 200, 60, 40);
+    for (int i = 0; i < MAX_COLONY; i++) {
+        enableColonyButtons[i]->setBounds(240, 200, 60, 40);
+    }
 }
 
 void MicrobiomeAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) 
@@ -111,10 +122,19 @@ void MicrobiomeAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)
 void MicrobiomeAudioProcessorEditor::buttonClicked(juce::Button* button)
 {
     if (button == &addColony) {
-        DBG("Adding Colony...");
-        audioProcessor.getEngine().addColony();
+        if (currentColony < MAX_COLONY-1) {
+            currentColony++;
+            repaint();
+            DBG("Switching editor view to colony: " << currentColony);
+        }
+        
+        // audioProcessor.getEngine().addColony();
     } else if (button == &removeColony) {
-        DBG("Removing Colony...");
-        audioProcessor.getEngine().removeColony();
+        if (currentColony > 0) {
+            currentColony--;
+            repaint();
+            DBG("Switching editor view to colony: " << currentColony);
+        }
+        // audioProcessor.getEngine().removeColony();
     }
 }

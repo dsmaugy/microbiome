@@ -22,7 +22,7 @@ struct EngineParams
 class MicrobiomeEngine 
 {
     public:
-        MicrobiomeEngine();
+        MicrobiomeEngine(juce::AudioProcessorValueTreeState&);
 
         void prepare(const EngineParams& params);
         void processAudio(juce::AudioBuffer<float>& buffer);
@@ -43,7 +43,9 @@ class MicrobiomeEngine
         void setBPM(double bpm);
 
     private:
-        Colony colony[MAX_COLONY];
+        juce::AudioProcessorValueTreeState& parameters;
+        std::array<std::unique_ptr<Colony>, MAX_COLONY> colony;
+        // Colony colony[MAX_COLONY];
         // TODO: should probably be renamed to aliveColonies with current use case
         int activeColonies;
         EngineParams params;

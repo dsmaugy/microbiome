@@ -22,7 +22,8 @@ MicrobiomeAudioProcessor::MicrobiomeAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
-        parameters(*this, nullptr, PARAMETER_VT_ID, createParameterLayout())
+        parameters(*this, nullptr, PARAMETER_VT_ID, createParameterLayout()),
+        engine(parameters)
 #endif
 {
     
@@ -233,8 +234,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout MicrobiomeAudioProcessor::cr
     // returning this is OK because APVST takes in parameters by value instead of by reference
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     for (int i = 1; i <= MAX_COLONY; i++) {
-        // TODO
-        layout.add(std::make_unique<juce::AudioParameterBool>(PARAMETER_ENABLE_ID(i), PARAMETER_ENABLE_NAME(i), false));
+        layout.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID {PARAMETER_ENABLE_ID(i), 1}, PARAMETER_ENABLE_NAME(i), (i-1) < DEFAULT_COLONIES));
     }
 
     return layout;

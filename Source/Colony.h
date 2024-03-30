@@ -13,7 +13,7 @@
 #include <JuceHeader.h>
 #include "Constants.h"
 
-struct ColonyParams
+struct ColonyParams 
 {
     // TODO: could prob make this a tiny more efficient by making this a reference but whatever
     juce::dsp::ProcessSpec procSpec;
@@ -34,10 +34,10 @@ struct ColonyParams
     // }
 };
 
-class Colony
+class Colony : public juce::AudioProcessorValueTreeState::Listener
 {
     public:
-        Colony();
+        Colony(int n);
 
         void prepare(const ColonyParams& params);
 
@@ -60,6 +60,7 @@ class Colony
         void setResampleLength(float lengthSec);
 
     private:
+        int colonyNum;
         enum class State
         {
             ALIVE,
@@ -108,5 +109,5 @@ class Colony
 
         ColonyParams params;
 
-
+        void parameterChanged(const juce::String &parameterID, float newValue) override;
 };

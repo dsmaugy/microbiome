@@ -17,7 +17,8 @@
 
 #define COLONY_LIFE_THRESH 0.05
 
-Colony::Colony() 
+Colony::Colony(int n) : colonyNum(n),
+                        colonyBuffer(std::make_unique<juce::AudioBuffer<float>>(0, 0))
 {
 }
 
@@ -204,6 +205,7 @@ void Colony::toggleState(bool value)
         currentState = Colony::State::ALIVE;
         gain.setTargetValue(params.initialGain);
         doneProcessing = false; // if we revive this colony again it should start processing right away
+        DBG("Reviving colony");
     } else if (!value && isActive()) {
         currentState = Colony::State::RAMP_DOWN;
         DBG("Ramping down colony");
@@ -264,4 +266,9 @@ void Colony::setResampleStart(float startSec)
 void Colony::setResampleLength(float length)
 {
 
+}
+
+void Colony::parameterChanged(const juce::String &parameterID, float newValue) {
+    // this should only run for enable toggles which should be pretty rare
+    toggleState(newValue != 0.0f);
 }

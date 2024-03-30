@@ -35,7 +35,8 @@ private:
     // access the processor object that created it.
     MicrobiomeAudioProcessor& audioProcessor;
     juce::AudioProcessorValueTreeState& parameters;
-
+    int currentColony;
+    
     juce::Slider resampleRatio;
     juce::Slider colonyBufferReadLength;
     juce::Slider colonyBufferReadStart;
