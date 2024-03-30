@@ -36,7 +36,7 @@ private:
     MicrobiomeAudioProcessor& audioProcessor;
     juce::AudioProcessorValueTreeState& parameters;
     int currentColony;
-    
+
     juce::Slider resampleRatio;
     juce::Slider colonyBufferReadLength;
     juce::Slider colonyBufferReadStart;
@@ -45,6 +45,9 @@ private:
 
     std::array<std::unique_ptr<juce::ToggleButton>, MAX_COLONY> enableColonyButtons;
     std::array<std::unique_ptr<ButtonAttachment>, MAX_COLONY> enableAttachments;
+    std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> resampleRatioSliders;
+    std::array<std::unique_ptr<SliderAttachment>, MAX_COLONY> resampleRatioAttachments;
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MicrobiomeAudioProcessorEditor)
 };

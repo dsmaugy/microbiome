@@ -20,15 +20,14 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
         enableAttachments[i] = std::make_unique<ButtonAttachment>(parameters, PARAMETER_ENABLE_ID(i + 1), *enableColonyButtons[i]);
         addChildComponent(*enableColonyButtons[i]);
 
-        
+        resampleRatioSliders[i] = std::make_unique<juce::Slider>();
+        resampleRatioSliders[i]->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+        resampleRatioSliders[i]->setRotaryParameters(3 * juce::MathConstants<float>::pi / 2, 5*juce::MathConstants<float>::pi / 2, true);
+        resampleRatioSliders[i]->setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
+        resampleRatioSliders[i]->setPopupDisplayEnabled(true, true, this);
+        resampleRatioAttachments[i] = std::make_unique<SliderAttachment>(parameters, PARAMETER_RESAMPLE_RATIO_ID(i+1), *resampleRatioSliders[i]);
+        addChildComponent(*resampleRatioSliders[i]);
     }
-
-    resampleRatio.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    resampleRatio.setRange(0.5, 1.3, 0.01);
-    resampleRatio.setValue(1);
-    resampleRatio.setRotaryParameters(3 * juce::MathConstants<float>::pi / 2, 5*juce::MathConstants<float>::pi / 2, true);
-    resampleRatio.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
-    resampleRatio.setPopupDisplayEnabled(true, true, this);
 
     colonyBufferReadLength.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     colonyBufferReadLength.setRange(0.5, COLONY_BUFFER_LENGTH_SEC, 0.01);
@@ -55,7 +54,6 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
     addColony.addListener(this);
     removeColony.addListener(this);
     
-    addAndMakeVisible(resampleRatio);
     addAndMakeVisible(addColony);
     addAndMakeVisible(removeColony);
     addAndMakeVisible(colonyBufferReadLength);
@@ -78,13 +76,15 @@ void MicrobiomeAudioProcessorEditor::paint (juce::Graphics& g)
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
     g.drawFittedText ("microbiome", getLocalBounds(), juce::Justification::centred, 1);
-
+    
     // TODO: this should go in another component for efficiency
     for (int i = 0; i < MAX_COLONY; i++) {
         if (i == currentColony) {
             enableColonyButtons[i]->setVisible(true);
+            resampleRatioSliders[i]->setVisible(true);
         } else {
             enableColonyButtons[i]->setVisible(false);
+            resampleRatioSliders[i]->setVisible(false);
         }
     }
 }
@@ -93,7 +93,6 @@ void MicrobiomeAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-    resampleRatio.setBounds(200-35, 100, 70, 70);
     colonyBufferReadLength.setBounds(100, 100, 70, 70);
     colonyBufferReadStart.setBounds(250, 100, 70, 70);
 
@@ -102,6 +101,7 @@ void MicrobiomeAudioProcessorEditor::resized()
 
     for (int i = 0; i < MAX_COLONY; i++) {
         enableColonyButtons[i]->setBounds(240, 200, 60, 40);
+        resampleRatioSliders[i]->setBounds(200-35, 100, 70, 70);
     }
 }
 
