@@ -234,12 +234,23 @@ juce::AudioProcessorValueTreeState::ParameterLayout MicrobiomeAudioProcessor::cr
     // returning this is OK because APVST takes in parameters by value instead of by reference
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     for (int i = 1; i <= MAX_COLONY; i++) {
-        layout.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID {PARAMETER_ENABLE_ID(i), 1}, PARAMETER_ENABLE_NAME(i), (i-1) < DEFAULT_COLONIES));
-        layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID {PARAMETER_RESAMPLE_RATIO_ID(i), 1}, 
+        layout.add(std::make_unique<juce::AudioParameterBool>(
+            juce::ParameterID {PARAMETER_ENABLE_ID(i), 1}, 
+            PARAMETER_ENABLE_NAME(i), 
+            (i-1) < DEFAULT_COLONIES));
+        layout.add(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID {PARAMETER_RESAMPLE_RATIO_ID(i), 1}, 
             PARAMETER_RESAMPLE_RATIO_NAME(i), 
             RESAMPLE_RATIO_MIN, 
             RESAMPLE_RATIO_MAX, 
-            RESAMPLE_RATIO_DEFAULT)
+            RESAMPLE_RATIO_DEF)
+        );
+        layout.add(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID {PARAMETER_RESAMPLE_START_ID(i), 1}, 
+            PARAMETER_RESAMPLE_START_NAME(i), 
+            RESAMPLE_START_MIN, 
+            RESAMPLE_START_MAX, 
+            RESAMPLE_START_DEF)
         );
     }
 
