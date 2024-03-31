@@ -79,6 +79,7 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
         int colonyNum;
 
         juce::String resampleRatioParamName;
+        juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> resampleRatio;
 
         Colony::State currentState = Colony::State::DEAD;
         Colony::ProcessMode currentMode = Colony::ProcessMode::REGENERATE;
@@ -102,7 +103,6 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
         int resampleIdx[MAX_CHANNELS];
         int resampleStart = 0;
         int resampleLength = 132300; // TODO: this doesn't really do anything
-        juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> resampleRatio;
 
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gain;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> loopFade;

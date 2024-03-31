@@ -20,7 +20,7 @@
 Colony::Colony(int n, juce::AudioProcessorValueTreeState& p) : colonyNum(n),
                         parameters(p),
                         colonyBuffer(std::make_unique<juce::AudioBuffer<float>>(0, 0)),
-                        resampleRatioParamName(PARAMETER_RESAMPLE_RATIO_ID(n))
+                        resampleRatioParamName(PARAMETER_RESAMPLE_RATIO_ID(n+1)) // for the users to see
 {
 }
 
@@ -105,8 +105,14 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
             DBG("Starting re-generation process");
         }
     } else if (currentMode == Colony::ProcessMode::LOOP) {
-        // restart procesing if any of the audio parameters corresponding to resampling change
+        // TODO: anything special here?
+    }
 
+    // restart procesing if any of the audio parameters corresponding to resampling change
+    float newResampleRatio = *parameters.getRawParameterValue(resampleRatioParamName);
+    if (!juce::approximatelyEqual(newResampleRatio, resampleRatio.getTargetValue())) {
+        doneProcessing = false;
+        resampleRatio.setTargetValue(newResampleRatio);
     }
 
     if (!doneProcessing) {
