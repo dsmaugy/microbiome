@@ -21,7 +21,9 @@ Colony::Colony(int n, juce::AudioProcessorValueTreeState& p) : colonyNum(n),
                         parameters(p),
                         colonyBuffer(std::make_unique<juce::AudioBuffer<float>>(0, 0)),
                         resampleRatioParamName(PARAMETER_RESAMPLE_RATIO_ID(n+1)), // for the users to see
-                        colonyBufferReadStartParamName(PARAMETER_COLONY_START_ID(n+1))
+                        resampleStartParamName(PARAMETER_RESAMPLE_START_ID(n+1)),
+                        colonyBufferReadStartParamName(PARAMETER_COLONY_START_ID(n+1)),
+                        gainParamName(PARAMETER_COLONY_DBFS_ID(n+1))
 {
 }
 
@@ -109,16 +111,17 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         // TODO: anything special here?
     }
 
+    // we want to restart procesing if any of the audio parameters corresponding to resampling change
+
     // TODO: put all the other parameters into locals here
-    float newResampleRatio = *parameters.getRawParameterValue(resampleRatioParamName);    
-    // restart procesing if any of the audio parameters corresponding to resampling change
+    float newResampleRatio = *parameters.getRawParameterValue(resampleRatioParamName);
     if (!juce::approximatelyEqual(newResampleRatio, resampleRatio.getTargetValue())) {
         doneProcessing = false;
         resampleRatio.setTargetValue(newResampleRatio);
     }
     
     // handle new colony buffer read offset
-    float newColonyBufferReadStartSec = *parameters.getRawParameterValue(colonyBufferReadStartParamName);
+    float newColonyBufferReadStartSec = *parameters.getRawParameterValue(colonyBufferReadStartParamName);    
     int newColonyBufferReadStart = (int) (newColonyBufferReadStartSec * params.procSpec.sampleRate);
     if (newColonyBufferReadStart != colonyBufferReadStart) {
         colonyBufferReadStart = newColonyBufferReadStart;
@@ -132,6 +135,20 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         }   
     }
 
+    float newResampleStartSec = *parameters.getRawParameterValue(resampleStartParamName);
+    int newResampleStart = (int) (newResampleStartSec * params.procSpec.sampleRate);
+    if (newResampleStart != resampleStart) {
+        resampleStart = newResampleStart;
+        doneProcessing = false; 
+        DBG("New Resample Start: " << resampleStart);
+    }
+
+    float newGain = juce::Decibels::decibelsToGain(parameters.getRawParameterValue(gainParamName)->load());
+    if (!juce::approximatelyEqual(newGain, gain.getTargetValue())) {
+        gain.setTargetValue(newGain);
+        DBG("New Gain: " << newGain);
+    }
+    
     if (!doneProcessing) {
         // copy data to local colony buffer so we don't modify the original signal
         int numChannels = buffer.getNumChannels();

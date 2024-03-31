@@ -272,6 +272,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout MicrobiomeAudioProcessor::cr
             COLONY_END_MAX, 
             COLONY_END_DEF)
         );
+
+        layout.add(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID {PARAMETER_COLONY_DBFS_ID(i), 1}, 
+            PARAMETER_COLONY_DBFS_NAME(i), 
+            COLONY_DBFS_MIN, 
+            COLONY_DBFS_MAX, 
+            COLONY_DBFS_DEF)
+        );
+
     }
 
     return layout;

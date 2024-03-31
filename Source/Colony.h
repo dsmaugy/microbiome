@@ -82,7 +82,7 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> resampleRatio;
 
         Colony::State currentState = Colony::State::DEAD;
-        Colony::ProcessMode currentMode = Colony::ProcessMode::REGENERATE;
+        Colony::ProcessMode currentMode = Colony::ProcessMode::LOOP;
         std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;
 
         juce::Interpolators::Lagrange resampler[MAX_CHANNELS];
@@ -101,10 +101,12 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
 
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> ghostDelays[MAX_GHOSTS][MAX_CHANNELS];
         
+        juce::String resampleStartParamName;
         int resampleIdx[MAX_CHANNELS];
         int resampleStart = 0;
         int resampleLength = 132300; // TODO: this doesn't really do anything
 
+        juce::String gainParamName;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gain;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> loopFade;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> colonyLifeVol;

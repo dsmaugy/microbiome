@@ -54,6 +54,8 @@ private:
     std::array<std::unique_ptr<SliderAttachment>, MAX_COLONY> resampleStartAttachments;
     std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> colonyPlayControlSliders;
     std::array<std::unique_ptr<juce::TwoValueSliderAttachment>, MAX_COLONY> colonyPlayControlAttachments;
+    std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> colonyGainSliders;
+    std::array<std::unique_ptr<SliderAttachment>, MAX_COLONY> colonyGainAttachments;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MicrobiomeAudioProcessorEditor)

@@ -31,6 +31,9 @@
 #define COLONY_END_MAX (COLONY_BUFFER_LENGTH_SEC)
 #define COLONY_END_MIN 0
 #define COLONY_END_DEF (COLONY_BUFFER_LENGTH_SEC)
+#define COLONY_DBFS_MIN 1
+#define COLONY_DBFS_MAX -8
+#define COLONY_DBFS_DEF -3
 
 #define PARAMETER_ENABLE_ID(n) "colony_" + juce::String(n) + "_enable"
 #define PARAMETER_ENABLE_NAME(n) "Colony " + juce::String(n) + " Enable"
@@ -42,3 +45,5 @@
 #define PARAMETER_COLONY_START_NAME(n) "Colony " + juce::String(n) + " Branch Loop Start"
 #define PARAMETER_COLONY_END_ID(n) "colony_" + juce::String(n) + "_branch_loop_end"
 #define PARAMETER_COLONY_END_NAME(n) "Colony " + juce::String(n) + " Branch Loop End"
+#define PARAMETER_COLONY_DBFS_ID(n) "colony_" + juce::String(n) + "_gain"
+#define PARAMETER_COLONY_DBFS_NAME(n) "Colony " + juce::String(n) + " Gain"

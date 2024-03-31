@@ -41,6 +41,12 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
             *colonyPlayControlSliders[i]);
         addChildComponent(*colonyPlayControlSliders[i]);
         colonyComponents[i].push_back(colonyPlayControlSliders[i].get());
+
+        colonyGainSliders[i] = std::make_unique<juce::Slider>();
+        applyRotarySliderStyle(*colonyGainSliders[i]);
+        colonyGainAttachments[i] = std::make_unique<SliderAttachment>(parameters, PARAMETER_COLONY_DBFS_ID(i+1), *colonyGainSliders[i]);
+        addChildComponent(*colonyGainSliders[i]);
+        colonyComponents[i].push_back(colonyGainSliders[i].get());
     }
 
     colonyBufferReadStart.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -65,7 +71,7 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
     addAndMakeVisible(colonyBufferReadLength);
     addAndMakeVisible(colonyBufferReadStart);
 
-    setSize(400, 300);
+    setSize(850, 500);
 }
 
 MicrobiomeAudioProcessorEditor::~MicrobiomeAudioProcessorEditor()
@@ -107,9 +113,10 @@ void MicrobiomeAudioProcessorEditor::resized()
 
     for (int i = 0; i < MAX_COLONY; i++) {
         enableColonyButtons[i]->setBounds(240, 240, 60, 40);
-        resampleRatioSliders[i]->setBounds(220, 100, 140, 140);
-        resampleStartSliders[i]->setBounds(100, 100, 140, 140);
+        resampleRatioSliders[i]->setBounds(220, 100, 100, 100);
+        resampleStartSliders[i]->setBounds(100, 100, 100, 100);
         colonyPlayControlSliders[i]->setBounds(340, 40, 30, 180);
+        colonyGainSliders[i]->setBounds(100, 200, 100, 100);
     }
 }
 
@@ -152,6 +159,6 @@ void MicrobiomeAudioProcessorEditor::applyRotarySliderStyle(juce::Slider& slider
 {
     slider.setSliderStyle(juce::Slider::Rotary);
     slider.setRotaryParameters(3 * juce::MathConstants<float>::pi / 2, 5 * juce::MathConstants<float>::pi / 2, true);
-    slider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 90, 35);
+    slider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 35);
     slider.setPopupDisplayEnabled(true, true, this);
 }
