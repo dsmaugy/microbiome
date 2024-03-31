@@ -63,9 +63,7 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
         enum class State
         {
             ALIVE,
-            RAMP_UP,
             RAMP_DOWN,
-            RAMP_DOWN_MODIFY, // when the colony is tuning down its gain to modulate some parameters
             DEAD
         };
 
