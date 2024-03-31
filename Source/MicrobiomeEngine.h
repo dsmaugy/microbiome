@@ -47,7 +47,7 @@ class MicrobiomeEngine
         std::array<std::unique_ptr<Colony>, MAX_COLONY> colony;
         // Colony colony[MAX_COLONY];
         // TODO: should probably be renamed to aliveColonies with current use case
-        int activeColonies;
+        //int activeColonies;
         EngineParams params;
 
         std::unique_ptr<juce::AudioBuffer<float>> delayBuffer;

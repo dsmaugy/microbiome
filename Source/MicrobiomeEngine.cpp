@@ -13,8 +13,6 @@
 
 MicrobiomeEngine::MicrobiomeEngine(juce::AudioProcessorValueTreeState& p) : parameters(p)
 {
-    activeColonies = DEFAULT_COLONIES;
-
     for (int i = 0; i < MAX_COLONY; i++) {
         colony[i] = std::make_unique<Colony>(i, parameters);
         parameters.addParameterListener(PARAMETER_ENABLE_ID(i+1), colony[i].get());
@@ -51,23 +49,23 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
     }
 
     int delayWriteStart = delayWriteIdx;
-    int delayReadStart = delayReadIdx;
+    //int delayReadStart = delayReadIdx;
     for (int channel = 0; channel < buffer.getNumChannels() && channel < MAX_CHANNELS; channel++)
     {
         auto* channelData = buffer.getWritePointer (channel);
         delayWriteIdx = delayWriteStart;
-        delayReadIdx = delayReadStart;
+        //delayReadIdx = delayReadStart;
 
         for (int i = 0; i < buffer.getNumSamples(); i++) {
             float originalSample = channelData[i];
             for (int j = 0; j < MAX_COLONY; j++) {
                 // can't break out early from checking appliedColonies because some colonies may be ramping down
                 if (colony[j]->isActive()) {
-                     //channelData[i] += colony[j].getSampleN(channel, i);
-                     channelData[i] = colony[j]->getSampleN(channel, i);
+                     channelData[i] += colony[j]->getSampleN(channel, i);
+                     //channelData[i] = colony[j]->getSampleN(channel, i);
                 }
             }
-            delayReadIdx = (delayReadIdx+1) % 22050;// ((int) params.procSpec.sampleRate) * 5;
+            //delayReadIdx = (delayReadIdx+1) % 22050;// ((int) params.procSpec.sampleRate) * 5;
             // we update the delay after the current output sample has already been updated
             delayBuffer->setSample(channel, delayWriteIdx, originalSample);
             delayWriteIdx = (delayWriteIdx+1) % delayBuffer->getNumSamples();
@@ -83,7 +81,7 @@ void MicrobiomeEngine::disableColony(int n)
     if (colony[n]->isAlive()) {
         DBG("Disabling Colony: " << n);
         colony[n]->toggleState(false);
-        activeColonies--;
+        //activeColonies--;
     }
 }
 
@@ -92,7 +90,7 @@ void MicrobiomeEngine::enableColony(int n)
     if (!colony[n]->isAlive()) {
         DBG("Enabling Colony: " << n);
         colony[n]->toggleState(true);
-        activeColonies++;
+        //activeColonies++;
     }
 }
 
@@ -104,7 +102,7 @@ void MicrobiomeEngine::removeColony()
             break;
         }
     }
-    DBG("Active Colonies: " << activeColonies);
+    //DBG("Active Colonies: " << activeColonies);
 }
 
 void MicrobiomeEngine::addColony()
@@ -115,7 +113,7 @@ void MicrobiomeEngine::addColony()
             break;
         }
     }
-    DBG("Active Colonies: " << activeColonies);
+    //DBG("Active Colonies: " << activeColonies);
 }
 
 void MicrobiomeEngine::setColonyDelayTime(int n, float sec)

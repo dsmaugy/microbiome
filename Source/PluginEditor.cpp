@@ -21,10 +21,7 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
         addChildComponent(*enableColonyButtons[i]);
 
         resampleRatioSliders[i] = std::make_unique<juce::Slider>();
-        resampleRatioSliders[i]->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-        resampleRatioSliders[i]->setRotaryParameters(3 * juce::MathConstants<float>::pi / 2, 5*juce::MathConstants<float>::pi / 2, true);
-        resampleRatioSliders[i]->setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
-        resampleRatioSliders[i]->setPopupDisplayEnabled(true, true, this);
+        applySliderStyle(*resampleRatioSliders[i]);
         resampleRatioAttachments[i] = std::make_unique<SliderAttachment>(parameters, PARAMETER_RESAMPLE_RATIO_ID(i+1), *resampleRatioSliders[i]);
         addChildComponent(*resampleRatioSliders[i]);
     }
@@ -75,7 +72,7 @@ void MicrobiomeAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
-    g.drawFittedText ("microbiome", getLocalBounds(), juce::Justification::centred, 1);
+    //g.drawFittedText ("microbiome", getLocalBounds(), juce::Justification::centred, 1);
     
     // TODO: this should go in another component for efficiency
     for (int i = 0; i < MAX_COLONY; i++) {
@@ -138,4 +135,12 @@ void MicrobiomeAudioProcessorEditor::buttonClicked(juce::Button* button)
         }
         // audioProcessor.getEngine().removeColony();
     }
+}
+
+void MicrobiomeAudioProcessorEditor::applySliderStyle(juce::Slider& slider)
+{
+    slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    slider.setRotaryParameters(3 * juce::MathConstants<float>::pi / 2, 5 * juce::MathConstants<float>::pi / 2, true);
+    slider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 90, 35);
+    slider.setPopupDisplayEnabled(true, true, this);
 }
