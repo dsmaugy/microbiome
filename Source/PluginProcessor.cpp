@@ -240,6 +240,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout MicrobiomeAudioProcessor::cr
             juce::ParameterID {PARAMETER_ENABLE_ID(i), 1}, 
             PARAMETER_ENABLE_NAME(i), 
             (i-1) < DEFAULT_COLONIES));
+
         layout.add(std::make_unique<juce::AudioParameterFloat>(
             juce::ParameterID {PARAMETER_RESAMPLE_RATIO_ID(i), 1}, 
             PARAMETER_RESAMPLE_RATIO_NAME(i), 
@@ -247,12 +248,29 @@ juce::AudioProcessorValueTreeState::ParameterLayout MicrobiomeAudioProcessor::cr
             RESAMPLE_RATIO_MAX, 
             RESAMPLE_RATIO_DEF)
         );
+
         layout.add(std::make_unique<juce::AudioParameterFloat>(
             juce::ParameterID {PARAMETER_RESAMPLE_START_ID(i), 1}, 
             PARAMETER_RESAMPLE_START_NAME(i), 
             RESAMPLE_START_MIN, 
             RESAMPLE_START_MAX, 
             RESAMPLE_START_DEF)
+        );
+
+        layout.add(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID {PARAMETER_COLONY_START_ID(i), 1}, 
+            PARAMETER_COLONY_START_NAME(i), 
+            COLONY_START_MIN, 
+            COLONY_START_MAX, 
+            COLONY_START_DEF)
+        );
+
+        layout.add(std::make_unique<juce::AudioParameterFloat>(
+            juce::ParameterID {PARAMETER_COLONY_END_ID(i), 1}, 
+            PARAMETER_COLONY_END_NAME(i), 
+            COLONY_END_MIN, 
+            COLONY_END_MAX, 
+            COLONY_END_DEF)
         );
     }
 

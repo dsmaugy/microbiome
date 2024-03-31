@@ -108,6 +108,7 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         // TODO: anything special here?
     }
 
+    // TODO: put all the other parameters into locals here
     // restart procesing if any of the audio parameters corresponding to resampling change
     float newResampleRatio = *parameters.getRawParameterValue(resampleRatioParamName);
     if (!juce::approximatelyEqual(newResampleRatio, resampleRatio.getTargetValue())) {

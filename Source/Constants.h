@@ -28,6 +28,9 @@
 #define COLONY_START_MAX (COLONY_BUFFER_LENGTH_SEC)
 #define COLONY_START_MIN 0
 #define COLONY_START_DEF 0
+#define COLONY_END_MAX (COLONY_BUFFER_LENGTH_SEC)
+#define COLONY_END_MIN 0
+#define COLONY_END_DEF (COLONY_BUFFER_LENGTH_SEC)
 
 #define PARAMETER_ENABLE_ID(n) "colony_" + juce::String(n) + "_enable"
 #define PARAMETER_ENABLE_NAME(n) "Colony " + juce::String(n) + " Enable"
@@ -35,3 +38,7 @@
 #define PARAMETER_RESAMPLE_RATIO_NAME(n) "Colony " + juce::String(n) + " Warp"
 #define PARAMETER_RESAMPLE_START_ID(n) "colony_" + juce::String(n) + "_branch_start"
 #define PARAMETER_RESAMPLE_START_NAME(n) "Colony " + juce::String(n) + " Branch Start"
+#define PARAMETER_COLONY_START_ID(n) "colony_" + juce::String(n) + "_branch_loop_start"
+#define PARAMETER_COLONY_START_NAME(n) "Colony " + juce::String(n) + " Branch Loop Start"
+#define PARAMETER_COLONY_END_ID(n) "colony_" + juce::String(n) + "_branch_loop_end"
+#define PARAMETER_COLONY_END_NAME(n) "Colony " + juce::String(n) + " Branch Loop End"

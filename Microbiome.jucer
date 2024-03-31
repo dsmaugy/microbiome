@@ -6,6 +6,8 @@
               pluginName="Microbiome" pluginManufacturer="Darwin Do" pluginDesc="Exploring the evolutionary nature of sound">
   <MAINGROUP id="HVHVHe" name="Microbiome">
     <GROUP id="{021420D8-7482-8AC4-5F25-AEEA04E9072F}" name="Source">
+      <FILE id="TP2p5b" name="TwoValueSliderAttachment.h" compile="0" resource="0"
+            file="Source/TwoValueSliderAttachment.h"/>
       <FILE id="ZCZ3pb" name="Constants.h" compile="0" resource="0" file="Source/Constants.h"/>
       <FILE id="iaTa37" name="Colony.cpp" compile="1" resource="0" file="Source/Colony.cpp"/>
       <FILE id="DP4imL" name="Colony.h" compile="0" resource="0" file="Source/Colony.h"/>
