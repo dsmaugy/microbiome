@@ -16,7 +16,7 @@
 #define MAX_CHANNELS 2
 #define MAX_DELAY_SECONDS 10 // global delay line length
 #define COLONY_BUFFER_LENGTH_SEC 5
-#define MAX_GHOSTS 20 // TODO: play around with this value
+#define MAX_GHOSTS 15 // TODO: play around with this value
 
 // audio parameter limits
 #define RESAMPLE_RATIO_MAX 1.5
@@ -31,9 +31,13 @@
 #define COLONY_END_MAX (COLONY_BUFFER_LENGTH_SEC)
 #define COLONY_END_MIN 0
 #define COLONY_END_DEF (COLONY_BUFFER_LENGTH_SEC)
-#define COLONY_DBFS_MIN 1
-#define COLONY_DBFS_MAX -8
+#define COLONY_DBFS_MIN -12
+#define COLONY_DBFS_MAX 12
 #define COLONY_DBFS_DEF -3
+#define ENGINE_WET_MIN 0
+#define ENGINE_WET_MAX 1
+#define ENGINE_WET_DEF 0.5
+#define COLONY_LOOP_DEF false
 
 #define PARAMETER_ENABLE_ID(n) "colony_" + juce::String(n) + "_enable"
 #define PARAMETER_ENABLE_NAME(n) "Colony " + juce::String(n) + " Enable"
@@ -47,3 +51,7 @@
 #define PARAMETER_COLONY_END_NAME(n) "Colony " + juce::String(n) + " Branch Loop End"
 #define PARAMETER_COLONY_DBFS_ID(n) "colony_" + juce::String(n) + "_gain"
 #define PARAMETER_COLONY_DBFS_NAME(n) "Colony " + juce::String(n) + " Gain"
+#define PARAMETER_ENGINE_WET_ID "engine_wet"
+#define PARAMETER_ENGINE_WET_NAME "Engine Wetness"
+#define PARAMETER_LOOP_ID(n) "colony_" + juce::String(n) + "_loop"
+#define PARAMETER_LOOP_NAME(n) "Colony " + juce::String(n) + " Loop"

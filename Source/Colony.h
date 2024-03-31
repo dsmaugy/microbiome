@@ -83,6 +83,8 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
 
         Colony::State currentState = Colony::State::DEAD;
         Colony::ProcessMode currentMode = Colony::ProcessMode::LOOP;
+        juce::String loopEnableParamName;
+
         std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;
 
         juce::Interpolators::Lagrange resampler[MAX_CHANNELS];
@@ -96,7 +98,8 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
         int colonyBufferWriteIdx[MAX_CHANNELS];
         int colonyBufferReadOffset[MAX_CHANNELS];
         int colonyBufferReadStart = 0;
-        int colonyBufferReadLength = 132300;
+        juce::String colonyBufferReadEndParamName;
+        int colonyBufferReadEnd = 132300;
         int colonyBufferReadOffsetLimit = 132300;
 
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> ghostDelays[MAX_GHOSTS][MAX_CHANNELS];
@@ -108,6 +111,7 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
 
         juce::String gainParamName;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gain;
+        juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> enableGain; // used for fading out colony when killing it
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> loopFade;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> colonyLifeVol;
         

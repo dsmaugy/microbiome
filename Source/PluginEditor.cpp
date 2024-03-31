@@ -17,9 +17,14 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
     
     for (int i = 0; i < MAX_COLONY; i++) {
         enableColonyButtons[i] = std::make_unique<juce::ToggleButton>("Toggle Colony");
-        enableAttachments[i] = std::make_unique<ButtonAttachment>(parameters, PARAMETER_ENABLE_ID(i + 1), *enableColonyButtons[i]);
+        enableAttachments[i] = std::make_unique<ButtonAttachment>(parameters, PARAMETER_ENABLE_ID(i+1), *enableColonyButtons[i]);
         addChildComponent(*enableColonyButtons[i]);
         colonyComponents[i].push_back(enableColonyButtons[i].get());
+
+        loopColonyButtons[i] = std::make_unique<juce::ToggleButton>("Loop Colony");
+        loopAttachments[i] = std::make_unique<ButtonAttachment>(parameters, PARAMETER_LOOP_ID(i + 1), *loopColonyButtons[i]);
+        addChildComponent(*loopColonyButtons[i]);
+        colonyComponents[i].push_back(loopColonyButtons[i].get());
 
         resampleRatioSliders[i] = std::make_unique<juce::Slider>();
         applyRotarySliderStyle(*resampleRatioSliders[i]);
@@ -49,28 +54,19 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
         colonyComponents[i].push_back(colonyGainSliders[i].get());
     }
 
-    colonyBufferReadStart.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    colonyBufferReadStart.setRange(0.5, COLONY_BUFFER_LENGTH_SEC, 0.01);
-    colonyBufferReadStart.setValue(1);
-    colonyBufferReadStart.setRotaryParameters(3 * juce::MathConstants<float>::pi / 2, 5 * juce::MathConstants<float>::pi / 2, true);
-    colonyBufferReadStart.setTextBoxStyle(juce::Slider::NoTextBox, false, 90, 0);
-    colonyBufferReadStart.setPopupDisplayEnabled(true, true, this);
-    colonyBufferReadStart.addListener(this);
-
-    //enableColony.setButtonText("Toggle On");
-    //enableAttachment.reset(new ButtonAttachment(parameters, PARAMETER_ENABLE_ID(1), enableColony));
+    engineWetSlider = std::make_unique<juce::Slider>();
+    applyRotarySliderStyle(*engineWetSlider);
+    engineWetAttachment = std::make_unique<SliderAttachment>(parameters, PARAMETER_ENGINE_WET_ID, *engineWetSlider);
+    addAndMakeVisible(*engineWetSlider);
 
     addColony.setButtonText("->");
-    removeColony.setButtonText("<-");
-
     addColony.addListener(this);
-    removeColony.addListener(this);
-    
     addAndMakeVisible(addColony);
-    addAndMakeVisible(removeColony);
-    addAndMakeVisible(colonyBufferReadLength);
-    addAndMakeVisible(colonyBufferReadStart);
 
+    removeColony.setButtonText("<-");
+    removeColony.addListener(this);
+    addAndMakeVisible(removeColony);
+    
     setSize(850, 500);
 }
 
@@ -110,13 +106,16 @@ void MicrobiomeAudioProcessorEditor::resized()
 
     addColony.setBounds(50, 50, 70, 35);
     removeColony.setBounds(150, 50, 70, 35);
+    engineWetSlider->setBounds(240, 200, 100, 100);
 
     for (int i = 0; i < MAX_COLONY; i++) {
-        enableColonyButtons[i]->setBounds(240, 240, 60, 40);
+        enableColonyButtons[i]->setBounds(240, 30, 60, 20);
+        loopColonyButtons[i]->setBounds(240, 50, 60, 20);
         resampleRatioSliders[i]->setBounds(220, 100, 100, 100);
         resampleStartSliders[i]->setBounds(100, 100, 100, 100);
         colonyPlayControlSliders[i]->setBounds(340, 40, 30, 180);
         colonyGainSliders[i]->setBounds(100, 200, 100, 100);
+        
     }
 }
 

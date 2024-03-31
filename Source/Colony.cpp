@@ -23,7 +23,9 @@ Colony::Colony(int n, juce::AudioProcessorValueTreeState& p) : colonyNum(n),
                         resampleRatioParamName(PARAMETER_RESAMPLE_RATIO_ID(n+1)), // for the users to see
                         resampleStartParamName(PARAMETER_RESAMPLE_START_ID(n+1)),
                         colonyBufferReadStartParamName(PARAMETER_COLONY_START_ID(n+1)),
-                        gainParamName(PARAMETER_COLONY_DBFS_ID(n+1))
+                        colonyBufferReadEndParamName(PARAMETER_COLONY_END_ID(n+1)),
+                        gainParamName(PARAMETER_COLONY_DBFS_ID(n+1)),
+                        loopEnableParamName(PARAMETER_LOOP_ID(n+1))
 {
 }
 
@@ -60,6 +62,9 @@ void Colony::prepare(const ColonyParams& params)
 
     colonyLifeVol.reset(params.procSpec.sampleRate, 10);
     colonyLifeVol.setCurrentAndTargetValue(1);
+
+    enableGain.reset(params.procSpec.sampleRate, GAIN_FADE_TIME);
+    enableGain.setCurrentAndTargetValue(1);
     
 
     // perform all channel-dependent init operations
@@ -78,8 +83,68 @@ void Colony::prepare(const ColonyParams& params)
 
 void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
 {
+    /****************************
+    *  BEGIN PARAMETER PARSING  *
+    *****************************/
+    if (*parameters.getRawParameterValue(loopEnableParamName) == 0.0f) {
+        currentMode = Colony::ProcessMode::REGENERATE;
+    }
+    else {
+        currentMode = Colony::ProcessMode::LOOP;
+    }
+
+    float newResampleRatio = *parameters.getRawParameterValue(resampleRatioParamName);
+    if (!juce::approximatelyEqual(newResampleRatio, resampleRatio.getTargetValue())) {
+        doneProcessing = false;
+        resampleRatio.setTargetValue(newResampleRatio);
+    }
+    
+    // handle new colony buffer read offset
+    float newColonyBufferReadStartSec = *parameters.getRawParameterValue(colonyBufferReadStartParamName);    
+    int newColonyBufferReadStart = (int) (newColonyBufferReadStartSec * params.procSpec.sampleRate);
+    if (newColonyBufferReadStart != colonyBufferReadStart) {
+        colonyBufferReadStart = newColonyBufferReadStart;
+        colonyBufferReadStart = std::min(colonyBufferReadStart, colonyBuffer->getNumSamples() - 1); // clamp down start value
+        //colonyBufferReadOffsetLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples()) - colonyBufferReadStart;
+        colonyBufferReadOffsetLimit = std::max(colonyBufferReadEnd - colonyBufferReadStart, 1);
+        DBG("New Read Start Set: " << colonyBufferReadStart << " (sec= " << newColonyBufferReadStartSec << ")");
+        loopFade.setCurrentAndTargetValue(0);
+
+        for (int i = 0; i < MAX_CHANNELS; i++) {
+            colonyBufferReadOffset[i] = 0;
+        }   
+    }
+
+    // handle new colony buffer read end
+    float newColonyBufferReadEndSec = *parameters.getRawParameterValue(colonyBufferReadEndParamName);
+    int newColonyBufferReadEnd = (int)(newColonyBufferReadEndSec * params.procSpec.sampleRate);
+    if (newColonyBufferReadEnd != colonyBufferReadEnd) {
+        colonyBufferReadEnd = newColonyBufferReadEnd;
+        colonyBufferReadOffsetLimit = std::max(colonyBufferReadEnd - colonyBufferReadStart, 1);
+        DBG("New Read End Set: " << colonyBufferReadEnd << " (sec= " << newColonyBufferReadEndSec << ")");
+    }
+    
+    // handle new starting point for pulling from main delay
+    float newResampleStartSec = *parameters.getRawParameterValue(resampleStartParamName);
+    int newResampleStart = (int) (newResampleStartSec * params.procSpec.sampleRate);
+    if (newResampleStart != resampleStart) {
+        resampleStart = newResampleStart;
+        doneProcessing = false; 
+        DBG("New Resample Start: " << resampleStart);
+    }
+
+    float newGain = juce::Decibels::decibelsToGain(parameters.getRawParameterValue(gainParamName)->load());
+    if (!juce::approximatelyEqual(newGain, gain.getTargetValue())) {
+        gain.setTargetValue(newGain);
+        DBG("New Gain: " << newGain);
+    }
+
+    /********************************************************
+    *  END PARAMETER PARSING, BEGIN PROCESSING/STATE LOGIC  *
+    *********************************************************/
+
     // update states
-    if (!gain.isSmoothing() && currentState == Colony::State::RAMP_DOWN) {
+    if (!enableGain.isSmoothing() && currentState == Colony::State::RAMP_DOWN) {
         // gain should be 0 here anyways
         DBG("Setting colony to DEAD");
         currentState = Colony::State::DEAD;
@@ -97,7 +162,7 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
     }
 
     if (currentMode == Colony::ProcessMode::REGENERATE) {
-        if (doneProcessing && colonyLifeVol.getCurrentValue() <= COLONY_LIFE_THRESH+0.01) {
+        if (doneProcessing && colonyLifeVol.getCurrentValue() <= COLONY_LIFE_THRESH + 0.01) {
             // colony has faded out enough to be killed and replaced by new snippet
             doneProcessing = false;
             DBG("Re-generating colony");
@@ -107,48 +172,12 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
             colonyLifeVol.setTargetValue(COLONY_LIFE_THRESH);
             DBG("Starting re-generation process");
         }
-    } else if (currentMode == Colony::ProcessMode::LOOP) {
+    }
+    else if (currentMode == Colony::ProcessMode::LOOP) {
         // TODO: anything special here?
     }
-
-    // we want to restart procesing if any of the audio parameters corresponding to resampling change
-
-    // TODO: put all the other parameters into locals here
-    float newResampleRatio = *parameters.getRawParameterValue(resampleRatioParamName);
-    if (!juce::approximatelyEqual(newResampleRatio, resampleRatio.getTargetValue())) {
-        doneProcessing = false;
-        resampleRatio.setTargetValue(newResampleRatio);
-    }
     
-    // handle new colony buffer read offset
-    float newColonyBufferReadStartSec = *parameters.getRawParameterValue(colonyBufferReadStartParamName);    
-    int newColonyBufferReadStart = (int) (newColonyBufferReadStartSec * params.procSpec.sampleRate);
-    if (newColonyBufferReadStart != colonyBufferReadStart) {
-        colonyBufferReadStart = newColonyBufferReadStart;
-        colonyBufferReadStart = std::min(colonyBufferReadStart, colonyBuffer->getNumSamples() - 1); // clamp down start value
-        colonyBufferReadOffsetLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples()) - colonyBufferReadStart;
-        DBG("New Read Start Set: " << colonyBufferReadStart << " (sec= " << newColonyBufferReadStartSec << ")");
-        loopFade.setCurrentAndTargetValue(0);
-
-        for (int i = 0; i < MAX_CHANNELS; i++) {
-            colonyBufferReadOffset[i] = 0;
-        }   
-    }
-
-    float newResampleStartSec = *parameters.getRawParameterValue(resampleStartParamName);
-    int newResampleStart = (int) (newResampleStartSec * params.procSpec.sampleRate);
-    if (newResampleStart != resampleStart) {
-        resampleStart = newResampleStart;
-        doneProcessing = false; 
-        DBG("New Resample Start: " << resampleStart);
-    }
-
-    float newGain = juce::Decibels::decibelsToGain(parameters.getRawParameterValue(gainParamName)->load());
-    if (!juce::approximatelyEqual(newGain, gain.getTargetValue())) {
-        gain.setTargetValue(newGain);
-        DBG("New Gain: " << newGain);
-    }
-    
+    // transfer samples from main delay into colony buffer
     if (!doneProcessing) {
         // copy data to local colony buffer so we don't modify the original signal
         int numChannels = buffer.getNumChannels();
@@ -240,7 +269,7 @@ float Colony::getSampleN(int channel, int n)
     //colonyBuffer->setSample(channel, sampleIndex, sample * 0.4);
     colonyBufferReadOffset[channel] = ((colonyBufferReadOffset[channel] + 1) % colonyBufferReadOffsetLimit);
     //colonyBuffer->setSample(channel, sampleIndex, sample + delaySample * 0.4);
-    return (*sample + delaySample) * gain.getNextValue() * loopFade.getNextValue() * colonyLifeVol.getNextValue();
+    return (*sample + delaySample) * gain.getNextValue() * loopFade.getNextValue() * colonyLifeVol.getNextValue() * enableGain.getNextValue();
     //return ret;
 }
 
@@ -248,13 +277,13 @@ void Colony::toggleState(bool value)
 {
     if (value && !isActive()) {
         currentState = Colony::State::ALIVE;
-        gain.setTargetValue(params.initialGain);
+        enableGain.setTargetValue(params.initialGain);
         doneProcessing = false; // if we revive this colony again it should start processing right away
         DBG("Reviving colony");
     } else if (!value && isActive()) {
         currentState = Colony::State::RAMP_DOWN;
         DBG("Ramping down colony");
-        gain.setTargetValue(0);
+        enableGain.setTargetValue(0);
     }
 }
 
@@ -282,23 +311,23 @@ void Colony::setResampleRatio(float ratio)
 // TODO: need a lock here???
 void Colony::setColonyBufferReadStart(float startSec)
 {
-    colonyBufferReadStart = (int)(startSec * params.procSpec.sampleRate);
-    colonyBufferReadStart = std::min(colonyBufferReadStart, colonyBuffer->getNumSamples() - 1); // clamp down start value
-    colonyBufferReadOffsetLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples()) - colonyBufferReadStart;
-    DBG("New Read Start Set: " << colonyBufferReadStart << " (sec= " << startSec << ")");
-    loopFade.setCurrentAndTargetValue(0);
+    //colonyBufferReadStart = (int)(startSec * params.procSpec.sampleRate);
+    //colonyBufferReadStart = std::min(colonyBufferReadStart, colonyBuffer->getNumSamples() - 1); // clamp down start value
+    //colonyBufferReadOffsetLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples()) - colonyBufferReadStart;
+    //DBG("New Read Start Set: " << colonyBufferReadStart << " (sec= " << startSec << ")");
+    //loopFade.setCurrentAndTargetValue(0);
 
-    for (int i = 0; i < MAX_CHANNELS; i++) {
-        colonyBufferReadOffset[i] = 0;
-    }
+    //for (int i = 0; i < MAX_CHANNELS; i++) {
+    //    colonyBufferReadOffset[i] = 0;
+    //}
 }
 
 void Colony::setColonyBufferReadLength(float lengthSec)
 {
-    colonyBufferReadLength = (int) (lengthSec * params.procSpec.sampleRate);
-    colonyBufferReadOffsetLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples()) - colonyBufferReadStart;
-    DBG("New Read Limit: " << colonyBufferReadOffsetLimit << " (sec= " << lengthSec << ")");
-    doneProcessing = false;
+    //colonyBufferReadLength = (int) (lengthSec * params.procSpec.sampleRate);
+    //colonyBufferReadOffsetLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples()) - colonyBufferReadStart;
+    //DBG("New Read Limit: " << colonyBufferReadOffsetLimit << " (sec= " << lengthSec << ")");
+    //doneProcessing = false;
 }
 
 // TODO: this prob has to be locked somehow

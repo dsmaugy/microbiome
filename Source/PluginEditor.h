@@ -45,9 +45,14 @@ private:
     juce::TextButton addColony = juce::TextButton("->");
     juce::TextButton removeColony = juce::TextButton("<-");
 
+    std::unique_ptr<juce::Slider> engineWetSlider;
+    std::unique_ptr<SliderAttachment> engineWetAttachment;
+
     std::array<std::vector<juce::Component*>, MAX_COLONY> colonyComponents;
     std::array<std::unique_ptr<juce::ToggleButton>, MAX_COLONY> enableColonyButtons;
     std::array<std::unique_ptr<ButtonAttachment>, MAX_COLONY> enableAttachments;
+    std::array<std::unique_ptr<juce::ToggleButton>, MAX_COLONY> loopColonyButtons;
+    std::array<std::unique_ptr<ButtonAttachment>, MAX_COLONY> loopAttachments;
     std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> resampleRatioSliders;
     std::array<std::unique_ptr<SliderAttachment>, MAX_COLONY> resampleRatioAttachments;
     std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> resampleStartSliders;
@@ -56,7 +61,6 @@ private:
     std::array<std::unique_ptr<juce::TwoValueSliderAttachment>, MAX_COLONY> colonyPlayControlAttachments;
     std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> colonyGainSliders;
     std::array<std::unique_ptr<SliderAttachment>, MAX_COLONY> colonyGainAttachments;
-
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MicrobiomeAudioProcessorEditor)
 };

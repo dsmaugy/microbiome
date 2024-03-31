@@ -31,11 +31,6 @@ void MicrobiomeEngine::prepare(const EngineParams& params)
 
     for (int i = 0; i < MAX_COLONY; i++) {
         ColonyParams colonyParams(params.procSpec, delayBuffer.get());
-
-        if (i < DEFAULT_COLONIES) {
-            // colonyParams.initialDelayInSamples = 10 * params.procSpec.sampleRate * (1.0/(i+1));
-            colony[i]->toggleState(true);
-        }
         colony[i]->prepare(colonyParams);
     }   
 }
@@ -43,6 +38,8 @@ void MicrobiomeEngine::prepare(const EngineParams& params)
 void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
 {
     for (int i = 0; i < MAX_COLONY; i++) {
+        colony[i]->toggleState(*parameters.getRawParameterValue(PARAMETER_ENABLE_ID(i + 1)) == 1.0f);
+
         if (colony[i]->isActive()) {
             colony[i]->processAudio(buffer);
         }
@@ -58,14 +55,17 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
 
         for (int i = 0; i < buffer.getNumSamples(); i++) {
             float originalSample = channelData[i];
+            float colonySample = 0;
             for (int j = 0; j < MAX_COLONY; j++) {
                 // can't break out early from checking appliedColonies because some colonies may be ramping down
                 if (colony[j]->isActive()) {
-                    //  channelData[i] += colony[j]->getSampleN(channel, i);
-                     channelData[i] = colony[j]->getSampleN(channel, i);
+                    colonySample += colony[j]->getSampleN(channel, i);
                 }
             }
-            //delayReadIdx = (delayReadIdx+1) % 22050;// ((int) params.procSpec.sampleRate) * 5;
+
+            float wet = *parameters.getRawParameterValue(PARAMETER_ENGINE_WET_ID);
+            channelData[i] = ((1.0 - wet) * originalSample) + (colonySample * wet);
+
             // we update the delay after the current output sample has already been updated
             delayBuffer->setSample(channel, delayWriteIdx, originalSample);
             delayWriteIdx = (delayWriteIdx+1) % delayBuffer->getNumSamples();
