@@ -92,6 +92,7 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
 
         bool doneProcessing = false;
 
+        juce::String colonyBufferReadStartParamName;
         int colonyBufferWriteIdx[MAX_CHANNELS];
         int colonyBufferReadOffset[MAX_CHANNELS];
         int colonyBufferReadStart = 0;

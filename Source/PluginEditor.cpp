@@ -109,7 +109,7 @@ void MicrobiomeAudioProcessorEditor::resized()
         enableColonyButtons[i]->setBounds(240, 240, 60, 40);
         resampleRatioSliders[i]->setBounds(220, 100, 140, 140);
         resampleStartSliders[i]->setBounds(100, 100, 140, 140);
-        colonyPlayControlSliders[i]->setBounds(340, 40, 30, 130);
+        colonyPlayControlSliders[i]->setBounds(340, 40, 30, 180);
     }
 }
 

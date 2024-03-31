@@ -20,7 +20,8 @@
 Colony::Colony(int n, juce::AudioProcessorValueTreeState& p) : colonyNum(n),
                         parameters(p),
                         colonyBuffer(std::make_unique<juce::AudioBuffer<float>>(0, 0)),
-                        resampleRatioParamName(PARAMETER_RESAMPLE_RATIO_ID(n+1)) // for the users to see
+                        resampleRatioParamName(PARAMETER_RESAMPLE_RATIO_ID(n+1)), // for the users to see
+                        colonyBufferReadStartParamName(PARAMETER_COLONY_START_ID(n+1))
 {
 }
 
@@ -109,11 +110,26 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
     }
 
     // TODO: put all the other parameters into locals here
+    float newResampleRatio = *parameters.getRawParameterValue(resampleRatioParamName);    
     // restart procesing if any of the audio parameters corresponding to resampling change
-    float newResampleRatio = *parameters.getRawParameterValue(resampleRatioParamName);
     if (!juce::approximatelyEqual(newResampleRatio, resampleRatio.getTargetValue())) {
         doneProcessing = false;
         resampleRatio.setTargetValue(newResampleRatio);
+    }
+    
+    // handle new colony buffer read offset
+    float newColonyBufferReadStartSec = *parameters.getRawParameterValue(colonyBufferReadStartParamName);
+    int newColonyBufferReadStart = (int) (newColonyBufferReadStartSec * params.procSpec.sampleRate);
+    if (newColonyBufferReadStart != colonyBufferReadStart) {
+        colonyBufferReadStart = newColonyBufferReadStart;
+        colonyBufferReadStart = std::min(colonyBufferReadStart, colonyBuffer->getNumSamples() - 1); // clamp down start value
+        colonyBufferReadOffsetLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples()) - colonyBufferReadStart;
+        DBG("New Read Start Set: " << colonyBufferReadStart << " (sec= " << newColonyBufferReadStartSec << ")");
+        loopFade.setCurrentAndTargetValue(0);
+
+        for (int i = 0; i < MAX_CHANNELS; i++) {
+            colonyBufferReadOffset[i] = 0;
+        }   
     }
 
     if (!doneProcessing) {
