@@ -302,5 +302,13 @@ juce::AudioProcessorValueTreeState::ParameterLayout MicrobiomeAudioProcessor::cr
         ENGINE_WET_DEF)
     );
 
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        juce::ParameterID{ PARAMETER_ENGINE_REVERB_ID, 1},
+        PARAMETER_ENGINE_REVERB_NAME,
+        ENGINE_REVERB_MIN,
+        ENGINE_REVERB_MAX,
+        ENGINE_REVERB_DEF)
+    );
+
     return layout;
 }

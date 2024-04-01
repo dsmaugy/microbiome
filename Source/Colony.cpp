@@ -186,16 +186,11 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
     
     // transfer samples from main delay into colony buffer
     if (!doneProcessing) {
-        // copy data to local colony buffer so we don't modify the original signal
         int numChannels = buffer.getNumChannels();
         int numInSamples = buffer.getNumSamples();
         int numOutputSamples = std::min(numInSamples, colonyBuffer->getNumSamples() - colonyBufferWriteIdx[0]); // TODO: this could be an arbitrary number as long as its above block size
         int colonyBufferWriteProcStart = colonyBufferWriteIdx[0];
         for (int i = 0; i < numChannels; i++) {
-            // pure copy
-            //colonyBuffer->copyFrom(i, colonyBufferWriteIdx[i], buffer, i, 0, numInSamples);
-            //colonyBufferWriteIdx[i] = (colonyBufferWriteIdx[i] + numInSamples) % (colonyBuffer->getNumSamples() - params.procSpec.maximumBlockSize);
-
             // resample copy
             int sampleLimit = std::max(params.delayBuffer->getNumSamples() - 1, resampleStart + resampleLength);
 
@@ -219,7 +214,7 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         juce::dsp::ProcessContextReplacing<float> procCtx(localBlock);
 
         ladder.process(procCtx);
-        reverb.process(procCtx);
+        // reverb.process(procCtx);
 
         // if (rng.nextFloat() < 0.005) {
         //     DBG("Setting new random delay!");

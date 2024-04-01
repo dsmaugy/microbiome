@@ -41,7 +41,14 @@
 #define COLONY_GHOSTS_MAX (MAX_GHOSTS)
 #define COLONY_GHOSTS_MIN 0
 #define COLONY_GHOSTS_DEF 5
+#define ENGINE_REVERB_MIN 0
+#define ENGINE_REVERB_MAX 1
+#define ENGINE_REVERB_DEF 0.7
 
+#define PARAMETER_ENGINE_WET_ID "engine_wet"
+#define PARAMETER_ENGINE_WET_NAME "Engine Wetness"
+#define PARAMETER_ENGINE_REVERB_ID "engine_reverb"
+#define PARAMETER_ENGINE_REVERB_NAME "Engine Reverb"
 #define PARAMETER_ENABLE_ID(n) "colony_" + juce::String(n) + "_enable"
 #define PARAMETER_ENABLE_NAME(n) "Colony " + juce::String(n) + " Enable"
 #define PARAMETER_RESAMPLE_RATIO_ID(n) "colony_" + juce::String(n) + "_warp"
@@ -54,8 +61,6 @@
 #define PARAMETER_COLONY_END_NAME(n) "Colony " + juce::String(n) + " Branch Loop End"
 #define PARAMETER_COLONY_DBFS_ID(n) "colony_" + juce::String(n) + "_gain"
 #define PARAMETER_COLONY_DBFS_NAME(n) "Colony " + juce::String(n) + " Gain"
-#define PARAMETER_ENGINE_WET_ID "engine_wet"
-#define PARAMETER_ENGINE_WET_NAME "Engine Wetness"
 #define PARAMETER_LOOP_ID(n) "colony_" + juce::String(n) + "_loop"
 #define PARAMETER_LOOP_NAME(n) "Colony " + juce::String(n) + " Loop"
 #define PARAMETER_COLONY_GHOST_ID(n) "colony_" + juce::String(n) + "_ghost"

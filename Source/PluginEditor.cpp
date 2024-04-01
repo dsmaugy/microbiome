@@ -65,6 +65,11 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
     engineWetAttachment = std::make_unique<SliderAttachment>(parameters, PARAMETER_ENGINE_WET_ID, *engineWetSlider);
     addAndMakeVisible(*engineWetSlider);
 
+    engineReverbSlider = std::make_unique<juce::Slider>();
+    applyRotarySliderStyle(*engineReverbSlider);
+    engineReverbAttachment = std::make_unique<SliderAttachment>(parameters, PARAMETER_ENGINE_REVERB_ID, *engineReverbSlider);
+    addAndMakeVisible(*engineReverbSlider);
+
     addColony.setButtonText("->");
     addColony.addListener(this);
     addAndMakeVisible(addColony);
@@ -113,6 +118,7 @@ void MicrobiomeAudioProcessorEditor::resized()
     addColony.setBounds(50, 50, 70, 35);
     removeColony.setBounds(150, 50, 70, 35);
     engineWetSlider->setBounds(240, 200, 100, 100);
+    engineReverbSlider->setBounds(240, 300, 100, 100);
 
     for (int i = 0; i < MAX_COLONY; i++) {
         enableColonyButtons[i]->setBounds(240, 30, 60, 20);
@@ -161,7 +167,7 @@ void MicrobiomeAudioProcessorEditor::buttonClicked(juce::Button* button)
 void MicrobiomeAudioProcessorEditor::applyRotarySliderStyle(juce::Slider& slider)
 {
     slider.setSliderStyle(juce::Slider::Rotary);
-    slider.setRotaryParameters(3 * juce::MathConstants<float>::pi / 2, 5 * juce::MathConstants<float>::pi / 2, true);
+    // slider.setRotaryParameters(3 * juce::MathConstants<float>::pi / 2, 5 * juce::MathConstants<float>::pi / 2, true);
     slider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 35);
     slider.setPopupDisplayEnabled(true, true, this);
 }

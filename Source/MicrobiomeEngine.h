@@ -44,13 +44,14 @@ class MicrobiomeEngine
 
     private:
         juce::AudioProcessorValueTreeState& parameters;
-        std::array<std::unique_ptr<Colony>, MAX_COLONY> colony;
-        // Colony colony[MAX_COLONY];
-        // TODO: should probably be renamed to aliveColonies with current use case
-        //int activeColonies;
         EngineParams params;
 
+        std::array<std::unique_ptr<Colony>, MAX_COLONY> colony;
+
+        juce::dsp::Reverb reverb;
+        juce::dsp::Reverb::Parameters reverbParameters;
         std::unique_ptr<juce::AudioBuffer<float>> delayBuffer;
+        
         int delayWriteIdx = 0;
         // TODO: this is just for debuggin
         int delayReadIdx = 0;

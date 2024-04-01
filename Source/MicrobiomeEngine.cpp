@@ -29,6 +29,9 @@ void MicrobiomeEngine::prepare(const EngineParams& params)
     // without clearing there are audible pops at initialization with using IIR filters
     delayBuffer->clear();
 
+    reverb.prepare(params.procSpec);
+    reverb.setParameters(reverbParameters);
+
     for (int i = 0; i < MAX_COLONY; i++) {
         ColonyParams colonyParams(params.procSpec, delayBuffer.get());
         colony[i]->prepare(colonyParams);
@@ -74,6 +77,12 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
             // DBG(delayBuffer->getSample(channel, delayReadIdx));
         }
     }
+
+    // set up local buffer effects chain processing
+    juce::dsp::AudioBlock<float> localBlock(buffer);
+    juce::dsp::ProcessContextReplacing<float> procCtx(localBlock);
+
+    reverb.process(procCtx);
 }
 
 void MicrobiomeEngine::disableColony(int n)
