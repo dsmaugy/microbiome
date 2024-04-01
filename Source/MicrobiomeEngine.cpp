@@ -78,6 +78,9 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
         }
     }
 
+    reverbParameters.wetLevel = *parameters.getRawParameterValue(PARAMETER_ENGINE_REVERB_ID);
+    reverb.setParameters(reverbParameters);
+    
     // set up local buffer effects chain processing
     juce::dsp::AudioBlock<float> localBlock(buffer);
     juce::dsp::ProcessContextReplacing<float> procCtx(localBlock);
