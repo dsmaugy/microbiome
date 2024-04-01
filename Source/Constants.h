@@ -38,6 +38,9 @@
 #define ENGINE_WET_MAX 1
 #define ENGINE_WET_DEF 0.5
 #define COLONY_LOOP_DEF false
+#define COLONY_GHOSTS_MAX (MAX_GHOSTS)
+#define COLONY_GHOSTS_MIN 0
+#define COLONY_GHOSTS_DEF 5
 
 #define PARAMETER_ENABLE_ID(n) "colony_" + juce::String(n) + "_enable"
 #define PARAMETER_ENABLE_NAME(n) "Colony " + juce::String(n) + " Enable"
@@ -55,3 +58,5 @@
 #define PARAMETER_ENGINE_WET_NAME "Engine Wetness"
 #define PARAMETER_LOOP_ID(n) "colony_" + juce::String(n) + "_loop"
 #define PARAMETER_LOOP_NAME(n) "Colony " + juce::String(n) + " Loop"
+#define PARAMETER_COLONY_GHOST_ID(n) "colony_" + juce::String(n) + "_ghost"
+#define PARAMETER_COLONY_GHOST_NAME(n) "Colony " + juce::String(n) + " Artifacts"

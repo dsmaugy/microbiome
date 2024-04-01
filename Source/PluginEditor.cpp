@@ -52,6 +52,12 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
         colonyGainAttachments[i] = std::make_unique<SliderAttachment>(parameters, PARAMETER_COLONY_DBFS_ID(i+1), *colonyGainSliders[i]);
         addChildComponent(*colonyGainSliders[i]);
         colonyComponents[i].push_back(colonyGainSliders[i].get());
+
+        colonyGhostSliders[i] = std::make_unique<juce::Slider>();
+        applyRotarySliderStyle(*colonyGhostSliders[i]);
+        colonyGhostAttachments[i] = std::make_unique<SliderAttachment>(parameters, PARAMETER_COLONY_GHOST_ID(i+1), *colonyGhostSliders[i]);
+        addChildComponent(*colonyGhostSliders[i]);
+        colonyComponents[i].push_back(colonyGhostSliders[i].get());
     }
 
     engineWetSlider = std::make_unique<juce::Slider>();
@@ -115,23 +121,23 @@ void MicrobiomeAudioProcessorEditor::resized()
         resampleStartSliders[i]->setBounds(100, 100, 100, 100);
         colonyPlayControlSliders[i]->setBounds(340, 40, 30, 180);
         colonyGainSliders[i]->setBounds(100, 200, 100, 100);
-        
+        colonyGhostSliders[i]->setBounds(100, 300, 100, 100);
     }
 }
 
 void MicrobiomeAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) 
 {
-    if (slider == &resampleRatio) {
-        // TODO: set this based off of currently selected colony
-        // audioProcessor.getEngine().setColonyResampleRatio(0, slider->getValue());
-    }
-    else if (slider == &colonyBufferReadLength) {
-        audioProcessor.getEngine().setColonyBufferLength(0, slider->getValue());
-    }
-    else if (slider == &colonyBufferReadStart) {
-        audioProcessor.getEngine().setColonyBufferStart(0, slider->getValue());
-    }
-    // audioProcessor.setReverbWet(slider->getValue());
+    // if (slider == &resampleRatio) {
+    //     // TODO: set this based off of currently selected colony
+    //     // audioProcessor.getEngine().setColonyResampleRatio(0, slider->getValue());
+    // }
+    // else if (slider == &colonyBufferReadLength) {
+    //     audioProcessor.getEngine().setColonyBufferLength(0, slider->getValue());
+    // }
+    // else if (slider == &colonyBufferReadStart) {
+    //     audioProcessor.getEngine().setColonyBufferStart(0, slider->getValue());
+    // }
+    // // audioProcessor.setReverbWet(slider->getValue());
 }
 
 void MicrobiomeAudioProcessorEditor::buttonClicked(juce::Button* button)
@@ -143,14 +149,12 @@ void MicrobiomeAudioProcessorEditor::buttonClicked(juce::Button* button)
             DBG("Switching editor view to colony: " << currentColony);
         }
         
-        // audioProcessor.getEngine().addColony();
     } else if (button == &removeColony) {
         if (currentColony > 0) {
             currentColony--;
             repaint();
             DBG("Switching editor view to colony: " << currentColony);
         }
-        // audioProcessor.getEngine().removeColony();
     }
 }
 

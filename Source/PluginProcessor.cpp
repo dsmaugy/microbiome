@@ -284,6 +284,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout MicrobiomeAudioProcessor::cr
             PARAMETER_LOOP_NAME(i),
             COLONY_LOOP_DEF)
         );
+
+        layout.add(std::make_unique<juce::AudioParameterInt>(
+            juce::ParameterID {PARAMETER_COLONY_GHOST_ID(i), 1}, 
+            PARAMETER_COLONY_GHOST_NAME(i), 
+            COLONY_GHOSTS_MIN, 
+            COLONY_GHOSTS_MAX, 
+            COLONY_GHOSTS_DEF)
+        );    
     }
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(

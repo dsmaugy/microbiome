@@ -25,7 +25,8 @@ Colony::Colony(int n, juce::AudioProcessorValueTreeState& p) : colonyNum(n),
                         colonyBufferReadStartParamName(PARAMETER_COLONY_START_ID(n+1)),
                         colonyBufferReadEndParamName(PARAMETER_COLONY_END_ID(n+1)),
                         gainParamName(PARAMETER_COLONY_DBFS_ID(n+1)),
-                        loopEnableParamName(PARAMETER_LOOP_ID(n+1))
+                        loopEnableParamName(PARAMETER_LOOP_ID(n+1)),
+                        ghostDelayParamName(PARAMETER_COLONY_GHOST_ID(n+1))
 {
 }
 
@@ -139,6 +140,12 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         DBG("New Gain: " << newGain);
     }
 
+    int newGhosts = (int) *parameters.getRawParameterValue(ghostDelayParamName);
+    if (newGhosts != numGhosts) {
+        numGhosts = newGhosts;
+        DBG("New Ghosts: " << numGhosts);
+    }
+
     /********************************************************
     *  END PARAMETER PARSING, BEGIN PROCESSING/STATE LOGIC  *
     *********************************************************/
@@ -151,7 +158,7 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
     }
 
     // update ghost delays per processing block for efficiency
-    for (int j = 0; j < MAX_GHOSTS; j++) {
+    for (int j = 0; j < numGhosts; j++) {
         if (!ghostDelays[j][0].isSmoothing() && rng.nextFloat() < 0.01) {
             int newGhost = rng.nextInt(4000);
             for (int i = 0; i < MAX_CHANNELS; i++) {
@@ -247,16 +254,13 @@ float Colony::getSampleN(int channel, int n)
     else if (colonyBufferReadOffset[channel] == (colonyBufferReadOffsetLimit * 0.75)) {
         loopFade.setTargetValue(0.35);
     }
-    //float ret = colonyBuffer->getSample(channel, colonyBufferReadOffset[channel] + colonyBufferReadStart) * gain.getNextValue() * loopFade.getNextValue();
-    //colonyBuffer->applyGain(channel, n, 1, 0.5);
+
     int sampleIndex = colonyBufferReadOffset[channel] + colonyBufferReadStart;
-    //float sample = colonyBuffer->getSample(channel, sampleIndex);
     float* sample = colonyBuffer->getWritePointer(channel, sampleIndex);
     float delaySample = 0;
 
-
     if (sampleIndex > 5000) {
-        for (int i = 0; i < MAX_GHOSTS; i++) {
+        for (int i = 0; i < numGhosts; i++) {
             int delayInt = (int) ghostDelays[i][channel].getNextValue();
             float fr = ghostDelays[i][channel].getCurrentValue() - delayInt;
             float x0 = *(sample - delayInt);

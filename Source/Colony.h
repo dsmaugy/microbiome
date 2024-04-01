@@ -100,6 +100,8 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
         int colonyBufferReadEnd = 132300;
         int colonyBufferReadOffsetLimit = 132300;
 
+        juce::String ghostDelayParamName;
+        int numGhosts = 0;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> ghostDelays[MAX_GHOSTS][MAX_CHANNELS];
         
         juce::String resampleStartParamName;
