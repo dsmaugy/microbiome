@@ -49,6 +49,8 @@ private:
     std::unique_ptr<SliderAttachment> engineWetAttachment;
     std::unique_ptr<juce::Slider> engineReverbSlider;
     std::unique_ptr<SliderAttachment> engineReverbAttachment;
+    std::unique_ptr<juce::Slider> engineLushSlider;
+    std::unique_ptr<SliderAttachment> engineLushAttachment;
 
     std::array<std::vector<juce::Component*>, MAX_COLONY> colonyComponents;
     std::array<std::unique_ptr<juce::ToggleButton>, MAX_COLONY> enableColonyButtons;

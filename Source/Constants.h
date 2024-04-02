@@ -43,12 +43,17 @@
 #define COLONY_GHOSTS_DEF 5
 #define ENGINE_REVERB_MIN 0
 #define ENGINE_REVERB_MAX 1
-#define ENGINE_REVERB_DEF 0.7
+#define ENGINE_REVERB_DEF 0.5
+#define ENGINE_LUSH_MIN 0
+#define ENGINE_LUSH_MAX 1
+#define ENGINE_LUSH_DEF 0.8
 
 #define PARAMETER_ENGINE_WET_ID "engine_wet"
 #define PARAMETER_ENGINE_WET_NAME "Engine Wetness"
 #define PARAMETER_ENGINE_REVERB_ID "engine_reverb"
 #define PARAMETER_ENGINE_REVERB_NAME "Engine Reverb"
+#define PARAMETER_ENGINE_LUSH_ID "engine_lush"
+#define PARAMETER_ENGINE_LUSH_NAME "Engine Lusciousness"
 #define PARAMETER_ENABLE_ID(n) "colony_" + juce::String(n) + "_enable"
 #define PARAMETER_ENABLE_NAME(n) "Colony " + juce::String(n) + " Enable"
 #define PARAMETER_RESAMPLE_RATIO_ID(n) "colony_" + juce::String(n) + "_warp"

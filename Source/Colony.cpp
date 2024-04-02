@@ -58,8 +58,11 @@ void Colony::prepare(const ColonyParams& params)
     ladder.prepare(params.procSpec);
     ladder.setCutoffFrequencyHz(1000);
 
-    reverb.prepare(params.procSpec);
-    reverb.setParameters(reverbParameters);
+    compressor.prepare(params.procSpec);
+    compressor.setAttack(0.6);
+    compressor.setRelease(0.3);
+    compressor.setThreshold(5);
+    compressor.setRatio(1.5);
 
     colonyLifeVol.reset(params.procSpec.sampleRate, 10);
     colonyLifeVol.setCurrentAndTargetValue(1);
@@ -214,6 +217,7 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         juce::dsp::ProcessContextReplacing<float> procCtx(localBlock);
 
         ladder.process(procCtx);
+        compressor.process(procCtx);
         // reverb.process(procCtx);
 
         // if (rng.nextFloat() < 0.005) {

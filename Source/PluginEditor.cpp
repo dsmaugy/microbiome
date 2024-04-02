@@ -62,13 +62,21 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
 
     engineWetSlider = std::make_unique<juce::Slider>();
     applyRotarySliderStyle(*engineWetSlider);
+    engineWetSlider->setColour(juce::Slider::ColourIds::thumbColourId, juce::Colours::blanchedalmond);
     engineWetAttachment = std::make_unique<SliderAttachment>(parameters, PARAMETER_ENGINE_WET_ID, *engineWetSlider);
     addAndMakeVisible(*engineWetSlider);
 
     engineReverbSlider = std::make_unique<juce::Slider>();
     applyRotarySliderStyle(*engineReverbSlider);
+    engineReverbSlider->setColour(juce::Slider::ColourIds::thumbColourId, juce::Colours::blanchedalmond);
     engineReverbAttachment = std::make_unique<SliderAttachment>(parameters, PARAMETER_ENGINE_REVERB_ID, *engineReverbSlider);
     addAndMakeVisible(*engineReverbSlider);
+
+    engineLushSlider = std::make_unique<juce::Slider>();
+    applyRotarySliderStyle(*engineLushSlider);
+    engineLushSlider->setColour(juce::Slider::ColourIds::thumbColourId, juce::Colours::blanchedalmond);
+    engineLushAttachment = std::make_unique<SliderAttachment>(parameters, PARAMETER_ENGINE_LUSH_ID, *engineLushSlider);
+    addAndMakeVisible(*engineLushSlider);
 
     addColony.setButtonText("->");
     addColony.addListener(this);
@@ -119,6 +127,7 @@ void MicrobiomeAudioProcessorEditor::resized()
     removeColony.setBounds(150, 50, 70, 35);
     engineWetSlider->setBounds(240, 200, 100, 100);
     engineReverbSlider->setBounds(240, 300, 100, 100);
+    engineLushSlider->setBounds(340, 300, 100, 100);
 
     for (int i = 0; i < MAX_COLONY; i++) {
         enableColonyButtons[i]->setBounds(240, 30, 60, 20);

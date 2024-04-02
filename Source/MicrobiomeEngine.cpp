@@ -11,7 +11,7 @@
 #include "MicrobiomeEngine.h"
 #include "Constants.h"
 
-MicrobiomeEngine::MicrobiomeEngine(juce::AudioProcessorValueTreeState& p) : parameters(p)
+MicrobiomeEngine::MicrobiomeEngine(juce::AudioProcessorValueTreeState& p) : parameters(p), reverbParameters{0.7f, 0.25f, 0.33f, 0.4f, 1.0f, 0.0f}
 {
     for (int i = 0; i < MAX_COLONY; i++) {
         colony[i] = std::make_unique<Colony>(i, parameters);
@@ -79,6 +79,7 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
     }
 
     reverbParameters.wetLevel = *parameters.getRawParameterValue(PARAMETER_ENGINE_REVERB_ID);
+    reverbParameters.roomSize = *parameters.getRawParameterValue(PARAMETER_ENGINE_LUSH_ID);
     reverb.setParameters(reverbParameters);
     
     // set up local buffer effects chain processing

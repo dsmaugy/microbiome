@@ -87,8 +87,7 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
 
         juce::Interpolators::Lagrange resampler[MAX_CHANNELS];
         juce::dsp::LadderFilter<float> ladder;
-        juce::dsp::Reverb reverb;
-        juce::dsp::Reverb::Parameters reverbParameters;
+        juce::dsp::Compressor<float> compressor;
 
         bool doneProcessing = false;
 
