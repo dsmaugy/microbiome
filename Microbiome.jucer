@@ -6,6 +6,10 @@
               pluginName="Microbiome" pluginManufacturer="Darwin Do" pluginDesc="Exploring the evolutionary nature of sound">
   <MAINGROUP id="HVHVHe" name="Microbiome">
     <GROUP id="{021420D8-7482-8AC4-5F25-AEEA04E9072F}" name="Source">
+      <FILE id="Rw9zPe" name="MicrobiomeWindow.cpp" compile="1" resource="0"
+            file="Source/MicrobiomeWindow.cpp"/>
+      <FILE id="vJvJN8" name="MicrobiomeWindow.h" compile="0" resource="0"
+            file="Source/MicrobiomeWindow.h"/>
       <FILE id="TP2p5b" name="TwoValueSliderAttachment.h" compile="0" resource="0"
             file="Source/TwoValueSliderAttachment.h"/>
       <FILE id="ZCZ3pb" name="Constants.h" compile="0" resource="0" file="Source/Constants.h"/>
@@ -39,6 +43,7 @@
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
   </MODULES>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
   <EXPORTFORMATS>
@@ -61,6 +66,7 @@
         <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_dsp" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../JUCE/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
     <VS2022 targetFolder="Builds/VisualStudio2022">
@@ -82,6 +88,7 @@
         <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_dsp" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../JUCE/modules"/>
       </MODULEPATHS>
     </VS2022>
     <XCODE_MAC targetFolder="Builds/MacOSX">
@@ -103,6 +110,7 @@
         <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_dsp" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
   </EXPORTFORMATS>

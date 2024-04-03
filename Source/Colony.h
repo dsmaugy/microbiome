@@ -82,6 +82,7 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
         Colony::State currentState = Colony::State::DEAD;
         Colony::ProcessMode currentMode = Colony::ProcessMode::LOOP;
         juce::String loopEnableParamName;
+        int currentModeIntRep = 0;
 
         std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;
 

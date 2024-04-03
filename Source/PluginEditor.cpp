@@ -85,6 +85,8 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
     removeColony.setButtonText("<-");
     removeColony.addListener(this);
     addAndMakeVisible(removeColony);
+
+    addAndMakeVisible(visualWindow);
     
     setSize(850, 500);
 }
@@ -122,7 +124,7 @@ void MicrobiomeAudioProcessorEditor::resized()
     // subcomponents in your editor..
     // colonyBufferReadLength.setBounds(100, 100, 70, 70);
     // colonyBufferReadStart.setBounds(250, 100, 70, 70);
-
+    visualWindow.setBounds(500, 200, 200, 200);
     addColony.setBounds(50, 50, 70, 35);
     removeColony.setBounds(150, 50, 70, 35);
     engineWetSlider->setBounds(240, 200, 100, 100);

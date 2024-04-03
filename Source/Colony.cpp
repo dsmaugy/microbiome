@@ -15,7 +15,7 @@
 #define RESAMPLE_FADE 0.5
 #define LOOP_FADE_TIME 0.4
 
-#define COLONY_LIFE_THRESH 0.05
+#define COLONY_LIFE_THRESH 0.01
 
 Colony::Colony(int n, juce::AudioProcessorValueTreeState& p) : colonyNum(n),
                         parameters(p),
@@ -59,10 +59,10 @@ void Colony::prepare(const ColonyParams& params)
     ladder.setCutoffFrequencyHz(1000);
 
     compressor.prepare(params.procSpec);
-    compressor.setAttack(0.6);
-    compressor.setRelease(0.3);
-    compressor.setThreshold(5);
-    compressor.setRatio(1.5);
+    compressor.setAttack(600);
+    compressor.setRelease(300);
+    compressor.setThreshold(-5);
+    compressor.setRatio(2);
 
     colonyLifeVol.reset(params.procSpec.sampleRate, 10);
     colonyLifeVol.setCurrentAndTargetValue(1);
@@ -90,7 +90,7 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
     /****************************
     *  BEGIN PARAMETER PARSING  *
     *****************************/
-    if (*parameters.getRawParameterValue(loopEnableParamName) == 0.0f) {
+    if (juce::approximatelyEqual(parameters.getRawParameterValue(loopEnableParamName)->load(), 0.0f)) {
         currentMode = Colony::ProcessMode::REGENERATE;
     }
     else {
@@ -172,21 +172,17 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
     }
 
     if (currentMode == Colony::ProcessMode::REGENERATE) {
-        if (doneProcessing && colonyLifeVol.getCurrentValue() <= COLONY_LIFE_THRESH + 0.01) {
-            // colony has faded out enough to be killed and replaced by new snippet
-            doneProcessing = false;
-            DBG("Re-generating colony");
-        }
-        else if (doneProcessing && colonyLifeVol.getCurrentValue() >= 0.95 && rng.nextFloat() < 0.01) {
+        if (doneProcessing && colonyLifeVol.getCurrentValue() >= 0.95 && rng.nextFloat() < 0.01) {
             // begin process of killing colony
             colonyLifeVol.setTargetValue(COLONY_LIFE_THRESH);
+            doneProcessing = false;
             DBG("Starting re-generation process");
         }
     }
     else if (currentMode == Colony::ProcessMode::LOOP) {
         // TODO: anything special here?
     }
-    
+
     // transfer samples from main delay into colony buffer
     if (!doneProcessing) {
         int numChannels = buffer.getNumChannels();
@@ -235,6 +231,7 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
 
             if (currentMode == Colony::ProcessMode::REGENERATE) {
                 colonyLifeVol.setTargetValue(1);
+                for (int i = 0; i < MAX_CHANNELS; i++) colonyBufferReadOffset[i] = 0;
             }
             doneProcessing = true;
         }
@@ -272,7 +269,7 @@ float Colony::getSampleN(int channel, int n)
     //colonyBuffer->setSample(channel, sampleIndex, sample * 0.4);
     colonyBufferReadOffset[channel] = ((colonyBufferReadOffset[channel] + 1) % colonyBufferReadOffsetLimit);
     //colonyBuffer->setSample(channel, sampleIndex, sample + delaySample * 0.4);
-    return (*sample + delaySample) * gain.getNextValue() * loopFade.getNextValue() * colonyLifeVol.getNextValue() * enableGain.getNextValue();
+    return (*sample + delaySample) * gain.getNextValue() * loopFade.getNextValue() * enableGain.getNextValue() * colonyLifeVol.getNextValue();;
     //return ret;
 }
 

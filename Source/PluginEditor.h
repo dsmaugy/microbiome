@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "TwoValueSliderAttachment.h"
+#include "MicrobiomeWindow.h"
 
 typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
@@ -38,6 +39,8 @@ private:
     MicrobiomeAudioProcessor& audioProcessor;
     juce::AudioProcessorValueTreeState& parameters;
     int currentColony;
+
+    MicrobiomeWindow visualWindow;
 
     juce::Slider resampleRatio;
     juce::Slider colonyBufferReadLength;
