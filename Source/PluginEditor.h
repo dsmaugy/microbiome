@@ -72,6 +72,8 @@ private:
     std::array<std::unique_ptr<SliderAttachment>, MAX_COLONY> colonyGhostAttachments;
     std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> colonyFilterSliders;
     std::array<std::unique_ptr<SliderAttachment>, MAX_COLONY> colonyFilterAttachments;
+    std::array<std::unique_ptr<juce::ComboBox>, MAX_COLONY> colonyModeBox;
+    std::array<std::unique_ptr<juce::ComboBoxParameterAttachment>, MAX_COLONY> colonyModeBoxAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MicrobiomeAudioProcessorEditor)
 };

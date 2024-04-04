@@ -16,6 +16,13 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
 {
     
     for (int i = 0; i < MAX_COLONY; i++) {
+        colonyModeBox[i] = std::make_unique<juce::ComboBox>("Mode Box");
+        colonyModeBox[i]->addItemList(COLONY_MODES, 1);
+        colonyModeBox[i]->addSeparator();
+        colonyModeBoxAttachment[i] = std::make_unique<juce::ComboBoxParameterAttachment>(*parameters.getParameter(PARAMETER_COLONY_MODE_ID(i + 1)), *colonyModeBox[i]);
+        addChildComponent(*colonyModeBox[i]);
+        colonyComponents[i].push_back(colonyModeBox[i].get());
+
         enableColonyButtons[i] = std::make_unique<juce::ToggleButton>("Toggle Colony");
         enableAttachments[i] = std::make_unique<ButtonAttachment>(parameters, PARAMETER_ENABLE_ID(i+1), *enableColonyButtons[i]);
         addChildComponent(*enableColonyButtons[i]);
@@ -146,6 +153,7 @@ void MicrobiomeAudioProcessorEditor::resized()
         colonyGainSliders[i]->setBounds(100, 200, 100, 100);
         colonyGhostSliders[i]->setBounds(100, 300, 100, 100);
         colonyFilterSliders[i]->setBounds(100, 400, 100, 100);
+        colonyModeBox[i]->setBounds(280, 30, 60, 20);
     }
 }
 

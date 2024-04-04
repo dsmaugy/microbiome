@@ -41,6 +41,8 @@
 #define COLONY_FILTER_MIN 400
 #define COLONY_FILTER_MAX 3000
 #define COLONY_FILTER_DEF 1000
+#define COLONY_MODES juce::StringArray{"LOOP", "REGENERATE", "FOLLOW"}
+#define COLONY_MODE_DEF 1
 #define ENGINE_REVERB_MIN 0
 #define ENGINE_REVERB_MAX 1
 #define ENGINE_REVERB_DEF 0.5
@@ -69,6 +71,8 @@
 #define PARAMETER_COLONY_END_NAME(n) "Colony " + juce::String(n) + " Branch Loop End"
 #define PARAMETER_COLONY_DBFS_ID(n) "colony_" + juce::String(n) + "_gain"
 #define PARAMETER_COLONY_DBFS_NAME(n) "Colony " + juce::String(n) + " Gain"
+#define PARAMETER_COLONY_MODE_ID(n) "colony_" + juce::String(n) + "_mode"
+#define PARAMETER_COLONY_MODE_NAME(n) "Colony " + juce::String(n) + " Mode"
 #define PARAMETER_LOOP_ID(n) "colony_" + juce::String(n) + "_loop"
 #define PARAMETER_LOOP_NAME(n) "Colony " + juce::String(n) + " Loop"
 #define PARAMETER_COLONY_GHOST_ID(n) "colony_" + juce::String(n) + "_ghost"
