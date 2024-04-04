@@ -58,6 +58,12 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
         colonyGhostAttachments[i] = std::make_unique<SliderAttachment>(parameters, PARAMETER_COLONY_GHOST_ID(i+1), *colonyGhostSliders[i]);
         addChildComponent(*colonyGhostSliders[i]);
         colonyComponents[i].push_back(colonyGhostSliders[i].get());
+
+        colonyFilterSliders[i] = std::make_unique<juce::Slider>();
+        applyRotarySliderStyle(*colonyFilterSliders[i]);
+        colonyFilterAttachments[i] = std::make_unique<SliderAttachment>(parameters, PARAMETER_COLONY_FILTER_ID(i+1), *colonyFilterSliders[i]);
+        addChildComponent(*colonyFilterSliders[i]);
+        colonyComponents[i].push_back(colonyFilterSliders[i].get());
     }
 
     engineWetSlider = std::make_unique<juce::Slider>();
@@ -86,7 +92,7 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
     removeColony.addListener(this);
     addAndMakeVisible(removeColony);
 
-    addAndMakeVisible(visualWindow);
+    //addAndMakeVisible(visualWindow);
     
     setSize(850, 500);
 }
@@ -139,6 +145,7 @@ void MicrobiomeAudioProcessorEditor::resized()
         colonyPlayControlSliders[i]->setBounds(340, 40, 30, 180);
         colonyGainSliders[i]->setBounds(100, 200, 100, 100);
         colonyGhostSliders[i]->setBounds(100, 300, 100, 100);
+        colonyFilterSliders[i]->setBounds(100, 400, 100, 100);
     }
 }
 

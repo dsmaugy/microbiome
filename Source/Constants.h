@@ -34,19 +34,22 @@
 #define COLONY_DBFS_MIN -12
 #define COLONY_DBFS_MAX 12
 #define COLONY_DBFS_DEF -3
-#define ENGINE_WET_MIN 0
-#define ENGINE_WET_MAX 1
-#define ENGINE_WET_DEF 0.5
 #define COLONY_LOOP_DEF false
 #define COLONY_GHOSTS_MAX (MAX_GHOSTS)
 #define COLONY_GHOSTS_MIN 0
 #define COLONY_GHOSTS_DEF 5
+#define COLONY_FILTER_MIN 400
+#define COLONY_FILTER_MAX 3000
+#define COLONY_FILTER_DEF 1000
 #define ENGINE_REVERB_MIN 0
 #define ENGINE_REVERB_MAX 1
 #define ENGINE_REVERB_DEF 0.5
 #define ENGINE_LUSH_MIN 0
 #define ENGINE_LUSH_MAX 1
 #define ENGINE_LUSH_DEF 0.8
+#define ENGINE_WET_MIN 0
+#define ENGINE_WET_MAX 1
+#define ENGINE_WET_DEF 0.5
 
 #define PARAMETER_ENGINE_WET_ID "engine_wet"
 #define PARAMETER_ENGINE_WET_NAME "Engine Wetness"
@@ -70,3 +73,5 @@
 #define PARAMETER_LOOP_NAME(n) "Colony " + juce::String(n) + " Loop"
 #define PARAMETER_COLONY_GHOST_ID(n) "colony_" + juce::String(n) + "_ghost"
 #define PARAMETER_COLONY_GHOST_NAME(n) "Colony " + juce::String(n) + " Artifacts"
+#define PARAMETER_COLONY_FILTER_ID(n) "colony_" + juce::String(n) + "_filter"
+#define PARAMETER_COLONY_FILTER_NAME(n) "Colony " + juce::String(n) + " Resonance"

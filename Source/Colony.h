@@ -88,6 +88,7 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
 
         juce::Interpolators::Lagrange resampler[MAX_CHANNELS];
         juce::dsp::LadderFilter<float> ladder;
+        juce::String ladderFreq;
         juce::dsp::Compressor<float> compressor;
 
         bool doneProcessing = false;

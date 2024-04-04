@@ -26,7 +26,8 @@ Colony::Colony(int n, juce::AudioProcessorValueTreeState& p) : colonyNum(n),
                         colonyBufferReadEndParamName(PARAMETER_COLONY_END_ID(n+1)),
                         gainParamName(PARAMETER_COLONY_DBFS_ID(n+1)),
                         loopEnableParamName(PARAMETER_LOOP_ID(n+1)),
-                        ghostDelayParamName(PARAMETER_COLONY_GHOST_ID(n+1))
+                        ghostDelayParamName(PARAMETER_COLONY_GHOST_ID(n+1)),
+                        ladderFreq(PARAMETER_COLONY_FILTER_ID(n+1))
 {
 }
 
@@ -57,6 +58,7 @@ void Colony::prepare(const ColonyParams& params)
     ladder.setMode(juce::dsp::LadderFilterMode::LPF12);
     ladder.prepare(params.procSpec);
     ladder.setCutoffFrequencyHz(1000);
+    ladder.setResonance(0.2);
 
     compressor.prepare(params.procSpec);
     compressor.setAttack(600);
@@ -148,6 +150,9 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         numGhosts = newGhosts;
         DBG("New Ghosts: " << numGhosts);
     }
+    
+    // TODO: set processing to be true if this changes
+    ladder.setCutoffFrequencyHz(*parameters.getRawParameterValue(ladderFreq));
 
     /********************************************************
     *  END PARAMETER PARSING, BEGIN PROCESSING/STATE LOGIC  *
