@@ -16,8 +16,11 @@ MicrobiomeWindow::MicrobiomeWindow()
 {
     setOpaque(true);
     glCtx.setRenderer(this);
-    glCtx.setContinuousRepainting(true);
+    // glCtx.setContinuousRepainting(true);
+    bool setSwapSuccess = glCtx.setSwapInterval(60);
     glCtx.attachTo(*this);
+
+    DBG("OpenGL: Succesfully set swap interval: " << (int) setSwapSuccess);
 }
 
 MicrobiomeWindow::~MicrobiomeWindow()

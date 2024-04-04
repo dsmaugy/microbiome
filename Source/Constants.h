@@ -34,7 +34,6 @@
 #define COLONY_DBFS_MIN -12
 #define COLONY_DBFS_MAX 12
 #define COLONY_DBFS_DEF -3
-#define COLONY_LOOP_DEF false
 #define COLONY_GHOSTS_MAX (MAX_GHOSTS)
 #define COLONY_GHOSTS_MIN 0
 #define COLONY_GHOSTS_DEF 5
@@ -73,8 +72,6 @@
 #define PARAMETER_COLONY_DBFS_NAME(n) "Colony " + juce::String(n) + " Gain"
 #define PARAMETER_COLONY_MODE_ID(n) "colony_" + juce::String(n) + "_mode"
 #define PARAMETER_COLONY_MODE_NAME(n) "Colony " + juce::String(n) + " Mode"
-#define PARAMETER_LOOP_ID(n) "colony_" + juce::String(n) + "_loop"
-#define PARAMETER_LOOP_NAME(n) "Colony " + juce::String(n) + " Loop"
 #define PARAMETER_COLONY_GHOST_ID(n) "colony_" + juce::String(n) + "_ghost"
 #define PARAMETER_COLONY_GHOST_NAME(n) "Colony " + juce::String(n) + " Artifacts"
 #define PARAMETER_COLONY_FILTER_ID(n) "colony_" + juce::String(n) + "_filter"

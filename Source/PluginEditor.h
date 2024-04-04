@@ -58,8 +58,6 @@ private:
     std::array<std::vector<juce::Component*>, MAX_COLONY> colonyComponents;
     std::array<std::unique_ptr<juce::ToggleButton>, MAX_COLONY> enableColonyButtons;
     std::array<std::unique_ptr<ButtonAttachment>, MAX_COLONY> enableAttachments;
-    std::array<std::unique_ptr<juce::ToggleButton>, MAX_COLONY> loopColonyButtons;
-    std::array<std::unique_ptr<ButtonAttachment>, MAX_COLONY> loopAttachments;
     std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> resampleRatioSliders;
     std::array<std::unique_ptr<SliderAttachment>, MAX_COLONY> resampleRatioAttachments;
     std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> resampleStartSliders;

@@ -25,9 +25,9 @@ Colony::Colony(int n, juce::AudioProcessorValueTreeState& p) : colonyNum(n),
                         colonyBufferReadStartParamName(PARAMETER_COLONY_START_ID(n+1)),
                         colonyBufferReadEndParamName(PARAMETER_COLONY_END_ID(n+1)),
                         gainParamName(PARAMETER_COLONY_DBFS_ID(n+1)),
-                        loopEnableParamName(PARAMETER_LOOP_ID(n+1)),
                         ghostDelayParamName(PARAMETER_COLONY_GHOST_ID(n+1)),
-                        ladderFreq(PARAMETER_COLONY_FILTER_ID(n+1))
+                        ladderFreq(PARAMETER_COLONY_FILTER_ID(n+1)),
+                        currentModeParamName(PARAMETER_COLONY_MODE_ID(n+1))
 {
 }
 
@@ -92,11 +92,12 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
     /****************************
     *  BEGIN PARAMETER PARSING  *
     *****************************/
-    if (juce::approximatelyEqual(parameters.getRawParameterValue(loopEnableParamName)->load(), 0.0f)) {
-        currentMode = Colony::ProcessMode::REGENERATE;
-    }
-    else {
-        currentMode = Colony::ProcessMode::LOOP;
+    // DBG("Current Mode: " << *parameters.getRawParameterValue(currentModeParamName));
+    int newModeIntRep = (int) *parameters.getRawParameterValue(currentModeParamName);
+    if (newModeIntRep != static_cast<int>(currentMode)) {
+        currentMode = static_cast<Colony::ProcessMode>(newModeIntRep);
+        DBG("New Mode: " << currentMode);
+        doneProcessing = false;
     }
 
     float newResampleRatio = *parameters.getRawParameterValue(resampleRatioParamName);

@@ -67,10 +67,11 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
             DEAD
         };
 
-        enum class ProcessMode
+        enum ProcessMode
         {
             LOOP,
-            REGENERATE
+            REGENERATE,
+            FOLLOW
         };
 
         juce::AudioProcessorValueTreeState& parameters;
@@ -81,7 +82,7 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
 
         Colony::State currentState = Colony::State::DEAD;
         Colony::ProcessMode currentMode = Colony::ProcessMode::LOOP;
-        juce::String loopEnableParamName;
+        juce::String currentModeParamName;
         int currentModeIntRep = 0;
 
         std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;

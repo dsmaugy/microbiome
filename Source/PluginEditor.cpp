@@ -28,11 +28,6 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
         addChildComponent(*enableColonyButtons[i]);
         colonyComponents[i].push_back(enableColonyButtons[i].get());
 
-        loopColonyButtons[i] = std::make_unique<juce::ToggleButton>("Loop Colony");
-        loopAttachments[i] = std::make_unique<ButtonAttachment>(parameters, PARAMETER_LOOP_ID(i + 1), *loopColonyButtons[i]);
-        addChildComponent(*loopColonyButtons[i]);
-        colonyComponents[i].push_back(loopColonyButtons[i].get());
-
         resampleRatioSliders[i] = std::make_unique<juce::Slider>();
         applyRotarySliderStyle(*resampleRatioSliders[i]);
         resampleRatioAttachments[i] = std::make_unique<SliderAttachment>(parameters, PARAMETER_RESAMPLE_RATIO_ID(i+1), *resampleRatioSliders[i]);
@@ -99,7 +94,7 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
     removeColony.addListener(this);
     addAndMakeVisible(removeColony);
 
-    //addAndMakeVisible(visualWindow);
+    addAndMakeVisible(visualWindow);
     
     setSize(850, 500);
 }
@@ -146,14 +141,13 @@ void MicrobiomeAudioProcessorEditor::resized()
 
     for (int i = 0; i < MAX_COLONY; i++) {
         enableColonyButtons[i]->setBounds(240, 30, 60, 20);
-        loopColonyButtons[i]->setBounds(240, 50, 60, 20);
         resampleRatioSliders[i]->setBounds(220, 100, 100, 100);
         resampleStartSliders[i]->setBounds(100, 100, 100, 100);
         colonyPlayControlSliders[i]->setBounds(340, 40, 30, 180);
         colonyGainSliders[i]->setBounds(100, 200, 100, 100);
         colonyGhostSliders[i]->setBounds(100, 300, 100, 100);
         colonyFilterSliders[i]->setBounds(100, 400, 100, 100);
-        colonyModeBox[i]->setBounds(280, 30, 60, 20);
+        colonyModeBox[i]->setBounds(240, 80, 100, 20);
     }
 }
 
