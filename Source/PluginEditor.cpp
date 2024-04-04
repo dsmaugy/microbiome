@@ -94,7 +94,7 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
     removeColony.addListener(this);
     addAndMakeVisible(removeColony);
 
-    addAndMakeVisible(visualWindow);
+    //addAndMakeVisible(visualWindow);
     
     setSize(850, 500);
 }

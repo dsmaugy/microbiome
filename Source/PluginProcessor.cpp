@@ -287,7 +287,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout MicrobiomeAudioProcessor::cr
             COLONY_GHOSTS_DEF)
         );    
 
-        layout.add(std::make_unique<juce::AudioParameterFloat>(
+        layout.add(std::make_unique<juce::AudioParameterInt>(
             juce::ParameterID{ PARAMETER_COLONY_FILTER_ID(i), 1 },
             PARAMETER_COLONY_FILTER_NAME(i),
             COLONY_FILTER_MIN,

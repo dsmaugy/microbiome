@@ -85,17 +85,24 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
         juce::String currentModeParamName;
         int currentModeIntRep = 0;
 
-        std::unique_ptr<juce::AudioBuffer<float>> colonyBuffer;
+        std::unique_ptr<juce::AudioBuffer<float>> resampleBuffer;
+        std::unique_ptr<juce::AudioBuffer<float>> outputBuffer;
 
+       
         juce::Interpolators::Lagrange resampler[MAX_CHANNELS];
+
         juce::dsp::LadderFilter<float> ladder;
-        juce::String ladderFreq;
+        juce::String ladderFreqParamName;
+        int ladderFreq = 0;
+
         juce::dsp::Compressor<float> compressor;
 
-        bool doneProcessing = false;
+        bool doneProcessing = false; // marks processing for resampling
+        bool processEffects = false; // marks processing for effects with DSP modules
+        int processEffectIndex = 0;
 
         juce::String colonyBufferReadStartParamName;
-        int colonyBufferWriteIdx[MAX_CHANNELS];
+        int resampleBufferWriteIdx[MAX_CHANNELS];
         int colonyBufferReadOffset[MAX_CHANNELS];
         int colonyBufferReadStart = 0;
         juce::String colonyBufferReadEndParamName;
