@@ -56,7 +56,7 @@ void Colony::prepare(const ColonyParams& params)
 
     resampleRatio.reset(params.procSpec.sampleRate, RESAMPLE_FADE);
     resampleRatio.setCurrentAndTargetValue(params.initialResampleRatio);
-    resampleLength = resampleBuffer->getNumSamples();
+    //resampleLength = resampleBuffer->getNumSamples();
 
     ladder.setMode(juce::dsp::LadderFilterMode::LPF12);
     ladder.prepare(params.procSpec);
@@ -196,32 +196,35 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
             DBG("Starting re-generation process");
         }
     }
-    else if (currentMode == Colony::ProcessMode::LOOP) {
-        // TODO: anything special here?
+    else  {
+        colonyLifeVol.setCurrentAndTargetValue(1.0);
     }
 
+    // PROCESS STEP #0: reset counter
+    for (int i = 0; i < MAX_CHANNELS; i++) outReadCount[i] = 0;
+
     // PROCESS STEP #1: resample audio
-    int numResampledOutput = -1;
+    numResampledOutput = -1;
     int prevWriteBuffStart = -1;
     if (!doneProcessing) {
         numResampledOutput = std::min(numInSamples, resampleBuffer->getNumSamples() - resampleBufferWriteIdx[0]); // TODO: this could be an arbitrary number as long as its above block size
         prevWriteBuffStart = resampleBufferWriteIdx[0]; // store the old value so we can reset it per channel
         for (int i = 0; i < MAX_CHANNELS; i++) {
             // resample copy
-            int sampleLimit = std::max(params.delayBuffer->getNumSamples() - 1, resampleStart + resampleLength);
-
+            //int sampleLimit = std::max(params.delayBuffer->getNumSamples() - 1, resampleStart + resampleLength);
+            //int sampleLimit = 
             int used = resampler[i].process(resampleRatio.getCurrentValue(),
                 params.delayBuffer->getReadPointer(i) + resampleIdx[i],
                 resampleBuffer->getWritePointer(i) + resampleBufferWriteIdx[i],
                 numResampledOutput,
-                sampleLimit - resampleIdx[i],
+                params.delayBuffer->getNumSamples() - resampleIdx[i],
                 0);
             resampleIdx[i] += used;
-            if (resampleIdx[i] >= sampleLimit) {
+            if (resampleIdx[i] >= params.delayBuffer->getNumSamples()) {
                 resampleIdx[i] = resampleStart;
             }
 
-            //DBG(used << "/" << resampleLength << " samples used");
+            DBG(used << " - " << resampleIdx[i] << " samples used\t(output=" << numResampledOutput << ")\tWriting at: " << resampleBufferWriteIdx[i] << "\tReading at : " << colonyBufferReadOffset[i]);
         }
         resampleRatio.skip(numInSamples);
         processEffects = true;
@@ -237,7 +240,7 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         }
 
         if (resampleBufferWriteIdx[0] < prevWriteBuffStart) {
-            DBG("Done processing resampling!");
+            DBG("Done processing resampling! RMS: " << resampleBuffer->getRMSLevel(0, 0, resampleBuffer->getNumSamples()) << "\tResample Write: " << resampleBufferWriteIdx[0] << "\tDelay Progress: " << resampleIdx[0] << "/" << params.delayBuffer->getNumSamples());
 
             if (currentMode == Colony::ProcessMode::REGENERATE) {
                 colonyLifeVol.setTargetValue(1);
@@ -270,8 +273,8 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         outputBlock.copyFrom(*resampleBuffer, startSampleIndex, 0, numberOfSamples); 
         juce::dsp::ProcessContextReplacing<float> procCtx(outputBlock);
 
-        //ladder.process(procCtx);
-        //compressor.process(procCtx);
+        ladder.process(procCtx);
+        compressor.process(procCtx);
 
         if (numResampledOutput < 0) {
             // manually update the process effect index if effect processing was triggered WITHOUT a resample processing trigger
@@ -288,31 +291,37 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
 // TODO: get rid of the n
 float Colony::getSampleN(int channel, int n)
 {
-    // fade loops in/out
-    if (colonyBufferReadOffset[channel] == 0) {
-        loopFade.setTargetValue(1);
-    }
-    else if (colonyBufferReadOffset[channel] == (colonyBufferReadOffsetLimit * 0.75)) {
-        loopFade.setTargetValue(0.35);
-    }
-
-    int sampleIndex = colonyBufferReadOffset[channel] + colonyBufferReadStart;
-    float* sample = outputBuffer->getWritePointer(channel, sampleIndex);
-    float delaySample = 0;
-
-    if (sampleIndex > 5000) {
-        for (int i = 0; i < numGhosts; i++) {
-            int delayInt = (int) ghostDelays[i][channel].getNextValue();
-            float fr = ghostDelays[i][channel].getCurrentValue() - delayInt;
-            float x0 = *(sample - delayInt);
-            float x1 = *(sample - ((delayInt+1) % 5000));
-            delaySample += ((1-fr)*x0 + fr*x1) * 0.50; // TODO: hardcode this number
-            // delaySample = *(sample-1000);
+    float output = 0.0;
+    if (numResampledOutput < 0 || (numResampledOutput > 0 && outReadCount[channel] < numResampledOutput)) {
+        // fade loops in/out
+        if (colonyBufferReadOffset[channel] == 0) {
+            loopFade.setTargetValue(1);
         }
-        //delaySample = colonyBuffer->getSample(channel, sampleIndex - 5000) + colonyBuffer->getSample(channel, sampleIndex - 4999) + colonyBuffer->getSample(channel, sampleIndex - 4998);
+        else if (colonyBufferReadOffset[channel] == (colonyBufferReadOffsetLimit * 0.75)) {
+            loopFade.setTargetValue(0.35);
+        }
+
+        int sampleIndex = colonyBufferReadOffset[channel] + colonyBufferReadStart;
+        float* sample = outputBuffer->getWritePointer(channel, sampleIndex);
+        float delaySample = 0;
+
+        if (sampleIndex > 5000) {
+            for (int i = 0; i < numGhosts; i++) {
+                int delayInt = (int)ghostDelays[i][channel].getNextValue();
+                float fr = ghostDelays[i][channel].getCurrentValue() - delayInt;
+                float x0 = *(sample - delayInt);
+                float x1 = *(sample - ((delayInt + 1) % 5000));
+                delaySample += ((1 - fr) * x0 + fr * x1) * 0.50; // TODO: hardcode this number
+                // delaySample = *(sample-1000);
+            }
+            //delaySample = colonyBuffer->getSample(channel, sampleIndex - 5000) + colonyBuffer->getSample(channel, sampleIndex - 4999) + colonyBuffer->getSample(channel, sampleIndex - 4998);
+        }
+        colonyBufferReadOffset[channel] = ((colonyBufferReadOffset[channel] + 1) % colonyBufferReadOffsetLimit);
+        output = (*sample + delaySample) * gain.getNextValue() * loopFade.getNextValue() * enableGain.getNextValue() * colonyLifeVol.getNextValue();
+        outReadCount[channel]++;
     }
-    colonyBufferReadOffset[channel] = ((colonyBufferReadOffset[channel] + 1) % colonyBufferReadOffsetLimit);
-    return (*sample + delaySample) * gain.getNextValue() * loopFade.getNextValue() * enableGain.getNextValue() * colonyLifeVol.getNextValue();;
+
+    return output;
 }
 
 void Colony::toggleState(bool value)

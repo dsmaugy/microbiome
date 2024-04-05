@@ -109,6 +109,10 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
         int colonyBufferReadEnd = 132300;
         int colonyBufferReadOffsetLimit = 132300;
 
+        // process cycle variables: these get updated every processBlock call
+        int outReadCount[MAX_CHANNELS];
+        int numResampledOutput = 0;
+
         juce::String ghostDelayParamName;
         int numGhosts = 0;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> ghostDelays[MAX_GHOSTS][MAX_CHANNELS];
@@ -116,7 +120,7 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
         juce::String resampleStartParamName;
         int resampleIdx[MAX_CHANNELS];
         int resampleStart = 0;
-        int resampleLength = 132300; // TODO: this doesn't really do anything
+        //int resampleLength = 132300; // TODO: this doesn't really do anything
 
         juce::String gainParamName;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gain;
