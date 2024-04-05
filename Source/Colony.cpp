@@ -206,7 +206,7 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
     if (!doneProcessing) {
         numResampledOutput = std::min(numInSamples, resampleBuffer->getNumSamples() - resampleBufferWriteIdx[0]); // TODO: this could be an arbitrary number as long as its above block size
         prevWriteBuffStart = resampleBufferWriteIdx[0]; // store the old value so we can reset it per channel
-        for (int i = 0; i < numChannels; i++) {
+        for (int i = 0; i < MAX_CHANNELS; i++) {
             // resample copy
             int sampleLimit = std::max(params.delayBuffer->getNumSamples() - 1, resampleStart + resampleLength);
 
@@ -262,16 +262,16 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
             //startSampleIndex = colonyBufferReadOffset[0];
             numberOfSamples = std::min(numInSamples, outputBuffer->getNumSamples() - startSampleIndex);
         }
-
-        DBG("Processing effect -> reading diff: " << startSampleIndex - colonyBufferReadOffset[0] + colonyBufferReadStart);
+        //numberOfSamples = std::min(numInSamples, outputBuffer->getNumSamples() - startSampleIndex);
+        //DBG("Processing effect -> reading diff: " << startSampleIndex - colonyBufferReadOffset[0] + colonyBufferReadStart);
         juce::dsp::AudioBlock<float> outputBlock(outputBuffer->getArrayOfWritePointers(), outputBuffer->getNumChannels(), startSampleIndex, numberOfSamples);
         // process replace on a duplicate block as to allow multiple process operations on a single block
         // destination offset starts at 0 since the block starts at the correct index in outputBuffer
         outputBlock.copyFrom(*resampleBuffer, startSampleIndex, 0, numberOfSamples); 
         juce::dsp::ProcessContextReplacing<float> procCtx(outputBlock);
 
-        ladder.process(procCtx);
-        compressor.process(procCtx);
+        //ladder.process(procCtx);
+        //compressor.process(procCtx);
 
         if (numResampledOutput < 0) {
             // manually update the process effect index if effect processing was triggered WITHOUT a resample processing trigger
