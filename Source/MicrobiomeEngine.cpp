@@ -25,9 +25,7 @@ void MicrobiomeEngine::prepare(const EngineParams& params)
     this->params = params;
 
     // TODO: prepare might get called more than once, we need to only reset things if sampleRate changed
-    delayBuffer = std::make_unique<juce::AudioBuffer<float>>(MAX_CHANNELS, MAX_DELAY_SECONDS * params.procSpec.sampleRate);
-    // without clearing there are audible pops at initialization with using IIR filters
-    delayBuffer->clear();
+    delayBuffer = std::make_unique<GlobalDelay>(params.procSpec.sampleRate);
 
     reverb.prepare(params.procSpec);
     reverb.setParameters(reverbParameters);
@@ -70,8 +68,9 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
             channelData[i] = ((1.0 - wet) * originalSample) + (colonySample * wet);
 
             // we update the delay after the current output sample has already been updated
-            delayBuffer->setSample(channel, delayWriteIdx, originalSample);
-            delayWriteIdx = (delayWriteIdx+1) % delayBuffer->getNumSamples();
+            //delayBuffer->setSample(channel, delayWriteIdx, originalSample);
+            //delayWriteIdx = (delayWriteIdx+1) % delayBuffer->getNumSamples();
+            delayBuffer->pushSample(channel, originalSample);
 
             // DBG("Read Idx: " << delayReadIdx << "\tWrite Idx: " << delayWriteIdx);
             // DBG(delayBuffer->getSample(channel, delayReadIdx));

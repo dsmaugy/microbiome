@@ -6,6 +6,8 @@
               pluginName="Microbiome" pluginManufacturer="Darwin Do" pluginDesc="Exploring the evolutionary nature of sound">
   <MAINGROUP id="HVHVHe" name="Microbiome">
     <GROUP id="{021420D8-7482-8AC4-5F25-AEEA04E9072F}" name="Source">
+      <FILE id="QbjMmO" name="GlobalDelay.cpp" compile="1" resource="0" file="Source/GlobalDelay.cpp"/>
+      <FILE id="Xe1HEL" name="GlobalDelay.h" compile="0" resource="0" file="Source/GlobalDelay.h"/>
       <FILE id="Rw9zPe" name="MicrobiomeWindow.cpp" compile="1" resource="0"
             file="Source/MicrobiomeWindow.cpp"/>
       <FILE id="vJvJN8" name="MicrobiomeWindow.h" compile="0" resource="0"

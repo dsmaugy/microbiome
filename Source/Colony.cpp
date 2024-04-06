@@ -81,7 +81,8 @@ void Colony::prepare(const ColonyParams& params)
         resampler[i].reset();
         resampleBufferWriteIdx[i] = 0;
         colonyBufferReadOffset[i] = 0;
-        resampleIdx[i] = 0;
+        resampleOffset[i] = 0;
+        resampleStartPt[i] = params.delayBuffer->getNSamplesBehind(i, 0);
 
         for (int j = 0; j < MAX_GHOSTS; j++) {
             ghostDelays[j][i].reset(params.procSpec.sampleRate, 0.5);
@@ -141,7 +142,11 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
     int newResampleStart = (int) (newResampleStartSec * params.procSpec.sampleRate);
     if (newResampleStart != resampleStart) {
         resampleStart = newResampleStart;
-        doneProcessing = false; 
+
+        for (int i = 0; i < MAX_CHANNELS; i++)
+            resampleStartPt[i] = params.delayBuffer->getNSamplesBehind(i, resampleStart);
+       
+        doneProcessing = false;
         DBG("New Resample Start: " << resampleStart);
     }
 
@@ -214,17 +219,17 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
             //int sampleLimit = std::max(params.delayBuffer->getNumSamples() - 1, resampleStart + resampleLength);
             //int sampleLimit = 
             int used = resampler[i].process(resampleRatio.getCurrentValue(),
-                params.delayBuffer->getReadPointer(i) + resampleIdx[i],
+                resampleStartPt[i] + resampleOffset[i],
                 resampleBuffer->getWritePointer(i) + resampleBufferWriteIdx[i],
                 numResampledOutput,
-                params.delayBuffer->getNumSamples() - resampleIdx[i],
+                params.delayBuffer->getNumSamples() - resampleOffset[i],
                 0);
-            resampleIdx[i] += used;
-            if (resampleIdx[i] >= params.delayBuffer->getNumSamples()) {
-                resampleIdx[i] = resampleStart;
+            resampleOffset[i] += used;
+            if (resampleOffset[i] >= params.delayBuffer->getNumSamples()) {
+                resampleOffset[i] = resampleStart * -1;
             }
 
-            DBG(used << " - " << resampleIdx[i] << " samples used\t(output=" << numResampledOutput << ")\tWriting at: " << resampleBufferWriteIdx[i] << "\tReading at : " << colonyBufferReadOffset[i]);
+            DBG(used << " - " << resampleOffset[i] << " samples used\t(output=" << numResampledOutput << ")\tWriting at: " << resampleBufferWriteIdx[i] << "\tReading at : " << colonyBufferReadOffset[i]);
         }
         resampleRatio.skip(numInSamples);
         processEffects = true;
@@ -240,7 +245,7 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         }
 
         if (resampleBufferWriteIdx[0] < prevWriteBuffStart) {
-            DBG("Done processing resampling! RMS: " << resampleBuffer->getRMSLevel(0, 0, resampleBuffer->getNumSamples()) << "\tResample Write: " << resampleBufferWriteIdx[0] << "\tDelay Progress: " << resampleIdx[0] << "/" << params.delayBuffer->getNumSamples());
+            DBG("Done processing resampling! RMS: " << resampleBuffer->getRMSLevel(0, 0, resampleBuffer->getNumSamples()) << "\tResample Write: " << resampleBufferWriteIdx[0] << "\tDelay Progress: " << resampleOffset[0] << "/" << params.delayBuffer->getNumSamples());
 
             if (currentMode == Colony::ProcessMode::REGENERATE) {
                 colonyLifeVol.setTargetValue(1);

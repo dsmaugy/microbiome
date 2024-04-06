@@ -13,6 +13,7 @@
 #include <JuceHeader.h>
 #include "Constants.h"
 #include "Colony.h"
+#include "GlobalDelay.h"
 
 struct EngineParams
 {
@@ -50,7 +51,8 @@ class MicrobiomeEngine
 
         juce::dsp::Reverb reverb;
         juce::dsp::Reverb::Parameters reverbParameters;
-        std::unique_ptr<juce::AudioBuffer<float>> delayBuffer;
+        //std::unique_ptr<juce::AudioBuffer<float>> delayBuffer;
+        std::unique_ptr<GlobalDelay> delayBuffer;
         
         int delayWriteIdx = 0;
         // TODO: this is just for debuggin

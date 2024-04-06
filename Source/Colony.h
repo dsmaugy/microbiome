@@ -12,17 +12,18 @@
 
 #include <JuceHeader.h>
 #include "Constants.h"
+#include "GlobalDelay.h"
 
 struct ColonyParams 
 {
     // TODO: could prob make this a tiny more efficient by making this a reference but whatever
     juce::dsp::ProcessSpec procSpec;
-    juce::AudioBuffer<float>* delayBuffer; // global delay buffer, should be only READING samples
+    GlobalDelay* delayBuffer; // global delay buffer, should be only READING samples
 
     float initialGain = 0.5;
     float initialResampleRatio = 1.25;
 
-    ColonyParams(juce::dsp::ProcessSpec spec, juce::AudioBuffer<float>* buffer) : procSpec(spec), delayBuffer(buffer) {}
+    ColonyParams(juce::dsp::ProcessSpec spec, GlobalDelay* buffer) : procSpec(spec), delayBuffer(buffer) {}
     ColonyParams() {}
     // ColonyParams& operator=(const ColonyParams& other) {
     //     if (this != &other) {
@@ -87,7 +88,7 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
 
         std::unique_ptr<juce::AudioBuffer<float>> resampleBuffer;
         std::unique_ptr<juce::AudioBuffer<float>> outputBuffer;
-
+        juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Lagrange3rd> fd;
        
         juce::Interpolators::Lagrange resampler[MAX_CHANNELS];
 
@@ -118,8 +119,9 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> ghostDelays[MAX_GHOSTS][MAX_CHANNELS];
         
         juce::String resampleStartParamName;
-        int resampleIdx[MAX_CHANNELS];
+        int resampleOffset[MAX_CHANNELS];
         int resampleStart = 0;
+        float* resampleStartPt[MAX_CHANNELS];
         //int resampleLength = 132300; // TODO: this doesn't really do anything
 
         juce::String gainParamName;
