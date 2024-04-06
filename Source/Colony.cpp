@@ -224,7 +224,7 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
                 resampleIdx[i] = resampleStart;
             }
 
-            DBG(used << " - " << resampleIdx[i] << " samples used\t(output=" << numResampledOutput << ")\tWriting at: " << resampleBufferWriteIdx[i] << "\tReading at : " << colonyBufferReadOffset[i]);
+            // DBG(used << " - " << resampleIdx[i] << " samples used\t(output=" << numResampledOutput << ")\tWriting at: " << resampleBufferWriteIdx[i] << "\tReading at : " << colonyBufferReadOffset[i]);
         }
         resampleRatio.skip(numInSamples);
         processEffects = true;
