@@ -37,6 +37,7 @@ private:
     juce::AudioProcessorValueTreeState& parameters;
 
     std::unique_ptr<juce::Slider> engineWetSlider;
+    juce::Label engineWetLabel;
     std::unique_ptr<SliderAttachment> engineWetAttachment;
     std::unique_ptr<juce::Slider> engineReverbSlider;
     std::unique_ptr<SliderAttachment> engineReverbAttachment;
@@ -62,6 +63,7 @@ private:
     std::array<std::unique_ptr<juce::ComboBoxParameterAttachment>, MAX_COLONY> colonyModeBoxAttachment;
 
     void applyRotarySliderStyle(juce::Slider& slider);
+    void applyLinearSliderStyle(juce::Slider& slider);
     void setViewToColony(int n);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MicrobiomeControls)

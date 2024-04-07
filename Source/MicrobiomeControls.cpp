@@ -36,7 +36,7 @@ MicrobiomeControls::MicrobiomeControls(juce::AudioProcessorValueTreeState& apvst
         colonyComponents[i].push_back(resampleRatioSliders[i].get());
 
         resampleStartSliders[i] = std::make_unique<juce::Slider>();
-        applyRotarySliderStyle(*resampleStartSliders[i]);
+        applyLinearSliderStyle(*resampleStartSliders[i]);
         resampleStartAttachments[i] = std::make_unique<SliderAttachment>(parameters, PARAMETER_RESAMPLE_START_ID(i+1), *resampleStartSliders[i]);
         addChildComponent(*resampleStartSliders[i]);
         colonyComponents[i].push_back(resampleStartSliders[i].get());
@@ -128,7 +128,7 @@ void MicrobiomeControls::resized()
     for (int i = 0; i < MAX_COLONY; i++) {
         enableColonyButtons[i]->setBounds(240, 30, 60, 20);
         resampleRatioSliders[i]->setBounds(220, 100, 100, 100);
-        resampleStartSliders[i]->setBounds(100, 100, 100, 100);
+        resampleStartSliders[i]->setBounds(50, 100, 200, 50);
         colonyPlayControlSliders[i]->setBounds(340, 40, 30, 180);
         colonyGainSliders[i]->setBounds(100, 200, 100, 100);
         colonyGhostSliders[i]->setBounds(100, 300, 100, 100);
@@ -161,6 +161,13 @@ void MicrobiomeControls::applyRotarySliderStyle(juce::Slider& slider)
 {
     slider.setSliderStyle(juce::Slider::Rotary);
     // slider.setRotaryParameters(3 * juce::MathConstants<float>::pi / 2, 5 * juce::MathConstants<float>::pi / 2, true);
-    slider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60, 35);
+    slider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    slider.setPopupDisplayEnabled(true, true, this);
+}
+
+void MicrobiomeControls::applyLinearSliderStyle(juce::Slider& slider)
+{
+    slider.setSliderStyle(juce::Slider::LinearHorizontal);
+    slider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
     slider.setPopupDisplayEnabled(true, true, this);
 }
