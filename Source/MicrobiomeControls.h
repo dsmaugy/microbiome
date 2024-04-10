@@ -38,12 +38,12 @@ private:
     juce::AudioProcessorValueTreeState& parameters;
 
     std::unique_ptr<juce::Slider> engineWetSlider;
-    juce::Label engineWetLabel;
     std::unique_ptr<SliderAttachment> engineWetAttachment;
     std::unique_ptr<juce::Slider> engineReverbSlider;
     std::unique_ptr<SliderAttachment> engineReverbAttachment;
     std::unique_ptr<juce::Slider> engineLushSlider;
     std::unique_ptr<SliderAttachment> engineLushAttachment;
+    juce::Rectangle<int> engineCtrlsRect;
 
     std::array<std::vector<juce::Component*>, MAX_COLONY> colonyComponents;
     std::array<std::unique_ptr<juce::ToggleButton>, MAX_COLONY> enableColonyButtons;

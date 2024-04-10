@@ -43,6 +43,8 @@ MicrobiomeControls::MicrobiomeControls(juce::AudioProcessorValueTreeState& apvst
 
         colonyPlayControlSliders[i] = std::make_unique<juce::Slider>();
         colonyPlayControlSliders[i]->setSliderStyle(juce::Slider::TwoValueVertical);
+        colonyPlayControlSliders[i]->setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+        colonyPlayControlSliders[i]->setPopupDisplayEnabled(true, true, this);
         colonyPlayControlAttachments[i] = std::make_unique<juce::TwoValueSliderAttachment>(parameters, 
             PARAMETER_COLONY_START_ID(i+1), 
             PARAMETER_COLONY_END_ID(i+1), 
@@ -109,10 +111,13 @@ void MicrobiomeControls::paint (juce::Graphics& g)
        drawing code..
     */
 
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
+    // g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
 
     g.setColour (juce::Colours::grey);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
+    g.fillRoundedRectangle(getLocalBounds().toFloat(), 10);
+
+    g.setColour(juce::Colours::darksalmon);
+    g.drawRoundedRectangle(engineCtrlsRect.toFloat(), 5, 2);
 
     for (int i = 0; i < MAX_COLONY; i++) {
         for (int j = 0; j < colonyComponents[0].size(); j++) { // all colonies should have same # of components
@@ -127,15 +132,23 @@ void MicrobiomeControls::paint (juce::Graphics& g)
 
 void MicrobiomeControls::resized()
 {
-    engineWetSlider->setBounds(240, 200, 100, 100);
-    engineReverbSlider->setBounds(240, 300, 100, 100);
-    engineLushSlider->setBounds(340, 300, 100, 100);
+    auto area = getLocalBounds();
 
+    engineCtrlsRect = area.removeFromLeft(100);
+    int engineCtrlsH = engineCtrlsRect.getHeight() / 3;
+    
+    auto rect = engineCtrlsRect;
+    engineWetSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 10));
+    engineReverbSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 10));
+    engineLushSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 10));
+
+    auto enableColonyRect = area.removeFromTop(60);
+    auto colonyPlayCtrlRect = area.removeFromRight(85).reduced(20);
     for (int i = 0; i < MAX_COLONY; i++) {
-        enableColonyButtons[i]->setBounds(240, 30, 60, 20);
+        enableColonyButtons[i]->setBounds(enableColonyRect);
         resampleRatioSliders[i]->setBounds(220, 100, 100, 100);
         resampleStartSliders[i]->setBounds(50, 100, 200, 50);
-        colonyPlayControlSliders[i]->setBounds(340, 40, 30, 180);
+        colonyPlayControlSliders[i]->setBounds(colonyPlayCtrlRect);
         colonyGainSliders[i]->setBounds(100, 200, 100, 100);
         colonyGhostSliders[i]->setBounds(100, 300, 100, 100);
         colonyFilterSliders[i]->setBounds(100, 400, 100, 100);
