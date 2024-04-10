@@ -39,10 +39,13 @@ private:
 
     std::unique_ptr<juce::Slider> engineWetSlider;
     std::unique_ptr<SliderAttachment> engineWetAttachment;
+    MoveableLabel engineWetLabel;
     std::unique_ptr<juce::Slider> engineReverbSlider;
     std::unique_ptr<SliderAttachment> engineReverbAttachment;
+    MoveableLabel engineReverbLabel;
     std::unique_ptr<juce::Slider> engineLushSlider;
     std::unique_ptr<SliderAttachment> engineLushAttachment;
+    MoveableLabel engineLushLabel;
     juce::Rectangle<int> engineCtrlsRect;
 
     std::array<std::vector<juce::Component*>, MAX_COLONY> colonyComponents;

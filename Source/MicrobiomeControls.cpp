@@ -71,11 +71,6 @@ MicrobiomeControls::MicrobiomeControls(juce::AudioProcessorValueTreeState& apvst
         colonyComponents[i].push_back(colonyFilterSliders[i].get());
     }
 
-    // use one label for all the controls across all colonies
-    resampleRatioLabel.setText("Sample Speed", juce::dontSendNotification);
-    resampleRatioLabel.attachToComponent(resampleRatioSliders[0].get(), false);
-    resampleRatioLabel.setPosition(juce::Justification::centredBottom);
-    addAndMakeVisible(resampleRatioLabel);
 
     engineWetSlider = std::make_unique<juce::Slider>();
     applyRotarySliderStyle(*engineWetSlider);
@@ -94,6 +89,27 @@ MicrobiomeControls::MicrobiomeControls(juce::AudioProcessorValueTreeState& apvst
     engineLushSlider->setColour(juce::Slider::ColourIds::thumbColourId, juce::Colours::blanchedalmond);
     engineLushAttachment = std::make_unique<SliderAttachment>(parameters, PARAMETER_ENGINE_LUSH_ID, *engineLushSlider);
     addAndMakeVisible(*engineLushSlider);
+
+    // use one label for all the controls across all colonies
+    resampleRatioLabel.setText("Sample Speed", juce::dontSendNotification);
+    resampleRatioLabel.attachToComponent(resampleRatioSliders[0].get(), false);
+    resampleRatioLabel.setPosition(juce::Justification::centredBottom);
+    addAndMakeVisible(resampleRatioLabel);
+
+    engineWetLabel.setText("Engine Wetness", juce::dontSendNotification);
+    engineWetLabel.attachToComponent(engineWetSlider.get(), false);
+    engineWetLabel.setPosition(juce::Justification::centredBottom);
+    addAndMakeVisible(engineWetLabel);
+
+    engineReverbLabel.setText("Engine Reverb", juce::dontSendNotification);
+    engineReverbLabel.attachToComponent(engineReverbSlider.get(), false);
+    engineReverbLabel.setPosition(juce::Justification::centredBottom);
+    addAndMakeVisible(engineReverbLabel);
+
+    engineLushLabel.setText("Engine Lush", juce::dontSendNotification);
+    engineLushLabel.attachToComponent(engineLushSlider.get(), false);
+    engineLushLabel.setPosition(juce::Justification::centredBottom);
+    addAndMakeVisible(engineLushLabel);
 
     setSize(500, 500);
 }
@@ -138,9 +154,9 @@ void MicrobiomeControls::resized()
     int engineCtrlsH = engineCtrlsRect.getHeight() / 3;
     
     auto rect = engineCtrlsRect;
-    engineWetSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 10));
-    engineReverbSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 10));
-    engineLushSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 10));
+    engineWetSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 20));
+    engineReverbSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 20));
+    engineLushSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 20));
 
     auto enableColonyRect = area.removeFromTop(60);
     auto colonyPlayCtrlRect = area.removeFromRight(85).reduced(20);

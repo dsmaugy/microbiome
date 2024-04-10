@@ -14,6 +14,7 @@
 //==============================================================================
 MoveableLabel::MoveableLabel(int j) : justification(j)
 {
+    setJustificationType(juce::Justification::centred);
 }
 
 MoveableLabel::~MoveableLabel()
