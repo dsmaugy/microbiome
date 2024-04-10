@@ -13,6 +13,7 @@
 #include <JuceHeader.h>
 #include "Constants.h"
 #include "TwoValueSliderAttachment.h"
+#include "MoveableLabel.h"
 
 typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
@@ -49,6 +50,7 @@ private:
     std::array<std::unique_ptr<ButtonAttachment>, MAX_COLONY> enableAttachments;
     std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> resampleRatioSliders;
     std::array<std::unique_ptr<SliderAttachment>, MAX_COLONY> resampleRatioAttachments;
+    MoveableLabel resampleRatioLabel;
     std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> resampleStartSliders;
     std::array<std::unique_ptr<SliderAttachment>, MAX_COLONY> resampleStartAttachments;
     std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> colonyPlayControlSliders;

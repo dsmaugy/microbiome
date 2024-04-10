@@ -6,6 +6,9 @@
               pluginName="Microbiome" pluginManufacturer="Darwin Do" pluginDesc="Exploring the evolutionary nature of sound">
   <MAINGROUP id="HVHVHe" name="Microbiome">
     <GROUP id="{021420D8-7482-8AC4-5F25-AEEA04E9072F}" name="Source">
+      <FILE id="JD57RT" name="MoveableLabel.cpp" compile="1" resource="0"
+            file="Source/MoveableLabel.cpp"/>
+      <FILE id="GxtJ7w" name="MoveableLabel.h" compile="0" resource="0" file="Source/MoveableLabel.h"/>
       <FILE id="ZQFhZr" name="MicrobiomeControls.cpp" compile="1" resource="0"
             file="Source/MicrobiomeControls.cpp"/>
       <FILE id="ZQIT42" name="MicrobiomeControls.h" compile="0" resource="0"

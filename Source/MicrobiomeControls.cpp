@@ -69,6 +69,12 @@ MicrobiomeControls::MicrobiomeControls(juce::AudioProcessorValueTreeState& apvst
         colonyComponents[i].push_back(colonyFilterSliders[i].get());
     }
 
+    // use one label for all the controls across all colonies
+    resampleRatioLabel.setText("Sample Speed", juce::dontSendNotification);
+    resampleRatioLabel.attachToComponent(resampleRatioSliders[0].get(), false);
+    resampleRatioLabel.setPosition(juce::Justification::centredBottom);
+    addAndMakeVisible(resampleRatioLabel);
+
     engineWetSlider = std::make_unique<juce::Slider>();
     applyRotarySliderStyle(*engineWetSlider);
     engineWetSlider->setColour(juce::Slider::ColourIds::thumbColourId, juce::Colours::blanchedalmond);
