@@ -56,14 +56,20 @@ private:
     MoveableLabel resampleRatioLabel;
     std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> resampleStartSliders;
     std::array<std::unique_ptr<SliderAttachment>, MAX_COLONY> resampleStartAttachments;
+    MoveableLabel resampleStartLabel;
     std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> colonyPlayControlSliders;
     std::array<std::unique_ptr<juce::TwoValueSliderAttachment>, MAX_COLONY> colonyPlayControlAttachments;
+    MoveableLabel playControlLabelTop;
+    MoveableLabel playControlLabelBottom;
     std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> colonyGainSliders;
     std::array<std::unique_ptr<SliderAttachment>, MAX_COLONY> colonyGainAttachments;
+    MoveableLabel gainLabel;
     std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> colonyGhostSliders;
     std::array<std::unique_ptr<SliderAttachment>, MAX_COLONY> colonyGhostAttachments;
+    MoveableLabel ghostLabel;
     std::array<std::unique_ptr<juce::Slider>, MAX_COLONY> colonyFilterSliders;
     std::array<std::unique_ptr<SliderAttachment>, MAX_COLONY> colonyFilterAttachments;
+    MoveableLabel lpfLabel;
     std::array<std::unique_ptr<juce::ComboBox>, MAX_COLONY> colonyModeBox;
     std::array<std::unique_ptr<juce::ComboBoxParameterAttachment>, MAX_COLONY> colonyModeBoxAttachment;
 
