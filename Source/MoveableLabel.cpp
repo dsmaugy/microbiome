@@ -16,7 +16,7 @@
 MoveableLabel::MoveableLabel(int j) : justification(j)
 {
     setJustificationType(juce::Justification::centred);
-    setFont(MicrobiomeResources::m_getLabelFont(26, juce::Font::FontStyleFlags::bold));
+    setFont(MicrobiomeResources::m_getLabelFont(18, juce::Font::FontStyleFlags::bold));
 }
 
 MoveableLabel::~MoveableLabel()

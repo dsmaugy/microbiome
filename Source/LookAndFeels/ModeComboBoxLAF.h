@@ -29,6 +29,6 @@ public:
 private:
     juce::Font getCommonMenuFont()
     {
-        return MicrobiomeResources::m_getComboBoxFont(30, juce::Font::FontStyleFlags::bold);
+        return MicrobiomeResources::m_getComboBoxFont(20, juce::Font::FontStyleFlags::bold);
     }
 };

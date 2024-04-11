@@ -197,7 +197,8 @@ void MicrobiomeControls::resized()
     engineReverbSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 20));
     engineLushSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 20));
 
-    auto enableColonyRect = area.removeFromTop(60);
+    engineCtrlsTtlRect = area.removeFromTop(60);
+    auto enableColonyRect = engineCtrlsTtlRect.removeFromRight(130);
     auto colonyPlayCtrlRect = area.removeFromRight(85).reduced(10).withTrimmedBottom(10);
 
     auto topSliderRect = area.removeFromTop(100);

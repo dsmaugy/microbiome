@@ -53,7 +53,7 @@ void MicrobiomeAudioProcessorEditor::resized()
     addColony.setBounds(50, 50, 70, 35);
     removeColony.setBounds(150, 50, 70, 35);
 
-    controlWindow.setBounds(area.removeFromRight(controlWindow.getWidth()));
+    controlWindow.setBounds(area.removeFromRight(controlWindow.getWidth()).reduced(10));
 }
 
 void MicrobiomeAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) 
