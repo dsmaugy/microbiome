@@ -15,6 +15,8 @@
 #include "TwoValueSliderAttachment.h"
 #include "MoveableLabel.h"
 
+#include "LookAndFeels/ModeComboBoxLAF.h"
+
 typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
 
@@ -36,6 +38,9 @@ public:
 private:
     int currentColony = 0;
     juce::AudioProcessorValueTreeState& parameters;
+
+    // look and feels
+    ModeComboBoxLAF cblaf;
 
     std::unique_ptr<juce::Slider> engineWetSlider;
     std::unique_ptr<SliderAttachment> engineWetAttachment;
@@ -72,6 +77,7 @@ private:
     MoveableLabel lpfLabel;
     std::array<std::unique_ptr<juce::ComboBox>, MAX_COLONY> colonyModeBox;
     std::array<std::unique_ptr<juce::ComboBoxParameterAttachment>, MAX_COLONY> colonyModeBoxAttachment;
+    MoveableLabel modeLabel;
 
     void applyRotarySliderStyle(juce::Slider& slider);
     void applyLinearSliderStyle(juce::Slider& slider);

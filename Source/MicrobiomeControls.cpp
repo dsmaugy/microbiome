@@ -20,6 +20,7 @@ MicrobiomeControls::MicrobiomeControls(juce::AudioProcessorValueTreeState& apvst
         colonyModeBox[i] = std::make_unique<juce::ComboBox>("Mode Box");
         colonyModeBox[i]->addItemList(COLONY_MODES, 1);
         colonyModeBox[i]->addSeparator();
+        colonyModeBox[i]->setLookAndFeel(&cblaf);
         colonyModeBoxAttachment[i] = std::make_unique<juce::ComboBoxParameterAttachment>(*parameters.getParameter(PARAMETER_COLONY_MODE_ID(i + 1)), *colonyModeBox[i]);
         addChildComponent(*colonyModeBox[i]);
         colonyComponents[i].push_back(colonyModeBox[i].get());
@@ -90,56 +91,61 @@ MicrobiomeControls::MicrobiomeControls(juce::AudioProcessorValueTreeState& apvst
     engineLushAttachment = std::make_unique<SliderAttachment>(parameters, PARAMETER_ENGINE_LUSH_ID, *engineLushSlider);
     addAndMakeVisible(*engineLushSlider);
 
-    engineWetLabel.setText("Engine Wetness", juce::dontSendNotification);
+    engineWetLabel.setText("engine wetness", juce::dontSendNotification);
     engineWetLabel.attachToComponent(engineWetSlider.get(), false);
     engineWetLabel.setPosition(juce::Justification::centredBottom);
     addAndMakeVisible(engineWetLabel);
 
-    engineReverbLabel.setText("Engine Reverb", juce::dontSendNotification);
+    engineReverbLabel.setText("engine reverb", juce::dontSendNotification);
     engineReverbLabel.attachToComponent(engineReverbSlider.get(), false);
     engineReverbLabel.setPosition(juce::Justification::centredBottom);
     addAndMakeVisible(engineReverbLabel);
 
-    engineLushLabel.setText("Engine Lush", juce::dontSendNotification);
+    engineLushLabel.setText("engine lush", juce::dontSendNotification);
     engineLushLabel.attachToComponent(engineLushSlider.get(), false);
     engineLushLabel.setPosition(juce::Justification::centredBottom);
     addAndMakeVisible(engineLushLabel);
 
     // use one label for all the controls across all colonies
-    resampleRatioLabel.setText("Sample Speed", juce::dontSendNotification);
+    resampleRatioLabel.setText("sample speed", juce::dontSendNotification);
     resampleRatioLabel.attachToComponent(resampleRatioSliders[currentColony].get(), false);
     resampleRatioLabel.setPosition(juce::Justification::centredBottom);
     addAndMakeVisible(resampleRatioLabel);
 
-    resampleStartLabel.setText("Resampler Seek", juce::dontSendNotification);
+    resampleStartLabel.setText("resampler seek", juce::dontSendNotification);
     resampleStartLabel.attachToComponent(resampleStartSliders[currentColony].get(), false);
     resampleStartLabel.setPosition(juce::Justification::centredBottom);
     addAndMakeVisible(resampleStartLabel);
 
-    playControlLabelTop.setText("End", juce::dontSendNotification);
+    playControlLabelTop.setText("end", juce::dontSendNotification);
     playControlLabelTop.attachToComponent(colonyPlayControlSliders[currentColony].get(), false);
     playControlLabelTop.setPosition(juce::Justification::centredTop);
     addAndMakeVisible(playControlLabelTop);
 
-    playControlLabelBottom.setText("Start", juce::dontSendNotification);
+    playControlLabelBottom.setText("start", juce::dontSendNotification);
     playControlLabelBottom.attachToComponent(colonyPlayControlSliders[currentColony].get(), false);
     playControlLabelBottom.setPosition(juce::Justification::centredBottom);
     addAndMakeVisible(playControlLabelBottom);
 
-    gainLabel.setText("Gain", juce::dontSendNotification);
+    gainLabel.setText("gain", juce::dontSendNotification);
     gainLabel.attachToComponent(colonyGainSliders[currentColony].get(), false);
     gainLabel.setPosition(juce::Justification::centredBottom);
     addAndMakeVisible(gainLabel);
 
-    ghostLabel.setText("Sample Ghosts", juce::dontSendNotification);
+    ghostLabel.setText("sample ghosts", juce::dontSendNotification);
     ghostLabel.attachToComponent(colonyGhostSliders[currentColony].get(), false);
     ghostLabel.setPosition(juce::Justification::centredBottom);
     addAndMakeVisible(ghostLabel);
 
-    lpfLabel.setText("Filter Cutoff", juce::dontSendNotification);
+    lpfLabel.setText("filter cutoff", juce::dontSendNotification);
     lpfLabel.attachToComponent(colonyFilterSliders[currentColony].get(), false);
     lpfLabel.setPosition(juce::Justification::centredBottom);
     addAndMakeVisible(lpfLabel);
+
+    modeLabel.setText("colony cultivation mode", juce::dontSendNotification);
+    modeLabel.attachToComponent(colonyModeBox[currentColony].get(), false);
+    modeLabel.setPosition(juce::Justification::centredTop);
+    addAndMakeVisible(modeLabel);
 
     setSize(500, 500);
 }
@@ -150,13 +156,6 @@ MicrobiomeControls::~MicrobiomeControls()
 
 void MicrobiomeControls::paint (juce::Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
-
     // g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
 
     g.setColour (juce::Colours::grey);
@@ -183,6 +182,7 @@ void MicrobiomeControls::paint (juce::Graphics& g)
     gainLabel.attachToComponent(colonyGainSliders[currentColony].get(), false);
     ghostLabel.attachToComponent(colonyGhostSliders[currentColony].get(), false);
     lpfLabel.attachToComponent(colonyFilterSliders[currentColony].get(), false);
+    modeLabel.attachToComponent(colonyModeBox[currentColony].get(), false);
 }
 
 void MicrobiomeControls::resized()
@@ -210,14 +210,17 @@ void MicrobiomeControls::resized()
     auto filterSlider = bottomSliderRect.removeFromLeft(bottomSliderSplit);
     auto gainSlider = bottomSliderRect.removeFromLeft(bottomSliderSplit);
 
-    auto modeRect = area.removeFromTop(area.getHeight()/3);
-    modeRect.removeFromLeft(85);
+    auto modeRect = area.removeFromTop(area.getHeight()/2);
+    modeRect.removeFromLeft(colonyPlayCtrlRect.getWidth() / 2);
+    modeRect = modeRect.withTrimmedTop(70).reduced(35, 5);
+
+    auto seekRect = modeRect.translated(0, area.getCentreY() - area.getY());
 
 
     for (int i = 0; i < MAX_COLONY; i++) {
         enableColonyButtons[i]->setBounds(enableColonyRect);
         resampleRatioSliders[i]->setBounds(resampleRatioRect);
-        resampleStartSliders[i]->setBounds(50, 100, 200, 50);
+        resampleStartSliders[i]->setBounds(seekRect);
         colonyPlayControlSliders[i]->setBounds(colonyPlayCtrlRect);
         colonyGainSliders[i]->setBounds(gainSlider);
         colonyGhostSliders[i]->setBounds(ghostRect);

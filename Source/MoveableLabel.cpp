@@ -10,11 +10,13 @@
 
 #include <JuceHeader.h>
 #include "MoveableLabel.h"
+#include "MicrobiomeResources.h"
 
 //==============================================================================
 MoveableLabel::MoveableLabel(int j) : justification(j)
 {
     setJustificationType(juce::Justification::centred);
+    setFont(MicrobiomeResources::m_getLabelFont(26, juce::Font::FontStyleFlags::bold));
 }
 
 MoveableLabel::~MoveableLabel()

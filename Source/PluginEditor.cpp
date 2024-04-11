@@ -47,12 +47,13 @@ void MicrobiomeAudioProcessorEditor::paint (juce::Graphics& g)
 
 void MicrobiomeAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    auto area = getLocalBounds();
+
     visualWindow.setBounds(500, 200, 200, 200);
     addColony.setBounds(50, 50, 70, 35);
     removeColony.setBounds(150, 50, 70, 35);
-    controlWindow.setBounds(300, 0, 500, 500);
+
+    controlWindow.setBounds(area.removeFromRight(controlWindow.getWidth()));
 }
 
 void MicrobiomeAudioProcessorEditor::sliderValueChanged(juce::Slider* slider) 
