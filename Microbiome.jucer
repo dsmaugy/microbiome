@@ -6,6 +6,8 @@
               pluginName="Microbiome" pluginManufacturer="Darwin Do" pluginDesc="Exploring the evolutionary nature of sound">
   <MAINGROUP id="HVHVHe" name="Microbiome">
     <GROUP id="{94B59616-946F-A263-9B1F-9BACD46311F2}" name="Resources">
+      <FILE id="JXtuCt" name="IBMPlexMono-Regular.ttf" compile="0" resource="1"
+            file="Resources/IBMPlexMono-Regular.ttf"/>
       <FILE id="TFir2S" name="Poppins-Regular.ttf" compile="0" resource="1"
             file="Resources/Poppins-Regular.ttf"/>
       <FILE id="dkzKmC" name="Suwannaphum-Regular.ttf" compile="0" resource="1"
