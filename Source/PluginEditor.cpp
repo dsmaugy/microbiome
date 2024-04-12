@@ -42,6 +42,9 @@ void MicrobiomeAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
+
+    
+    g.fillRect(p_topbarRect);
     //g.drawFittedText ("microbiome", getLocalBounds(), juce::Justification::centred, 1);
 }
 
@@ -53,6 +56,7 @@ void MicrobiomeAudioProcessorEditor::resized()
     addColony.setBounds(50, 50, 70, 35);
     removeColony.setBounds(150, 50, 70, 35);
 
+    p_topbarRect = area.removeFromTop(30);
     controlWindow.setBounds(area.removeFromRight(controlWindow.getWidth()).reduced(10));
 }
 

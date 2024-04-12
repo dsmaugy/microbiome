@@ -173,15 +173,14 @@ void MicrobiomeControls::paint (juce::Graphics& g)
     g.fillRoundedRectangle(p_engineCtrlsTtlRect.toFloat(), 5);
     //g.fillRect(p_engineCtrlsTtlRect.toFloat());
 
-    if (*parameters.getRawParameterValue(PARAMETER_ENABLE_ID(currentColony+1)) == 0.0f) {
-        g.setColour(juce::Colours::lightslategrey);
-        g.fillRect(p_colonyCtrlsOverlayRect);
-    }
+    bool currColonyEnabled = *parameters.getRawParameterValue(PARAMETER_ENABLE_ID(currentColony+1)) == 1.0f;
 
     for (int i = 0; i < MAX_COLONY; i++) {
         for (int j = 0; j < colonyComponents[0].size(); j++) { // all colonies should have same # of components
             if (i == currentColony) {
                 colonyComponents[i].at(j)->setVisible(true);
+                if (!currColonyEnabled && colonyComponents[i].at(j)->getName() != "Toggle Colony") colonyComponents[i].at(j)->setEnabled(false);
+                else colonyComponents[i].at(j)->setEnabled(true);
             } else {
                 colonyComponents[i].at(j)->setVisible(false);
             }
@@ -197,6 +196,18 @@ void MicrobiomeControls::paint (juce::Graphics& g)
     ghostLabel.attachToComponent(colonyGhostSliders[currentColony].get(), false);
     lpfLabel.attachToComponent(colonyFilterSliders[currentColony].get(), false);
     modeLabel.attachToComponent(colonyModeBox[currentColony].get(), false);
+}
+
+void MicrobiomeControls::paintOverChildren(juce::Graphics& g)
+{
+    bool currColonyEnabled = *parameters.getRawParameterValue(PARAMETER_ENABLE_ID(currentColony+1)) == 1.0f;
+    g.setColour(juce::Colours::black);
+    if (!currColonyEnabled) {
+        g.setOpacity(0.90);
+    } else {
+        g.setOpacity(0.0);
+    }
+    g.fillRect(p_colonyCtrlsOverlayRect);
 }
 
 void MicrobiomeControls::resized()
