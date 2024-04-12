@@ -170,8 +170,8 @@ void MicrobiomeControls::paint (juce::Graphics& g)
 
     
     g.setColour(juce::Colours::lightblue);
-    //g.fillRoundedRectangle(p_engineCtrlsTtlRect.toFloat(), 5);
-    g.fillRect(p_engineCtrlsTtlRect.toFloat());
+    g.fillRoundedRectangle(p_engineCtrlsTtlRect.toFloat(), 5);
+    //g.fillRect(p_engineCtrlsTtlRect.toFloat());
 
     if (*parameters.getRawParameterValue(PARAMETER_ENABLE_ID(currentColony+1)) == 0.0f) {
         g.setColour(juce::Colours::lightslategrey);
