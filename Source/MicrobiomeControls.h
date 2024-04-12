@@ -40,7 +40,13 @@ private:
     juce::AudioProcessorValueTreeState& parameters;
 
     // look and feels
-    ModeComboBoxLAF cblaf;
+    ModeComboBoxLAF comboxLAF;
+    juce::LookAndFeel_V4 tglButtonLAF;
+
+    juce::Rectangle<int> p_engineCtrlsRect;
+    juce::Rectangle<int> p_engineCtrlsTtlRect;
+
+    juce::Label controlTitle;
 
     std::unique_ptr<juce::Slider> engineWetSlider;
     std::unique_ptr<SliderAttachment> engineWetAttachment;
@@ -51,9 +57,6 @@ private:
     std::unique_ptr<juce::Slider> engineLushSlider;
     std::unique_ptr<SliderAttachment> engineLushAttachment;
     MoveableLabel engineLushLabel;
-
-    juce::Rectangle<int> engineCtrlsRect;
-    juce::Rectangle<int> engineCtrlsTtlRect;
 
     std::array<std::vector<juce::Component*>, MAX_COLONY> colonyComponents;
     std::array<std::unique_ptr<juce::ToggleButton>, MAX_COLONY> enableColonyButtons;
@@ -84,6 +87,8 @@ private:
     void applyRotarySliderStyle(juce::Slider& slider);
     void applyLinearSliderStyle(juce::Slider& slider);
     void setViewToColony(int n);
+
+    void createGUILabels();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MicrobiomeControls)
 };

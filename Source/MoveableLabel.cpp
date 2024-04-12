@@ -44,7 +44,7 @@ void MoveableLabel::componentMovedOrResized(juce::Component& component, bool was
     }
     else if (justification == juce::Justification::centredTop)
     {
-        auto height = borderSize.getTopAndBottom() + 6 + juce::roundToInt(f.getHeight() + 0.5f);
+        auto height = borderSize.getTopAndBottom() + juce::roundToInt(f.getHeight() + 0.5f);
 
         setBounds(component.getX(), component.getY() - height, component.getWidth(), height);
     }

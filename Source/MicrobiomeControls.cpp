@@ -20,12 +20,13 @@ MicrobiomeControls::MicrobiomeControls(juce::AudioProcessorValueTreeState& apvst
         colonyModeBox[i] = std::make_unique<juce::ComboBox>("Mode Box");
         colonyModeBox[i]->addItemList(COLONY_MODES, 1);
         colonyModeBox[i]->addSeparator();
-        colonyModeBox[i]->setLookAndFeel(&cblaf);
+        colonyModeBox[i]->setLookAndFeel(&comboxLAF);
         colonyModeBoxAttachment[i] = std::make_unique<juce::ComboBoxParameterAttachment>(*parameters.getParameter(PARAMETER_COLONY_MODE_ID(i + 1)), *colonyModeBox[i]);
         addChildComponent(*colonyModeBox[i]);
         colonyComponents[i].push_back(colonyModeBox[i].get());
 
         enableColonyButtons[i] = std::make_unique<juce::ToggleButton>("Toggle Colony");
+        enableColonyButtons[i]->setLookAndFeel(&tglButtonLAF);
         enableAttachments[i] = std::make_unique<ButtonAttachment>(parameters, PARAMETER_ENABLE_ID(i+1), *enableColonyButtons[i]);
         addChildComponent(*enableColonyButtons[i]);
         colonyComponents[i].push_back(enableColonyButtons[i].get());
@@ -147,6 +148,8 @@ MicrobiomeControls::MicrobiomeControls(juce::AudioProcessorValueTreeState& apvst
     modeLabel.setPosition(juce::Justification::centredTop);
     addAndMakeVisible(modeLabel);
 
+    createGUILabels();
+
     setSize(500, 500);
 }
 
@@ -162,7 +165,14 @@ void MicrobiomeControls::paint (juce::Graphics& g)
     g.fillRoundedRectangle(getLocalBounds().toFloat(), 10);
 
     g.setColour(juce::Colours::darksalmon);
-    g.drawRoundedRectangle(engineCtrlsRect.toFloat(), 5, 2);
+    //g.drawRoundedRectangle(p_engineCtrlsRect.toFloat(), 5, 2);
+    g.drawRect(p_engineCtrlsRect.toFloat(), 2);
+
+    
+    g.setColour(juce::Colours::lightblue);
+    //g.fillRoundedRectangle(p_engineCtrlsTtlRect.toFloat(), 5);
+    g.fillRect(p_engineCtrlsTtlRect.toFloat());
+
 
     for (int i = 0; i < MAX_COLONY; i++) {
         for (int j = 0; j < colonyComponents[0].size(); j++) { // all colonies should have same # of components
@@ -189,17 +199,21 @@ void MicrobiomeControls::resized()
 {
     auto area = getLocalBounds();
 
-    engineCtrlsRect = area.removeFromLeft(100);
-    int engineCtrlsH = engineCtrlsRect.getHeight() / 3;
+    p_engineCtrlsRect = area.removeFromLeft(100);
+    int engineCtrlsH = p_engineCtrlsRect.getHeight() / 3;
     
-    auto rect = engineCtrlsRect;
+    auto rect = p_engineCtrlsRect;
     engineWetSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 20));
     engineReverbSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 20));
     engineLushSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 20));
 
-    engineCtrlsTtlRect = area.removeFromTop(60);
-    auto enableColonyRect = engineCtrlsTtlRect.removeFromRight(130);
-    auto colonyPlayCtrlRect = area.removeFromRight(85).reduced(10).withTrimmedBottom(10);
+    
+    auto ctrlTitle = area.removeFromTop(60);
+    p_engineCtrlsTtlRect = juce::Rectangle{ ctrlTitle.withTrimmedBottom(20) };
+
+    auto enableColonyRect = ctrlTitle.removeFromRight(130).withTrimmedBottom(20);
+    auto colonyPlayCtrlRect = area.removeFromRight(85).reduced(10, 20);
+    controlTitle.setBounds(ctrlTitle.withTrimmedBottom(20).withTrimmedLeft(10));
 
     auto topSliderRect = area.removeFromTop(100);
     int topSliderSplit = topSliderRect.getWidth() / 2;
@@ -263,4 +277,11 @@ void MicrobiomeControls::applyLinearSliderStyle(juce::Slider& slider)
     slider.setSliderStyle(juce::Slider::LinearHorizontal);
     slider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
     slider.setPopupDisplayEnabled(true, true, this);
+}
+
+void MicrobiomeControls::createGUILabels()
+{
+    controlTitle.setText("Colony Controls", juce::dontSendNotification);
+    controlTitle.setFont(MicrobiomeResources::m_getTitleFont1(21, 0));
+    addAndMakeVisible(controlTitle);
 }
