@@ -173,6 +173,10 @@ void MicrobiomeControls::paint (juce::Graphics& g)
     //g.fillRoundedRectangle(p_engineCtrlsTtlRect.toFloat(), 5);
     g.fillRect(p_engineCtrlsTtlRect.toFloat());
 
+    if (*parameters.getRawParameterValue(PARAMETER_ENABLE_ID(currentColony+1)) == 0.0f) {
+        g.setColour(juce::Colours::lightslategrey);
+        g.fillRect(p_colonyCtrlsOverlayRect);
+    }
 
     for (int i = 0; i < MAX_COLONY; i++) {
         for (int j = 0; j < colonyComponents[0].size(); j++) { // all colonies should have same # of components
@@ -210,6 +214,7 @@ void MicrobiomeControls::resized()
     
     auto ctrlTitle = area.removeFromTop(60);
     p_engineCtrlsTtlRect = juce::Rectangle{ ctrlTitle.withTrimmedBottom(20) };
+    p_colonyCtrlsOverlayRect = juce::Rectangle{ area.withTrimmedTop(-20)};
 
     auto enableColonyRect = ctrlTitle.removeFromRight(130).withTrimmedBottom(20);
     auto colonyPlayCtrlRect = area.removeFromRight(85).reduced(10, 20);

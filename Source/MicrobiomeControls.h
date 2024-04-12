@@ -45,6 +45,7 @@ private:
 
     juce::Rectangle<int> p_engineCtrlsRect;
     juce::Rectangle<int> p_engineCtrlsTtlRect;
+    juce::Rectangle<int> p_colonyCtrlsOverlayRect;
 
     juce::Label controlTitle;
 
