@@ -11,9 +11,9 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "../MicrobiomeResources.h"
+#include "MicrobiomeResources.h"
 
-class ModeComboBoxLAF : public juce::LookAndFeel_V4
+class MicrobiomeLAF : public juce::LookAndFeel_V4
 {
 public:
     juce::Font getComboBoxFont(juce::ComboBox&) override

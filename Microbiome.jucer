@@ -6,6 +6,8 @@
               pluginName="Microbiome" pluginManufacturer="Darwin Do" pluginDesc="Exploring the evolutionary nature of sound">
   <MAINGROUP id="HVHVHe" name="Microbiome">
     <GROUP id="{94B59616-946F-A263-9B1F-9BACD46311F2}" name="Resources">
+      <FILE id="aQDYng" name="MuseoModerno-Regular.ttf" compile="0" resource="1"
+            file="Resources/MuseoModerno-Regular.ttf"/>
       <FILE id="jiEh0R" name="RobotoSlab-Medium.ttf" compile="0" resource="1"
             file="Resources/RobotoSlab-Medium.ttf"/>
       <FILE id="TFir2S" name="Poppins-Regular.ttf" compile="0" resource="1"
@@ -14,25 +16,27 @@
             file="Resources/Suwannaphum-Regular.ttf"/>
     </GROUP>
     <GROUP id="{021420D8-7482-8AC4-5F25-AEEA04E9072F}" name="Source">
-      <GROUP id="{4E2E2A7F-88CD-66C3-E9F3-9573C45B425B}" name="LookAndFeels">
-        <FILE id="MiLLXP" name="ModeComboBoxLAF.h" compile="0" resource="0"
-              file="Source/LookAndFeels/ModeComboBoxLAF.h"/>
+      <GROUP id="{4E2E2A7F-88CD-66C3-E9F3-9573C45B425B}" name="gui">
+        <FILE id="nkdlQo" name="MicrobiomeControls.cpp" compile="1" resource="0"
+              file="Source/gui/MicrobiomeControls.cpp"/>
+        <FILE id="vU6gPs" name="MicrobiomeControls.h" compile="0" resource="0"
+              file="Source/gui/MicrobiomeControls.h"/>
+        <FILE id="vOuEQD" name="MicrobiomeLAF.h" compile="0" resource="0" file="Source/gui/MicrobiomeLAF.h"/>
+        <FILE id="ASKtix" name="MicrobiomeResources.h" compile="0" resource="0"
+              file="Source/gui/MicrobiomeResources.h"/>
+        <FILE id="gXNTtU" name="MicrobiomeWindow.cpp" compile="1" resource="0"
+              file="Source/gui/MicrobiomeWindow.cpp"/>
+        <FILE id="mi6YES" name="MicrobiomeWindow.h" compile="0" resource="0"
+              file="Source/gui/MicrobiomeWindow.h"/>
+        <FILE id="AuFy21" name="MoveableLabel.cpp" compile="1" resource="0"
+              file="Source/gui/MoveableLabel.cpp"/>
+        <FILE id="fEce3L" name="MoveableLabel.h" compile="0" resource="0" file="Source/gui/MoveableLabel.h"/>
+        <FILE id="t1G7qa" name="PluginEditor.cpp" compile="1" resource="0"
+              file="Source/gui/PluginEditor.cpp"/>
+        <FILE id="s85zz7" name="PluginEditor.h" compile="0" resource="0" file="Source/gui/PluginEditor.h"/>
+        <FILE id="RxggMp" name="TwoValueSliderAttachment.h" compile="0" resource="0"
+              file="Source/gui/TwoValueSliderAttachment.h"/>
       </GROUP>
-      <FILE id="Xdg7hB" name="MicrobiomeResources.h" compile="0" resource="0"
-            file="Source/MicrobiomeResources.h"/>
-      <FILE id="JD57RT" name="MoveableLabel.cpp" compile="1" resource="0"
-            file="Source/MoveableLabel.cpp"/>
-      <FILE id="GxtJ7w" name="MoveableLabel.h" compile="0" resource="0" file="Source/MoveableLabel.h"/>
-      <FILE id="ZQFhZr" name="MicrobiomeControls.cpp" compile="1" resource="0"
-            file="Source/MicrobiomeControls.cpp"/>
-      <FILE id="ZQIT42" name="MicrobiomeControls.h" compile="0" resource="0"
-            file="Source/MicrobiomeControls.h"/>
-      <FILE id="Rw9zPe" name="MicrobiomeWindow.cpp" compile="1" resource="0"
-            file="Source/MicrobiomeWindow.cpp"/>
-      <FILE id="vJvJN8" name="MicrobiomeWindow.h" compile="0" resource="0"
-            file="Source/MicrobiomeWindow.h"/>
-      <FILE id="TP2p5b" name="TwoValueSliderAttachment.h" compile="0" resource="0"
-            file="Source/TwoValueSliderAttachment.h"/>
       <FILE id="ZCZ3pb" name="Constants.h" compile="0" resource="0" file="Source/Constants.h"/>
       <FILE id="iaTa37" name="Colony.cpp" compile="1" resource="0" file="Source/Colony.cpp"/>
       <FILE id="DP4imL" name="Colony.h" compile="0" resource="0" file="Source/Colony.h"/>
@@ -44,9 +48,6 @@
             file="Source/PluginProcessor.cpp"/>
       <FILE id="Rbaydh" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
-      <FILE id="BwxgUI" name="PluginEditor.cpp" compile="1" resource="0"
-            file="Source/PluginEditor.cpp"/>
-      <FILE id="LzVtFd" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
   </MAINGROUP>
   <MODULES>

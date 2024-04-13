@@ -7,7 +7,7 @@
 */
 
 #include "PluginProcessor.h"
-#include "PluginEditor.h"
+#include "gui/PluginEditor.h"
 
 #define PARAMETER_VT_ID "root_parameters"
 
@@ -162,31 +162,11 @@ void MicrobiomeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    //DBG("Wet Level: " << reverbWet);
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    //buffer.applyGain(0.5);
-    // for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    // {
-    //     auto* channelData = buffer.getWritePointer (channel);
-        
-    //     for (int i = 0; i < buffer.getNumSamples(); i++) {
-    //         auto inVal = channelData[i];
-    //         channelData[i] = channelData[i] + 0.5 * testDelay.popSample(channel);
-    //         testDelay.pushSample(channel, channelData[i]); // switch this to *channelData to do feedback
-    //     }
-    // }
 
     // TODO: return immediately if no samples
     // TODO: solve ableton maxing out at beginning
     engine.setBPM(getPlayHead()->getPosition()->getBpm().orFallback(0));
     engine.processAudio(buffer);
-    // testVerb.processStereo(buffer.getWritePointer(0), buffer.getWritePointer(1), buffer.getNumSamples());
 }
 
 //==============================================================================
