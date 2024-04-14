@@ -54,7 +54,7 @@ void MicrobiomeAudioProcessorEditor::paint (juce::Graphics& g)
     g.setColour(juce::Colours::bisque);
     g.fillRoundedRectangle(p_colMenuRect.toFloat(), 3);
 
-    g.setFont(MicrobiomeResources::m_getTitleFont2(32, 0));
+    g.setFont(MicrobiomeResources::m_getTitleFont1(32, 0));
     g.setColour(juce::Colours::black);
     g.drawFittedText(juce::String("Current Colony: ") + juce::String(currentColony+1), p_colMenuRect, juce::Justification::centredTop, 1);
 }
