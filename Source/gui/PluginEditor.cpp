@@ -23,7 +23,7 @@ MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioPr
     prevColony.addListener(this);
     addAndMakeVisible(prevColony);
 
-    //addAndMakeVisible(visualWindow);
+    addAndMakeVisible(visualWindow);
     addAndMakeVisible(controlWindow);
 
     for (int i = 0; i < MAX_COLONY; i++) parameters.addParameterListener(PARAMETER_ENABLE_ID(i+1), this);
@@ -40,7 +40,6 @@ MicrobiomeAudioProcessorEditor::~MicrobiomeAudioProcessorEditor()
 //==============================================================================
 void MicrobiomeAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    //g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
     g.fillAll(juce::Colours::lightcoral);
 
     g.setColour (juce::Colours::white);
@@ -63,20 +62,17 @@ void MicrobiomeAudioProcessorEditor::paint (juce::Graphics& g)
 void MicrobiomeAudioProcessorEditor::resized()
 {
     auto area = getLocalBounds();
-
-    // visualWindow.setBounds(500, 200, 200, 200);
-    nextColony.setBounds(50, 50, 70, 35);
     
-
     p_topbarRect = area.removeFromTop(30);
-    controlWindow.setBounds(area.removeFromRight(controlWindow.getWidth()).reduced(10));
+    controlWindow.setBounds(area.removeFromRight(500).reduced(10));
 
-    auto colMenu = area.removeFromTop(120).reduced(10);
+    auto colMenu = area.removeFromTop(100).reduced(10);
     p_colMenuRect = juce::Rectangle{colMenu};
-    prevColony.setBounds(colMenu.removeFromLeft(colMenu.getWidth()/2).reduced(10));
-    nextColony.setBounds(colMenu.reduced(10));
-}
+    prevColony.setBounds(colMenu.removeFromLeft(colMenu.getWidth()/2).reduced(10).withTrimmedTop(30));
+    nextColony.setBounds(colMenu.reduced(10).withTrimmedTop(30));
 
+    visualWindow.setBounds(area.reduced(10, 30));
+}
 
 void MicrobiomeAudioProcessorEditor::buttonClicked(juce::Button* button)
 {
@@ -89,7 +85,6 @@ void MicrobiomeAudioProcessorEditor::buttonClicked(juce::Button* button)
 
     repaint(p_colMenuRect);
 }
-
 
 void MicrobiomeAudioProcessorEditor::parameterChanged(const juce::String &parameterID, float newValue)
 {

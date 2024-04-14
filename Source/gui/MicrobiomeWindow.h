@@ -15,8 +15,8 @@
 //==============================================================================
 /*
 */
-class MicrobiomeWindow :    public juce::Component,
-                            public juce::OpenGLRenderer
+class MicrobiomeWindow :    public juce::AnimatedAppComponent
+
 {
 public:
     MicrobiomeWindow();
@@ -24,12 +24,14 @@ public:
 
     void paint (juce::Graphics&) override;
     void resized() override;
+    void update() override;	
 
-    void newOpenGLContextCreated() override;
-    void renderOpenGL() override;
-    void openGLContextClosing() override;
+
+    // void newOpenGLContextCreated() override;
+    // void renderOpenGL() override;
+    // void openGLContextClosing() override;
 
 private:
-    juce::OpenGLContext glCtx;
+    // juce::OpenGLContext glCtx;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MicrobiomeWindow)
 };

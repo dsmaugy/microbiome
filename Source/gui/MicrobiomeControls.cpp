@@ -150,7 +150,7 @@ MicrobiomeControls::MicrobiomeControls(juce::AudioProcessorValueTreeState& apvst
 
     createGUILabels();
 
-    setSize(500, 500);
+    // setSize(500, 500);
 }
 
 MicrobiomeControls::~MicrobiomeControls()
@@ -205,7 +205,7 @@ void MicrobiomeControls::paintOverChildren(juce::Graphics& g)
     bool currColonyEnabled = *parameters.getRawParameterValue(PARAMETER_ENABLE_ID(currentColony+1)) == 1.0f;
     g.setColour(juce::Colours::black);
     if (!currColonyEnabled) {
-        g.setOpacity(0.90);
+        g.setOpacity(0.60);
     } else {
         g.setOpacity(0.0);
     }
