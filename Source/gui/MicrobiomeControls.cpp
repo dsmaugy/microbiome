@@ -243,7 +243,7 @@ void MicrobiomeControls::resized()
     auto filterSlider = bottomSliderRect.removeFromLeft(bottomSliderSplit);
     auto gainSlider = bottomSliderRect.removeFromLeft(bottomSliderSplit);
 
-    auto modeRect = area.removeFromTop(area.getHeight()/2);
+    auto modeRect = area.removeFromTop(area.getHeight()/1.5);
     modeRect.removeFromLeft(colonyPlayCtrlRect.getWidth() / 2);
     modeRect = modeRect.withTrimmedTop(70).reduced(35, 5);
 
