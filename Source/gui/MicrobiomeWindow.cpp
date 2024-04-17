@@ -60,8 +60,8 @@ void MicrobiomeWindow::paint (juce::Graphics& g)
         g.drawLine(
             (float)windowRect.getCentreX() + (CENTRAL_NODE_SIZE*0.5)*std::cos((i/(float)NUM_NODE_LINES)*2*PI), 
             (float)windowRect.getCentreY() + (CENTRAL_NODE_SIZE*0.5)*std::sin((i/(float)NUM_NODE_LINES)*2*PI), 
-            (float)windowRect.getCentreX() + (CENTRAL_NODE_SIZE*0.8*shift)*std::cos((i/(float)NUM_NODE_LINES)*2*PI), 
-            (float)windowRect.getCentreY() + (CENTRAL_NODE_SIZE*0.8*shift)*std::sin((i/(float)NUM_NODE_LINES)*2*PI), 2);
+            (float)windowRect.getCentreX() + (CENTRAL_NODE_SIZE*0.57*shift)*std::cos((i/(float)NUM_NODE_LINES)*2*PI), 
+            (float)windowRect.getCentreY() + (CENTRAL_NODE_SIZE*0.57*shift)*std::sin((i/(float)NUM_NODE_LINES)*2*PI), 2.5);
     }
 
     g.drawEllipse(windowRect.withSizeKeepingCentre(CENTRAL_NODE_SIZE, CENTRAL_NODE_SIZE).toFloat(), 3);
