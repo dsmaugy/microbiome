@@ -11,6 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#define NUM_NODE_LINES 30
 
 //==============================================================================
 /*
@@ -33,8 +34,8 @@ public:
 
 private:
     // juce::OpenGLContext glCtx;
-    int loopCounter = 0;
-    int loopDelta = 1;
+    float nodeLineShifts[NUM_NODE_LINES];
+    juce::Random rng;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MicrobiomeWindow)
 };
