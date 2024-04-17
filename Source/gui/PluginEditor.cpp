@@ -12,7 +12,7 @@
 
 //==============================================================================
 MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioProcessor& p, juce::AudioProcessorValueTreeState& apvst)
-    : AudioProcessorEditor(&p), audioProcessor(p), parameters(apvst), controlWindow(apvst)
+    : AudioProcessorEditor(&p), audioProcessor(p), parameters(apvst), controlWindow(apvst), visualWindow(apvst)
 {
     
     nextColony.setButtonText("->");

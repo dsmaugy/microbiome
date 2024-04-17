@@ -11,7 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#define NUM_NODE_LINES 30
+#define NUM_NODE_LINES 15
 
 //==============================================================================
 /*
@@ -20,7 +20,7 @@ class MicrobiomeWindow :    public juce::AnimatedAppComponent
 
 {
 public:
-    MicrobiomeWindow();
+    MicrobiomeWindow(juce::AudioProcessorValueTreeState&);
     ~MicrobiomeWindow() override;
 
     void paint (juce::Graphics&) override;
@@ -34,8 +34,11 @@ public:
 
 private:
     // juce::OpenGLContext glCtx;
+    juce::AudioProcessorValueTreeState& parameters;
     float nodeLineShifts[NUM_NODE_LINES];
     juce::Random rng;
+
+    juce::Path generateTentacle();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MicrobiomeWindow)
 };

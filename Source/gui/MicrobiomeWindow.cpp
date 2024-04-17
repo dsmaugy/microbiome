@@ -9,14 +9,15 @@
 */
 
 #include <JuceHeader.h>
+#include "../Constants.h"
 #include "MicrobiomeWindow.h"
 
-#define CENTRAL_NODE_SIZE 30
+#define CENTRAL_NODE_SIZE 40
 
 #define PI juce::MathConstants<float>::pi
 
 //==============================================================================
-MicrobiomeWindow::MicrobiomeWindow()
+MicrobiomeWindow::MicrobiomeWindow(juce::AudioProcessorValueTreeState& p) : parameters(p)
 {
     setOpaque(false);
     setFramesPerSecond(24);
@@ -49,9 +50,6 @@ void MicrobiomeWindow::paint (juce::Graphics& g)
     g.setGradientFill(nodeGradient);
     g.fillEllipse(windowRect.withSizeKeepingCentre(CENTRAL_NODE_SIZE, CENTRAL_NODE_SIZE).toFloat());
 
-    // DBG("Center X: " << windowRect.getCentreX() << " Center Y: " << windowRect.getCentreY());
-    // DBG("X2: " << nodeGradient.point2.getX() << " Y2: " << nodeGradient.point2.getY());
-
     // TODO: set this to a different gradient
     g.setColour(nodeGradient.getColourAtPosition((gradScale+1)/2.0f));
 
@@ -66,7 +64,27 @@ void MicrobiomeWindow::paint (juce::Graphics& g)
 
     g.drawEllipse(windowRect.withSizeKeepingCentre(CENTRAL_NODE_SIZE, CENTRAL_NODE_SIZE).toFloat(), 3);
 
+    for (int i = 0; i < MAX_COLONY; i++) {
+        if (*parameters.getRawParameterValue(PARAMETER_ENABLE_ID(i+1)) == 1.0f) {
+            // TODO: draw colony appendages here
+        }
+    }
+
+    g.fillPath(generateTentacle(), juce::AffineTransform().translated(windowRect.getCentreX(), windowRect.getCentreY()));
     //DBG("Updating window: " << getFrameCounter());
+}
+
+juce::Path MicrobiomeWindow::generateTentacle()
+{
+    juce::Path tentacle;
+
+    tentacle.cubicTo(-57.82, -89.35, -54.4, -88.48, -55.5, -88.77);
+    tentacle.cubicTo(-59.71, -88.97, -52.12, -80.49, -55.51, -84.27);
+    tentacle.cubicTo(-51.35, -82.01, -40.34, -69.81, -45.61, -75.64);
+    tentacle.cubicTo(-30.17, -61.81, -24.31, -54.13, -27.56, -58.38);
+    tentacle.cubicTo(-17.42, -42.07, -9.68, -19.92, -13.77, -31.42);
+    tentacle.cubicTo(-7.52, -13.32, -6.96, 3.27, -7.39, -6.36);
+    return tentacle;
 }
 
 void MicrobiomeWindow::resized()
