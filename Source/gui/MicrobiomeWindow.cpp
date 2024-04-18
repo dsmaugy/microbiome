@@ -69,8 +69,8 @@ void MicrobiomeWindow::paint (juce::Graphics& g)
             // TODO: draw colony appendages here
         }
     }
-    //juce::AffineTransform().translated(windowRect.getCentreX(), windowRect.getCentreY())
-    //g.fillPath(generateTentacle());
+    // juce::AffineTransform().translated(windowRect.getCentreX(), windowRect.getCentreY())
+    g.fillPath(generateTentacle(), juce::AffineTransform().translated(windowRect.getCentreX()-CENTRAL_NODE_SIZE/2, windowRect.getCentreY()-CENTRAL_NODE_SIZE/2));
     //DBG("Updating window: " << getFrameCounter());
 }
 
