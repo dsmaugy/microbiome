@@ -13,6 +13,7 @@
 #include "MicrobiomeWindow.h"
 
 #define CENTRAL_NODE_SIZE 40
+#define TENTACLE_NUM 30
 
 #define PI juce::MathConstants<float>::pi
 
@@ -70,7 +71,8 @@ void MicrobiomeWindow::paint (juce::Graphics& g)
         }
     }
     // juce::AffineTransform().translated(windowRect.getCentreX(), windowRect.getCentreY())
-    g.fillPath(generateTentacle(), juce::AffineTransform().translated(windowRect.getCentreX()-CENTRAL_NODE_SIZE/2, windowRect.getCentreY()-CENTRAL_NODE_SIZE/2));
+    juce::AffineTransform tentacleTrans = juce::AffineTransform().translated(windowRect.getCentreX() - CENTRAL_NODE_SIZE / 2, windowRect.getCentreY() - CENTRAL_NODE_SIZE / 2);
+    g.fillPath(generateTentacle(), tentacleTrans.rotated(PI, windowRect.getCentreX(), windowRect.getCentreY()));
     //DBG("Updating window: " << getFrameCounter());
 }
 
