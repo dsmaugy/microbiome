@@ -12,6 +12,8 @@
 
 #include <JuceHeader.h>
 #define NUM_NODE_LINES 15
+#define NUM_TENTACLES 30
+
 
 //==============================================================================
 /*
@@ -19,6 +21,11 @@
 class MicrobiomeWindow :    public juce::AnimatedAppComponent
 
 {
+    struct DrawnTentacle {
+        juce::Path tentacle;
+        juce::AffineTransform transform;
+    };
+
 public:
     MicrobiomeWindow(juce::AudioProcessorValueTreeState&);
     ~MicrobiomeWindow() override;
@@ -27,18 +34,16 @@ public:
     void resized() override;
     void update() override;	
 
-
-    // void newOpenGLContextCreated() override;
-    // void renderOpenGL() override;
-    // void openGLContextClosing() override;
-
 private:
-    // juce::OpenGLContext glCtx;
+
     juce::AudioProcessorValueTreeState& parameters;
     float nodeLineShifts[NUM_NODE_LINES];
+    DrawnTentacle tentacles[NUM_TENTACLES];
+
     juce::Random rng;
 
-    juce::Path generateTentacle();
+
+    DrawnTentacle generateTentacle();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MicrobiomeWindow)
 };
