@@ -12,7 +12,8 @@
 #include "../Constants.h"
 #include "MicrobiomeWindow.h"
 
-#define CENTRAL_NODE_SIZE 40
+#define CENTRAL_NODE_SIZE 65
+#define SCRUB_DELTA 1
 
 
 #define PI juce::MathConstants<float>::pi
@@ -25,6 +26,8 @@ juce::Path tentaclePaths[] = {
     //juce::Drawable::parseSVGPath("m6.2307, 15.5321c.2458.0354.5312 - .3592.653 - .6299.2226 - .4948.0871 - .9948.0355 - 1.1996 - .2964 - 1.1773.1122 - .8213 - .2941 - 3.4706 - .2387 - 1.5562 - .3667 - 2.347 - .7941 - 2.9706 - .306 - .4465 - .6688 - .9759 - 1.3235 - 1.2059 - .4622 - .1624 - .8007 - .0811 - 1.3824 - .3824 - .3375 - .1748 - .6429 - .3317 - .7353 - .6176 - .1647 - .5095.636 - 1.1553, 1.5294 - 1.8529C6.5404, 1.1558, 7.786.4306, 7.6692.1291c - .0898 - .2318 - .9405 - .1002 - 1.5882, 0 - .8865.1371 - 2.0564.443 - 3.4976, 1.2411C1.1069, 2.1878.3283, 2.5954.0869, 3.4907c - .2622.9726.1489, 1.8166.1852, 1.8884.9077, 1.7961, 3.3567.9599, 4.4792, 2.7143.2322.3628.397, 1.6509.7267, 4.2269.2543, 1.987.3528, 3.1543.7527, 3.2119Z"),
     juce::Drawable::parseSVGPath("m12.6812,16.2152c.6164-.5031,2.0145-5.4573-.3229-9.568C9.0586.8442.0789-.1745.0005.0223c-.0367.0922,1.7826.6986,5.6157,2.8628,2.1695,1.225,3.2689,1.8526,3.9854,2.5945,2.1638,2.2406,2.6346,4.987,2.8079,6.0835.3055,1.9336.1518,4.0137-.1208,4.5627-.0224.0452-.1567.3038-.0906.3579.0771.063.3836-.1872.4831-.2684Z")
 };
+
+juce::Path colonyBranch = juce::Drawable::parseSVGPath("m31.8442,97.6548h7.2353c-1.2187-3.4826-2.3631-8.6254-.4706-13.7059,2.6175-7.0266,8.6712-7.5637,13.5294-12.9412,9.9838-11.0508,6.0815-32.7609-1.2353-45.8824-5.6471-10.1271-13.914-15.0861-18.2488-17.733C23.6196,1.8758,13.4032-.8099,12.256,1.1254c-.7525,1.2694,2.9998,3.5104,2.8235,7.5882-.1517,3.5117-3.1072,5.8458-4.7902,7.456C3.9828,22.2039,2.2928,30.755,1.1383,36.596c-1.9772,10.0043.5409,23.6099,8.9277,32.0556,8.6942,8.7552,18.4851,6.8348,22.2353,15.3291,2.179,4.9355.8034,10.2898-.4571,13.6741Z");
 
 //==============================================================================
 MicrobiomeWindow::MicrobiomeWindow(juce::AudioProcessorValueTreeState& p) : parameters(p)
@@ -48,16 +51,77 @@ void MicrobiomeWindow::paint (juce::Graphics& g)
     g.setColour(juce::Colours::black);
     g.fillRoundedRectangle(windowRect.toFloat(), 8);
 
-    juce::AffineTransform tentacleTrans = juce::AffineTransform().translated(windowRect.getCentreX() - CENTRAL_NODE_SIZE / 1.5, windowRect.getCentreY() - CENTRAL_NODE_SIZE / 1.5);
+    /*
+    * ADD TENTACLES
+    */
     g.setColour(juce::Colours::rebeccapurple);
     for (int i = 0; i < NUM_TENTACLES; i++) {
-        float shift = (std::sin(getFrameCounter()*0.05 + nodeLineShifts[i%NUM_TENTACLES]) + 1)*0.008;
+        float shift = (std::sin(getFrameCounter() * 0.05 + nodeLineShifts[i % NUM_TENTACLES]) + 1) * 0.008;
+        juce::AffineTransform scaleTrans = juce::AffineTransform::scale(1.75, 1.75);
+        juce::AffineTransform moveToNodeTransform = scaleTrans.translated(
+            windowRect.getCentreX() - (tentacles[i].tentacle.getBoundsTransformed(scaleTrans).getWidth() / 2),
+            (windowRect.getCentreY() - CENTRAL_NODE_SIZE / 2) - tentacles[i].tentacle.getBoundsTransformed(scaleTrans).getHeight() + 5
+        );
 
         g.fillPath(
-            tentacles[i].tentacle, 
-            tentacleTrans
-                .rotated(i * (2 * PI) / NUM_TENTACLES, windowRect.getCentreX(), windowRect.getCentreY())
-                .sheared(shift, 0));
+            tentacles[i].tentacle,
+            moveToNodeTransform
+            .rotated(i * (2 * PI) / NUM_TENTACLES, windowRect.getCentreX(), windowRect.getCentreY())
+            .sheared(shift, 0));
+    }
+
+    /*
+    * ADD COLONY LEAVES
+    */
+    for (int i = 0; i < MAX_COLONY; i++) {
+        if (*parameters.getRawParameterValue(PARAMETER_ENABLE_ID(i + 1)) == 1.0f) {
+            auto branchPath = generateColonyBranch();
+            float angleFromResample = (*parameters.getRawParameterValue(PARAMETER_RESAMPLE_START_ID(i + 1)) / (float)RESAMPLE_START_MAX) * 2 * PI;
+
+            auto transform = juce::AffineTransform::translation(
+                windowRect.getCentreX() - branchPath.getBounds().getWidth()/2,
+                (windowRect.getCentreY() - CENTRAL_NODE_SIZE / 2) - branchPath.getBounds().getHeight())
+                .rotated(angleFromResample, windowRect.getCentreX(), windowRect.getCentreY());
+
+            g.setColour(juce::Colours::aqua);
+            g.fillPath(branchPath, transform);
+
+            float pathLen = branchPath.getLength();
+            float branchPathStartPos = ((*parameters.getRawParameterValue(PARAMETER_COLONY_START_ID(i + 1))) / (float)COLONY_START_MAX) * (pathLen / 2);
+            float branchPathEndPos = ((*parameters.getRawParameterValue(PARAMETER_COLONY_END_ID(i + 1))) / (float)COLONY_END_MAX) * (pathLen / 2);
+
+            auto branchColStartPoint = branchPath.getPointAlongPath(branchPathStartPos, transform);
+            auto branchColStartPoint2 = branchPath.getPointAlongPath(pathLen - branchPathStartPos, transform);
+            auto branchColEndPoint = branchPath.getPointAlongPath(branchPathEndPos, transform);
+            auto branchColEndPoint2 = branchPath.getPointAlongPath(pathLen - branchPathEndPos, transform);
+
+            juce::Path branchScrubVisual = juce::Path();
+            branchScrubVisual.startNewSubPath(branchColStartPoint);
+
+            //  TODO: this can freeze if SCRUB_DELTA is too large 
+            auto currentPoint = branchColStartPoint;
+            float currentPos = branchPathStartPos;
+            while (currentPoint.getDistanceFrom(branchColEndPoint) > 1) {
+                currentPos += SCRUB_DELTA;
+                currentPoint = branchPath.getPointAlongPath(currentPos, transform);
+                branchScrubVisual.lineTo(currentPoint);
+            }
+            
+            branchScrubVisual.lineTo(branchColEndPoint2);
+
+            currentPoint = branchColEndPoint2;
+            currentPos = pathLen - branchPathEndPos;
+            while (currentPoint.getDistanceFrom(branchColStartPoint2) > 1) {
+                currentPos += SCRUB_DELTA;
+                currentPoint = branchPath.getPointAlongPath(currentPos, transform);
+                branchScrubVisual.lineTo(currentPoint);
+            }
+
+            branchScrubVisual.closeSubPath();
+
+            g.setColour(juce::Colours::darkolivegreen);
+            g.fillPath(branchScrubVisual);
+        }
     }
 
     float gradScale = std::sin(getFrameCounter() * 0.05);
@@ -87,14 +151,9 @@ void MicrobiomeWindow::paint (juce::Graphics& g)
     }
 
 
-    for (int i = 0; i < MAX_COLONY; i++) {
-        if (*parameters.getRawParameterValue(PARAMETER_ENABLE_ID(i+1)) == 1.0f) {
-            // TODO: draw colony appendages here
-        }
-    }
-
     g.setColour(nodeGradient.getColourAtPosition((gradScale + 1) / 2.0f));
     g.drawEllipse(windowRect.withSizeKeepingCentre(CENTRAL_NODE_SIZE, CENTRAL_NODE_SIZE).toFloat(), 3);
+
 
     //DBG("Updating window: " << getFrameCounter());
 }
@@ -106,6 +165,11 @@ MicrobiomeWindow::DrawnTentacle MicrobiomeWindow::generateTentacle()
     dt.transform = juce::AffineTransform();
     
     return dt;
+}
+
+juce::Path MicrobiomeWindow::generateColonyBranch()
+{
+    return colonyBranch;
 }
 
 void MicrobiomeWindow::resized()
