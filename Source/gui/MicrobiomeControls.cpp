@@ -15,6 +15,11 @@
 
 // #define COLONY_TITLE_LABEL juce::String("Colony Controls: #")
 
+//const juce::Colour bgColor = juce::Colour{ 0xFF6F99AD };
+const juce::Colour bgColor = juce::Colour{ 0xFF6A837A };
+const juce::Colour topbarColor = juce::Colour{ 0xFF223327 };
+
+
 //==============================================================================
 MicrobiomeControls::MicrobiomeControls(juce::AudioProcessorValueTreeState& apvst) : parameters(apvst)
 {
@@ -92,7 +97,7 @@ MicrobiomeControls::MicrobiomeControls(juce::AudioProcessorValueTreeState& apvst
     engineLushAttachment = std::make_unique<SliderAttachment>(parameters, PARAMETER_ENGINE_LUSH_ID, *engineLushSlider);
     addAndMakeVisible(*engineLushSlider);
 
-    engineWetLabel.setText("engine wetness", juce::dontSendNotification);
+    engineWetLabel.setText("engine wet", juce::dontSendNotification);
     engineWetLabel.attachToComponent(engineWetSlider.get(), false);
     engineWetLabel.setPosition(juce::Justification::centredBottom);
     addAndMakeVisible(engineWetLabel);
@@ -161,7 +166,7 @@ void MicrobiomeControls::paint (juce::Graphics& g)
 {
     // g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
 
-    g.setColour (juce::Colours::grey);
+    g.setColour (bgColor);
     g.fillRoundedRectangle(getLocalBounds().toFloat(), 10);
 
     g.setColour(juce::Colours::darksalmon);
@@ -169,7 +174,7 @@ void MicrobiomeControls::paint (juce::Graphics& g)
     g.drawRect(p_engineCtrlsRect.toFloat(), 2);
 
     
-    g.setColour(juce::Colours::lightblue);
+    g.setColour(topbarColor);
     g.fillRoundedRectangle(p_engineCtrlsTtlRect.toFloat(), 5);
     //g.fillRect(p_engineCtrlsTtlRect.toFloat());
 
