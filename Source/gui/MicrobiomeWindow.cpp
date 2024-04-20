@@ -48,6 +48,18 @@ void MicrobiomeWindow::paint (juce::Graphics& g)
     g.setColour(juce::Colours::black);
     g.fillRoundedRectangle(windowRect.toFloat(), 8);
 
+    juce::AffineTransform tentacleTrans = juce::AffineTransform().translated(windowRect.getCentreX() - CENTRAL_NODE_SIZE / 1.5, windowRect.getCentreY() - CENTRAL_NODE_SIZE / 1.5);
+    g.setColour(juce::Colours::rebeccapurple);
+    for (int i = 0; i < NUM_TENTACLES; i++) {
+        float shift = (std::sin(getFrameCounter()*0.05 + nodeLineShifts[i%NUM_TENTACLES]) + 1)*0.008;
+
+        g.fillPath(
+            tentacles[i].tentacle, 
+            tentacleTrans
+                .rotated(i * (2 * PI) / NUM_TENTACLES, windowRect.getCentreX(), windowRect.getCentreY())
+                .sheared(shift, 0));
+    }
+
     float gradScale = std::sin(getFrameCounter() * 0.05);
     juce::ColourGradient nodeGradient = juce::ColourGradient{
             juce::Colour{154, 224, 44},
@@ -79,17 +91,6 @@ void MicrobiomeWindow::paint (juce::Graphics& g)
         if (*parameters.getRawParameterValue(PARAMETER_ENABLE_ID(i+1)) == 1.0f) {
             // TODO: draw colony appendages here
         }
-    }
-    juce::AffineTransform tentacleTrans = juce::AffineTransform().translated(windowRect.getCentreX() - CENTRAL_NODE_SIZE / 1.5, windowRect.getCentreY() - CENTRAL_NODE_SIZE / 1.5);
-
-    // TODO: move the tentacles up and down
-    g.setColour(juce::Colours::rebeccapurple);
-    for (int i = 0; i < NUM_TENTACLES; i++) {
-        g.fillPath(
-            tentacles[i].tentacle, 
-            tentacleTrans
-                .rotated(i * (2 * PI) / NUM_TENTACLES, windowRect.getCentreX(), windowRect.getCentreY())
-                .followedBy(tentacles[i].transform));
     }
 
     g.setColour(nodeGradient.getColourAtPosition((gradScale + 1) / 2.0f));

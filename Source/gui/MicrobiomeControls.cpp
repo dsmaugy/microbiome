@@ -223,7 +223,6 @@ void MicrobiomeControls::resized()
     engineWetSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 20));
     engineReverbSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 20));
     engineLushSlider->setBounds(rect.removeFromTop(engineCtrlsH).reduced(0, 20));
-
     
     auto ctrlTitle = area.removeFromTop(60);
     p_engineCtrlsTtlRect = juce::Rectangle{ ctrlTitle.withTrimmedBottom(20) };
