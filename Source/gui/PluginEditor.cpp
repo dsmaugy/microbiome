@@ -11,7 +11,6 @@
 #include "../Constants.h"
 
 const juce::Colour bgColor = juce::Colour{ 0xFF6FAD98 };
-//const juce::Colour colMenuBgColor = juce::Colour{ 0xFFF6F89F };
 const juce::Colour colMenuBgColor = juce::Colour{ 0xFFAD8E6F };
 const juce::Colour titleTextColor = juce::Colour{ 0xFF697A6F };
 const juce::Colour borderColor = juce::Colour{ 0xFF49584B };
