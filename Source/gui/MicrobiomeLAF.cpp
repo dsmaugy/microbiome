@@ -23,10 +23,16 @@ MicrobiomeLAF::MicrobiomeLAF()
     setColour(juce::ComboBox::ColourIds::backgroundColourId, Microbiome::baseColorDark);
     setColour(juce::ComboBox::ColourIds::outlineColourId, Microbiome::baseColorLight);
     setColour(juce::ComboBox::ColourIds::arrowColourId, Microbiome::interactGreenColor);
+    setColour(juce::ComboBox::ColourIds::textColourId, Microbiome::textColor);
     setColour(juce::PopupMenu::ColourIds::backgroundColourId, Microbiome::baseColorLight);
     setColour(juce::PopupMenu::ColourIds::highlightedBackgroundColourId, Microbiome::baseColorDark);
+    setColour(juce::PopupMenu::ColourIds::textColourId, Microbiome::textColor);
     setColour(juce::TextButton::ColourIds::buttonColourId, Microbiome::baseColorLight);
     setColour(juce::TextButton::ColourIds::buttonOnColourId, Microbiome::baseColorDark);
+    setColour(juce::TextButton::ColourIds::textColourOffId, Microbiome::textColor);
+    setColour(juce::TextButton::ColourIds::textColourOnId, Microbiome::textColor);
+    setColour(juce::Label::ColourIds::textColourId, Microbiome::textColor);
+    setColour(juce::ToggleButton::ColourIds::textColourId, Microbiome::textColor);
 }
 
 void MicrobiomeLAF::drawPopupMenuItem(Graphics& g, const Rectangle<int>& area,

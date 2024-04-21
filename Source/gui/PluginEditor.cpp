@@ -14,7 +14,6 @@ const juce::Colour bgColor = juce::Colour{ 0xFF6FAD98 };
 //const juce::Colour colMenuBgColor = juce::Colour{ 0xFFF6F89F };
 const juce::Colour colMenuBgColor = juce::Colour{ 0xFFAD8E6F };
 const juce::Colour titleTextColor = juce::Colour{ 0xFF697A6F };
-const juce::Colour mainTextColor = juce::Colour{ 0xFFFFFFFF };
 const juce::Colour borderColor = juce::Colour{ 0xFF49584B };
 
 //==============================================================================
@@ -63,7 +62,7 @@ void MicrobiomeAudioProcessorEditor::paint (juce::Graphics& g)
     g.fillRoundedRectangle(p_colMenuRect.toFloat(), 5);
 
     g.setFont(MicrobiomeResources::m_getTitleFont1(32, 0));
-    g.setColour(mainTextColor);
+    g.setColour(Microbiome::textColor);
     g.drawFittedText(juce::String("Current Colony: ") + juce::String(currentColony+1), p_colMenuRect, juce::Justification::centredTop, 1);
 }
 

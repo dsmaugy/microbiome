@@ -82,4 +82,7 @@ namespace Microbiome
     const juce::Colour baseColorLight = juce::Colour{ 0xFF475851 };
     const juce::Colour baseColorDark = juce::Colour{ 0xFF2B3632 };
     const juce::Colour interactGreenColor = juce::Colour{ 0xFFACFCC3 };
+    const juce::Colour textColor = juce::Colour{ 0xFFFCF7C5 };
+    //const juce::Colour textColor = juce::Colour{ 0xFFF0FCE3 };
+    
 }

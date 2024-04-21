@@ -14,9 +14,9 @@
 
 #define CENTRAL_NODE_SIZE 65
 #define SCRUB_DELTA 1
-
-
 #define PI juce::MathConstants<float>::pi
+
+const juce::Colour colonyLeafColor = juce::Colour{0xFFB5E0D0};
 
 juce::Path tentaclePaths[] = {
     juce::Drawable::parseSVGPath("m14.7356,12.9145c.2516.049.6516-.655.8824-1.3235,1.2471-3.613-1.162-9.9156-5.2059-11.2941C5.7549-1.2907-.0454,4.0018.0003,4.091c.0244.0477,1.9336-.9803,5.2941-1.9412,2.4911-.7123,3.4316-.7164,4.3235-.3529.2427.0989,1.8033.7348,2.2941,2.1177.191.5381.1122.8854.4412,1.5882.3597.7684.8484,1.1958,1.0588,1.4118,1.7529,1.7985.7344,5.8853,1.3235,6Z"),
@@ -83,7 +83,7 @@ void MicrobiomeWindow::paint (juce::Graphics& g)
                 (windowRect.getCentreY() - CENTRAL_NODE_SIZE / 2) - branchPath.getBounds().getHeight())
                 .rotated(angleFromResample, windowRect.getCentreX(), windowRect.getCentreY());
 
-            g.setColour(juce::Colours::aqua);
+            g.setColour(colonyLeafColor);
             g.fillPath(branchPath, transform);
 
             float pathLen = branchPath.getLength();
