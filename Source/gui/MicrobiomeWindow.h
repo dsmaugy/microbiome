@@ -11,6 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "../Constants.h"
 #define NUM_NODE_LINES 15
 #define NUM_TENTACLES 30
 
@@ -39,9 +40,11 @@ private:
     juce::AudioProcessorValueTreeState& parameters;
     float nodeLineShifts[NUM_NODE_LINES];
     DrawnTentacle tentacles[NUM_TENTACLES];
+    float playbackIndicatorPos[MAX_COLONY];
+    float playbackIndicatorDelta;
 
     juce::Random rng;
-
+    
 
     DrawnTentacle generateTentacle();
     juce::Path generateColonyBranch();

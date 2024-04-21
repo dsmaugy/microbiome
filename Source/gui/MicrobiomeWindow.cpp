@@ -16,12 +16,12 @@
 #define SCRUB_DELTA 1
 #define PI juce::MathConstants<float>::pi
 
-const juce::Colour colonyLeafColor = juce::Colour{0xFFB5E0D0};
+const juce::Colour colonyLeafColor = juce::Colour{0xFF8FB0A4 };
 // const juce::Colour coreGradient1 = juce::Colour{0xFF9AE02C};
 // const juce::Colour coreGradient2 = juce::Colour{0xFF00C4EC};
 const juce::Colour coreGradient1 = juce::Colour{0xFF4EDEA3};
 const juce::Colour coreGradient2 = juce::Colour{0xFF1898B3};
-const juce::Colour leafGradient1 = juce::Colour{0xFF2F6160};
+const juce::Colour leafGradient1 = juce::Colour{0xFF4985E3};
 const juce::Colour leafGradient2 = juce::Colour{0xFF93E0C4};
 
 
@@ -38,7 +38,8 @@ juce::Path tentaclePaths[] = {
 juce::Path colonyBranch = juce::Drawable::parseSVGPath("m31.8442,97.6548h7.2353c-1.2187-3.4826-2.3631-8.6254-.4706-13.7059,2.6175-7.0266,8.6712-7.5637,13.5294-12.9412,9.9838-11.0508,6.0815-32.7609-1.2353-45.8824-5.6471-10.1271-13.914-15.0861-18.2488-17.733C23.6196,1.8758,13.4032-.8099,12.256,1.1254c-.7525,1.2694,2.9998,3.5104,2.8235,7.5882-.1517,3.5117-3.1072,5.8458-4.7902,7.456C3.9828,22.2039,2.2928,30.755,1.1383,36.596c-1.9772,10.0043.5409,23.6099,8.9277,32.0556,8.6942,8.7552,18.4851,6.8348,22.2353,15.3291,2.179,4.9355.8034,10.2898-.4571,13.6741Z");
 
 //==============================================================================
-MicrobiomeWindow::MicrobiomeWindow(juce::AudioProcessorValueTreeState& p) : parameters(p)
+MicrobiomeWindow::MicrobiomeWindow(juce::AudioProcessorValueTreeState& p) : 
+    parameters(p), playbackIndicatorDelta(0.03)
 {
     setOpaque(false);
     setFramesPerSecond(24);
@@ -46,6 +47,8 @@ MicrobiomeWindow::MicrobiomeWindow(juce::AudioProcessorValueTreeState& p) : para
     for (int i = 0; i < NUM_NODE_LINES; i++) nodeLineShifts[i] = rng.nextFloat() * 2 * PI;
 
     for (int i = 0; i < NUM_TENTACLES; i++) tentacles[i] = generateTentacle();
+
+    for (int i = 0; i < MAX_COLONY; i++) playbackIndicatorPos[i] = 0.0;
 }
 
 MicrobiomeWindow::~MicrobiomeWindow()
@@ -116,7 +119,8 @@ void MicrobiomeWindow::paint (juce::Graphics& g)
                 currentPoint = branchPath.getPointAlongPath(currentPos, transform);
                 branchScrubVisual.lineTo(currentPoint);
             }
-            
+
+            auto bsvPlaybackPoint = branchScrubVisual.getPointAlongPath(branchScrubVisual.getLength() * playbackIndicatorPos[i]);
             branchScrubVisual.lineTo(branchColEndPoint2);
 
             currentPoint = branchColEndPoint2;
@@ -127,23 +131,31 @@ void MicrobiomeWindow::paint (juce::Graphics& g)
                 branchScrubVisual.lineTo(currentPoint);
             }
 
+            auto bsvPlaybackPoint2 = branchScrubVisual.getPointAlongPath(branchScrubVisual.getLength() - ((branchScrubVisual.getLength()/2) * playbackIndicatorPos[i]));
+        
             branchScrubVisual.closeSubPath();
+            if ((playbackIndicatorPos[i] += playbackIndicatorDelta) > 1.0) playbackIndicatorPos[i] = 0.0;
 
             auto branchColStartMidPoint = ((branchColStartPoint2 - branchColStartPoint)/2) + branchColStartPoint;
             auto branchColEndMidPoint = ((branchColEndPoint2 - branchColEndPoint)/2) + branchColEndPoint;
-            auto scrubVisDist = branchColEndPoint.getDistanceFrom(branchColStartMidPoint);
+            float scrubVisDist = branchColEndPoint.getDistanceFrom(branchColStartMidPoint);
+            auto direcVec = branchColEndMidPoint - branchColStartMidPoint;
+            auto unitVec = direcVec / direcVec.getDistanceFromOrigin();
             g.setGradientFill(
                 juce::ColourGradient{
                     leafGradient1,
                     branchColStartMidPoint.x,
                     branchColStartMidPoint.y,
                     leafGradient2,
-                    branchColEndMidPoint.x + scrubVisDist * visualScrubGradScale,
-                    branchColEndMidPoint.y + scrubVisDist * visualScrubGradScale,
+                    branchColStartMidPoint.x + (unitVec.x * scrubVisDist),
+                    branchColStartMidPoint.y + (unitVec.y * scrubVisDist),
                     false
             });
 
             g.fillPath(branchScrubVisual);
+
+            g.setColour(juce::Colours::red);
+            g.drawLine(bsvPlaybackPoint.x, bsvPlaybackPoint.y, bsvPlaybackPoint2.x, bsvPlaybackPoint2.y, 2);
         }
     }
 
