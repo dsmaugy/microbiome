@@ -76,3 +76,10 @@
 #define PARAMETER_COLONY_GHOST_NAME(n) "Colony " + juce::String(n) + " Artifacts"
 #define PARAMETER_COLONY_FILTER_ID(n) "colony_" + juce::String(n) + "_filter"
 #define PARAMETER_COLONY_FILTER_NAME(n) "Colony " + juce::String(n) + " Resonance"
+
+namespace Microbiome
+{
+    const juce::Colour baseColorLight = juce::Colour{ 0xFF475851 };
+    const juce::Colour baseColorDark = juce::Colour{ 0xFF2B3632 };
+    const juce::Colour interactGreenColor = juce::Colour{ 0xFFACFCC3 };
+}

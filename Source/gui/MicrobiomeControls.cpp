@@ -15,9 +15,9 @@
 
 // #define COLONY_TITLE_LABEL juce::String("Colony Controls: #")
 
-//const juce::Colour bgColor = juce::Colour{ 0xFF6F99AD };
 const juce::Colour bgColor = juce::Colour{ 0xFF6A837A };
 const juce::Colour topbarColor = juce::Colour{ 0xFF223327 };
+
 
 
 //==============================================================================
@@ -170,8 +170,8 @@ void MicrobiomeControls::paint (juce::Graphics& g)
     g.fillRoundedRectangle(getLocalBounds().toFloat(), 10);
 
     g.setColour(juce::Colours::darksalmon);
-    //g.drawRoundedRectangle(p_engineCtrlsRect.toFloat(), 5, 2);
-    g.drawRect(p_engineCtrlsRect.toFloat(), 2);
+    g.drawRoundedRectangle(p_engineCtrlsRect.reduced(2).toFloat(), 10, 3.5);
+    //g.drawRect(p_engineCtrlsRect.toFloat(), 2);
 
     
     g.setColour(topbarColor);
@@ -291,7 +291,6 @@ int MicrobiomeControls::decrementColonyView()
 void MicrobiomeControls::applyRotarySliderStyle(juce::Slider& slider)
 {
     slider.setSliderStyle(juce::Slider::Rotary);
-    // slider.setRotaryParameters(3 * juce::MathConstants<float>::pi / 2, 5 * juce::MathConstants<float>::pi / 2, true);
     slider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
     slider.setPopupDisplayEnabled(true, true, this);
 }

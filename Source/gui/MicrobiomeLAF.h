@@ -16,6 +16,8 @@
 class MicrobiomeLAF : public juce::LookAndFeel_V4
 {
 public:
+    MicrobiomeLAF();
+
     juce::Font getComboBoxFont(juce::ComboBox&) override
     {
         return getCommonMenuFont();
@@ -25,6 +27,16 @@ public:
     {
         return getCommonMenuFont();
     }
+
+    void drawPopupMenuItem(juce::Graphics& g, const juce::Rectangle<int>& area,
+        const bool isSeparator, const bool isActive,
+        const bool isHighlighted, const bool isTicked,
+        const bool hasSubMenu, const juce::String& text,
+        const juce::String& shortcutKeyText,
+        const juce::Drawable* icon, const juce::Colour* const textColourToUse);
+
+    void drawComboBox(juce::Graphics& g, int width, int height, bool,
+        int, int, int, int, juce::ComboBox& box);
 
 private:
     juce::Font getCommonMenuFont()

@@ -11,9 +11,11 @@
 #include "../Constants.h"
 
 const juce::Colour bgColor = juce::Colour{ 0xFF6FAD98 };
-const juce::Colour colMenuBgColor = juce::Colour{ 0xFFF6F89F };
+//const juce::Colour colMenuBgColor = juce::Colour{ 0xFFF6F89F };
+const juce::Colour colMenuBgColor = juce::Colour{ 0xFFAD8E6F };
 const juce::Colour titleTextColor = juce::Colour{ 0xFF697A6F };
-const juce::Colour mainTextColor = juce::Colour{ 0xFF697A7A };
+const juce::Colour mainTextColor = juce::Colour{ 0xFFFFFFFF };
+const juce::Colour borderColor = juce::Colour{ 0xFF49584B };
 
 //==============================================================================
 MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioProcessor& p, juce::AudioProcessorValueTreeState& apvst)
@@ -50,7 +52,7 @@ void MicrobiomeAudioProcessorEditor::paint (juce::Graphics& g)
     g.setColour (juce::Colours::white);
     g.fillRect(p_topbarRect);
 
-    g.setColour(mainTextColor);
+    g.setColour(borderColor);
     g.drawRect(getLocalBounds(), 3);
 
     g.setFont(MicrobiomeResources::m_getTitleFont2(22, juce::Font::bold));
