@@ -14,8 +14,8 @@
 #define MAX_COLONY 4
 #define DEFAULT_COLONIES 1
 #define MAX_CHANNELS 2
-#define MAX_DELAY_SECONDS 10 // global delay line length
-#define COLONY_BUFFER_LENGTH_SEC 5
+#define MAX_DELAY_SECONDS 30 // global delay line length
+#define COLONY_BUFFER_LENGTH_SEC 10
 #define MAX_GHOSTS 15 // TODO: play around with this value
 
 // audio parameter limits
@@ -82,7 +82,5 @@ namespace Microbiome
     const juce::Colour baseColorLight = juce::Colour{ 0xFF475851 };
     const juce::Colour baseColorDark = juce::Colour{ 0xFF2B3632 };
     const juce::Colour interactGreenColor = juce::Colour{ 0xFFACFCC3 };
-    const juce::Colour textColor = juce::Colour{ 0xFFFCF7C5 };
-    //const juce::Colour textColor = juce::Colour{ 0xFFF0FCE3 };
-    
+    const juce::Colour textColor = juce::Colour{ 0xFFFCF7C5 };    
 }

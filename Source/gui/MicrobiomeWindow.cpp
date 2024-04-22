@@ -17,8 +17,6 @@
 #define PI juce::MathConstants<float>::pi
 
 const juce::Colour colonyLeafColor = juce::Colour{0xFF8FB0A4 };
-// const juce::Colour coreGradient1 = juce::Colour{0xFF9AE02C};
-// const juce::Colour coreGradient2 = juce::Colour{0xFF00C4EC};
 const juce::Colour coreGradient1 = juce::Colour{0xFF4EDEA3};
 const juce::Colour coreGradient2 = juce::Colour{0xFF1898B3};
 const juce::Colour leafGradient1 = juce::Colour{0xFF4985E3};
