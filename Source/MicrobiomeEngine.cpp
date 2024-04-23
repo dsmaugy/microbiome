@@ -17,6 +17,8 @@ MicrobiomeEngine::MicrobiomeEngine(juce::AudioProcessorValueTreeState& p) : para
         colony[i] = std::make_unique<Colony>(i, parameters);
         parameters.addParameterListener(PARAMETER_ENABLE_ID(i+1), colony[i].get());
     }
+    reverb.setParameters(reverbParameters);
+
 }
 
 
@@ -24,13 +26,14 @@ void MicrobiomeEngine::prepare(const EngineParams& params)
 {
     this->params = params;
 
-    // TODO: prepare might get called more than once, we need to only reset things if sampleRate changed
-    delayBuffer = std::make_unique<juce::AudioBuffer<float>>(MAX_CHANNELS, MAX_DELAY_SECONDS * params.procSpec.sampleRate);
-    // without clearing there are audible pops at initialization with using IIR filters
-    delayBuffer->clear();
+    if (!delayBuffer || delayBuffer->getNumSamples() != MAX_DELAY_SECONDS * (int) params.procSpec.sampleRate) {
+        DBG("Regenerating new Engine buffer");
+        delayBuffer = std::make_unique<juce::AudioBuffer<float>>(MAX_CHANNELS, MAX_DELAY_SECONDS * (int) params.procSpec.sampleRate);
+        // without clearing there are audible pops at initialization with using IIR filters
+        delayBuffer->clear();
+    }
 
     reverb.prepare(params.procSpec);
-    reverb.setParameters(reverbParameters);
 
     for (int i = 0; i < MAX_COLONY; i++) {
         ColonyParams colonyParams(params.procSpec, delayBuffer.get());
@@ -62,7 +65,7 @@ void MicrobiomeEngine::processAudio(juce::AudioBuffer<float>& buffer)
             for (int j = 0; j < MAX_COLONY; j++) {
                 // can't break out early from checking appliedColonies because some colonies may be ramping down
                 if (colony[j]->isActive()) {
-                    colonySample += colony[j]->getSampleN(channel, i);
+                    colonySample += colony[j]->getSampleN(channel);
                 }
             }
 

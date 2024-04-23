@@ -24,6 +24,8 @@
         <FILE id="cMbhvY" name="MicrobiomeLAF.cpp" compile="1" resource="0"
               file="Source/gui/MicrobiomeLAF.cpp"/>
         <FILE id="vOuEQD" name="MicrobiomeLAF.h" compile="0" resource="0" file="Source/gui/MicrobiomeLAF.h"/>
+        <FILE id="KPNq3e" name="MicrobiomeResources.cpp" compile="1" resource="0"
+              file="Source/gui/MicrobiomeResources.cpp"/>
         <FILE id="ASKtix" name="MicrobiomeResources.h" compile="0" resource="0"
               file="Source/gui/MicrobiomeResources.h"/>
         <FILE id="gXNTtU" name="MicrobiomeWindow.cpp" compile="1" resource="0"

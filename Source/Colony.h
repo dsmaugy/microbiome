@@ -43,7 +43,7 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
 
         // copies buffer data into local colony buffer and applies colony processing on that local buffer
         void processAudio(const juce::AudioBuffer<float>& buffer);
-        float getSampleN(int channel, int n);
+        float getSampleN(int channel);
 
         // set true to activate colony, false to kill it
         void toggleState(bool value);

@@ -36,16 +36,17 @@ void Colony::prepare(const ColonyParams& params)
 {
     this->params = params;
 
-    // TODO: prepare might get called more than once, we need to only reset things if sampleRate changed
-    resampleBuffer = std::make_unique<juce::AudioBuffer<float>>(MAX_CHANNELS, params.procSpec.sampleRate * COLONY_BUFFER_LENGTH_SEC);
-    resampleBuffer->clear();
+    if (!resampleBuffer || resampleBuffer->getNumSamples() != COLONY_BUFFER_LENGTH_SEC * (int) params.procSpec.sampleRate) {    resampleBuffer = std::make_unique<juce::AudioBuffer<float>>(MAX_CHANNELS, (int) params.procSpec.sampleRate * COLONY_BUFFER_LENGTH_SEC);
+        resampleBuffer->clear();
 
-    outputBuffer = std::make_unique<juce::AudioBuffer<float>>(MAX_CHANNELS, params.procSpec.sampleRate * COLONY_BUFFER_LENGTH_SEC);
-    outputBuffer->clear();
+        outputBuffer = std::make_unique<juce::AudioBuffer<float>>(MAX_CHANNELS, (int) params.procSpec.sampleRate * COLONY_BUFFER_LENGTH_SEC);
+        outputBuffer->clear();
 
-    std::stringstream bufferAddr;
-    bufferAddr << std::hex << reinterpret_cast<std::uintptr_t>(resampleBuffer.get());
-    DBG("Colony buffer created at: 0x" << bufferAddr.str());
+        std::stringstream bufferAddr;
+        bufferAddr << std::hex << reinterpret_cast<std::uintptr_t>(resampleBuffer.get());
+        DBG("Colony buffer created at: 0x" << bufferAddr.str());
+    }
+
     
     gain.reset(params.procSpec.sampleRate, GAIN_FADE_TIME);
     gain.setCurrentAndTargetValue(0);
@@ -56,7 +57,6 @@ void Colony::prepare(const ColonyParams& params)
 
     resampleRatio.reset(params.procSpec.sampleRate, RESAMPLE_FADE);
     resampleRatio.setCurrentAndTargetValue(params.initialResampleRatio);
-    //resampleLength = resampleBuffer->getNumSamples();
 
     ladder.setMode(juce::dsp::LadderFilterMode::LPF12);
     ladder.prepare(params.procSpec);
@@ -288,8 +288,7 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
     }
 }
 
-// TODO: get rid of the n
-float Colony::getSampleN(int channel, int n)
+float Colony::getSampleN(int channel)
 {
     float output = 0.0;
     if (numResampledOutput < 0 || (numResampledOutput > 0 && outReadCount[channel] < numResampledOutput)) {
