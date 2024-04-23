@@ -12,7 +12,8 @@
 
 #include <JuceHeader.h>
 
-class MicrobiomeResources
+// JUCE autoleak detector triggers here because of static members
+class MicrobiomeResources : public juce::DeletedAtShutdown
 {
 public:
     static juce::Font m_getLabelFont(float fontHeight = 15.0f, int style = juce::Font::FontStyleFlags::plain);

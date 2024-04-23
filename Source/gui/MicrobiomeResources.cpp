@@ -10,34 +10,37 @@
 
 #include "MicrobiomeResources.h"
 
+static const auto poppinsFont = juce::Typeface::createSystemTypefaceFor(BinaryData::PoppinsRegular_ttf, BinaryData::PoppinsRegular_ttfSize);
+static const auto suwannaTypeface = juce::Typeface::createSystemTypefaceFor(BinaryData::SuwannaphumRegular_ttf, BinaryData::SuwannaphumRegular_ttfSize);
+static const auto robotoTypeface = juce::Typeface::createSystemTypefaceFor(BinaryData::RobotoSlabMedium_ttf, BinaryData::RobotoSlabMedium_ttfSize);
 
-juce::Font MicrobiomeResources::m_getLabelFont(float fontHeight, int style) {
-    static auto typeface = juce::Typeface::createSystemTypefaceFor(BinaryData::PoppinsRegular_ttf, BinaryData::PoppinsRegular_ttfSize);
-    juce::Font f = juce::Font(typeface);
+juce::Font MicrobiomeResources::m_getLabelFont(float fontHeight, int style) 
+{   
+    juce::Font f = juce::Font(poppinsFont);
     f.setHeight(fontHeight);
     f.setStyleFlags(style);
     return f;
 }
 
-juce::Font MicrobiomeResources::m_getComboBoxFont(float fontHeight, int style) {
-    static auto typeface = juce::Typeface::createSystemTypefaceFor(BinaryData::SuwannaphumRegular_ttf, BinaryData::SuwannaphumRegular_ttfSize);
-    juce::Font f = juce::Font(typeface);
+juce::Font MicrobiomeResources::m_getComboBoxFont(float fontHeight, int style) 
+{    
+    juce::Font f = juce::Font(suwannaTypeface);
     f.setHeight(fontHeight);
     f.setStyleFlags(style);
     return f;
 }
 
-juce::Font MicrobiomeResources::m_getTitleFont1(float fontHeight, int style) {
-    static auto typeface = juce::Typeface::createSystemTypefaceFor(BinaryData::RobotoSlabMedium_ttf, BinaryData::RobotoSlabMedium_ttfSize);
-    juce::Font f = juce::Font(typeface);
+juce::Font MicrobiomeResources::m_getTitleFont1(float fontHeight, int style) 
+{    
+    juce::Font f = juce::Font(robotoTypeface);
     f.setHeight(fontHeight);
     f.setStyleFlags(style);
     return f;
 }
 
-juce::Font MicrobiomeResources::m_getTitleFont2(float fontHeight, int style) {
-    static auto typeface = juce::Typeface::createSystemTypefaceFor(BinaryData::MuseoModernoRegular_ttf, BinaryData::MuseoModernoRegular_ttfSize);
-    juce::Font f = juce::Font(typeface);
+juce::Font MicrobiomeResources::m_getTitleFont2(float fontHeight, int style) 
+{
+    juce::Font f = juce::Font(robotoTypeface);
     f.setHeight(fontHeight);
     f.setStyleFlags(style);
     return f;

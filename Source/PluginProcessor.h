@@ -54,6 +54,8 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    double getBPM();
+
     MicrobiomeEngine& getEngine();
 
 private:
@@ -62,6 +64,8 @@ private:
 
     juce::AudioProcessorValueTreeState parameters;
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
+    double hostBPM = 0;
 
     MicrobiomeEngine engine;
 

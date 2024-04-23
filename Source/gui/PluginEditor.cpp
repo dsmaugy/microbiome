@@ -17,7 +17,7 @@ const juce::Colour borderColor = juce::Colour{ 0xFF49584B };
 
 //==============================================================================
 MicrobiomeAudioProcessorEditor::MicrobiomeAudioProcessorEditor(MicrobiomeAudioProcessor& p, juce::AudioProcessorValueTreeState& apvst)
-    : AudioProcessorEditor(&p), audioProcessor(p), parameters(apvst), controlWindow(apvst), visualWindow(apvst)
+    : AudioProcessorEditor(&p), audioProcessor(p), parameters(apvst), controlWindow(apvst), visualWindow(p, apvst)
 {
     
     nextColony.setButtonText("->");

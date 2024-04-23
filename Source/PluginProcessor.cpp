@@ -165,7 +165,8 @@ void MicrobiomeAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 
     // TODO: return immediately if no samples
     // TODO: solve ableton maxing out at beginning
-    engine.setBPM(getPlayHead()->getPosition()->getBpm().orFallback(0));
+    hostBPM = getPlayHead()->getPosition()->getBpm().orFallback(0);
+    engine.setBPM(hostBPM);
     engine.processAudio(buffer);
 }
 
@@ -200,6 +201,11 @@ void MicrobiomeAudioProcessor::setStateInformation (const void* data, int sizeIn
 MicrobiomeEngine& MicrobiomeAudioProcessor::getEngine()
 {
     return engine;
+}
+
+double MicrobiomeAudioProcessor::getBPM()
+{
+    return hostBPM;
 }
 
 //==============================================================================
