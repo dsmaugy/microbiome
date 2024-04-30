@@ -34,3 +34,7 @@
 
 # Export Builds
 Builds/
+JuceLibraryCode/
+
+# Development
+.vscode/
