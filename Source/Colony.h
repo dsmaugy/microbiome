@@ -34,7 +34,7 @@ struct ColonyParams
     // }
 };
 
-class Colony : public juce::AudioProcessorValueTreeState::Listener
+class Colony
 {
     public:
         Colony(int n, juce::AudioProcessorValueTreeState& parameters);
@@ -53,11 +53,6 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
 
         float getGain();
 
-        void setResampleRatio(float ratio);
-        void setColonyBufferReadStart(float startSec);
-        void setColonyBufferReadLength(float lengthSec);
-        void setResampleStart(float startSec);
-        void setResampleLength(float lengthSec);
 
     private:
         enum class State
@@ -83,7 +78,9 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
         Colony::State currentState = Colony::State::DEAD;
         Colony::ProcessMode currentMode = Colony::ProcessMode::LOOP;
         juce::String currentModeParamName;
+        juce::String enabledParamName;
         int currentModeIntRep = 0;
+        float enabledParamValue = 0.0f;
 
         std::unique_ptr<juce::AudioBuffer<float>> resampleBuffer;
         std::unique_ptr<juce::AudioBuffer<float>> outputBuffer;
@@ -120,7 +117,6 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
         juce::String resampleStartParamName;
         int resampleIdx[MAX_CHANNELS];
         int resampleStart = 0;
-        //int resampleLength = 132300; // TODO: this doesn't really do anything
 
         juce::String gainParamName;
         juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gain;
@@ -133,6 +129,4 @@ class Colony : public juce::AudioProcessorValueTreeState::Listener
         juce::Random rng;
 
         ColonyParams params;
-
-        void parameterChanged(const juce::String &parameterID, float newValue) override;
 };

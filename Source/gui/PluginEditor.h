@@ -48,7 +48,6 @@ private:
     juce::TextButton prevColony = juce::TextButton("<-");
 
     void buttonClicked(juce::Button* button) override;
-    void applyRotarySliderStyle(juce::Slider& slider);
     void parameterChanged(const juce::String &parameterID, float newValue) override;
 
 

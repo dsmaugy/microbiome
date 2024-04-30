@@ -27,7 +27,8 @@ Colony::Colony(int n, juce::AudioProcessorValueTreeState& p) : colonyNum(n),
                         gainParamName(PARAMETER_COLONY_DBFS_ID(n+1)),
                         ghostDelayParamName(PARAMETER_COLONY_GHOST_ID(n+1)),
                         ladderFreqParamName(PARAMETER_COLONY_FILTER_ID(n+1)),
-                        currentModeParamName(PARAMETER_COLONY_MODE_ID(n+1))
+                        currentModeParamName(PARAMETER_COLONY_MODE_ID(n+1)),
+                        enabledParamName(PARAMETER_ENABLE_ID(n+1))
 {
 }
 
@@ -157,12 +158,17 @@ void Colony::processAudio(const juce::AudioBuffer<float>& buffer)
         DBG("New Ghosts: " << numGhosts);
     }
     
-    // TODO: set processing to be true if this changes
     int newLadderFreq = (int) *parameters.getRawParameterValue(ladderFreqParamName);
     if (ladderFreq != newLadderFreq) {
         ladderFreq = newLadderFreq;
         ladder.setCutoffFrequencyHz(ladderFreq);
         processEffects = true;
+    }
+
+    float newEnabledParamValue = *parameters.getRawParameterValue(enabledParamName);
+    if (newEnabledParamValue != enabledParamValue) {
+        enabledParamValue = newEnabledParamValue;
+        toggleState(enabledParamValue != 0.0f);
     }
     
 
@@ -352,47 +358,3 @@ float Colony::getGain()
     return gain.getCurrentValue();
 }
 
-void Colony::setResampleRatio(float ratio)
-{
-    resampleRatio.setTargetValue(ratio);
-    doneProcessing = false;
-}
-
-// TODO: need a lock here???
-void Colony::setColonyBufferReadStart(float startSec)
-{
-    //colonyBufferReadStart = (int)(startSec * params.procSpec.sampleRate);
-    //colonyBufferReadStart = std::min(colonyBufferReadStart, colonyBuffer->getNumSamples() - 1); // clamp down start value
-    //colonyBufferReadOffsetLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples()) - colonyBufferReadStart;
-    //DBG("New Read Start Set: " << colonyBufferReadStart << " (sec= " << startSec << ")");
-    //loopFade.setCurrentAndTargetValue(0);
-
-    //for (int i = 0; i < MAX_CHANNELS; i++) {
-    //    colonyBufferReadOffset[i] = 0;
-    //}
-}
-
-void Colony::setColonyBufferReadLength(float lengthSec)
-{
-    //colonyBufferReadLength = (int) (lengthSec * params.procSpec.sampleRate);
-    //colonyBufferReadOffsetLimit = std::min(colonyBufferReadStart + colonyBufferReadLength, colonyBuffer->getNumSamples()) - colonyBufferReadStart;
-    //DBG("New Read Limit: " << colonyBufferReadOffsetLimit << " (sec= " << lengthSec << ")");
-    //doneProcessing = false;
-}
-
-// TODO: this prob has to be locked somehow
-void Colony::setResampleStart(float startSec)
-{
-    resampleStart = (int) (startSec * params.procSpec.sampleRate);
-    doneProcessing = false;
-}
-
-void Colony::setResampleLength(float length)
-{
-
-}
-
-void Colony::parameterChanged(const juce::String &parameterID, float newValue) {
-    // this should only run for enable toggles which should be pretty rare
-    toggleState(newValue != 0.0f);
-}

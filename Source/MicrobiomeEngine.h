@@ -35,11 +35,6 @@ class MicrobiomeEngine
         // adds from beginning of colony array to end
         void addColony();
 
-        void setColonyDelayTime(int n, float sec);
-        void setColonyResampleRatio(int n, float ratio);
-        void setColonyResampleStart(int n, float start);
-        void setColonyBufferStart(int n, float startSec);
-        void setColonyBufferLength(int n, float lengthSec);
         void setBPM(double bpm);
 
     private:

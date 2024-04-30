@@ -15,7 +15,6 @@ MicrobiomeEngine::MicrobiomeEngine(juce::AudioProcessorValueTreeState& p) : para
 {
     for (int i = 0; i < MAX_COLONY; i++) {
         colony[i] = std::make_unique<Colony>(i, parameters);
-        parameters.addParameterListener(PARAMETER_ENABLE_ID(i+1), colony[i].get());
     }
     reverb.setParameters(reverbParameters);
 
@@ -132,32 +131,7 @@ void MicrobiomeEngine::addColony()
     //DBG("Active Colonies: " << activeColonies);
 }
 
-void MicrobiomeEngine::setColonyDelayTime(int n, float sec)
-{
-    // colony[n].setDelayTime(sec);
-}
-
-void MicrobiomeEngine::setColonyResampleRatio(int n, float ratio)
-{
-    colony[n]->setResampleRatio(ratio);
-}
-
 void MicrobiomeEngine::setBPM(double bpm)
 {
     currentBpm = bpm;
-}
-
-void MicrobiomeEngine::setColonyResampleStart(int n, float start)
-{
-    colony[n]->setResampleStart(start);
-}
-
-void MicrobiomeEngine::setColonyBufferStart(int n, float startSec)
-{
-    colony[n]->setColonyBufferReadStart(startSec);
-}
-
-void MicrobiomeEngine::setColonyBufferLength(int n, float lengthSec)
-{
-    colony[n]->setColonyBufferReadLength(lengthSec);
 }
