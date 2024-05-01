@@ -10,7 +10,7 @@ Each Colony resamples a user-defined section of a global delay line, feeding its
 
 Microbiome has built-in reverb/compression/LPF, various re-sampling methods per colony, a plugin editor UI, and supports parameter automation. 
 
-## Compatability
+## Compatibility
 Microbiome can be downloaded as an AU plugin on MacOS, VST3 on Windows, and VST3/LV2 on Linux.
 See [Installation](#Installation) for installation steps.
 
