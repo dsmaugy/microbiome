@@ -23,7 +23,7 @@ See [Installation](#Installation) for installation steps.
 - Download the latest **Microbiome_Win_VST3** zip from the [releases page](https://github.com/dsmaugy/microbiome/releases)
 - Open the zip and extract the `Microbiome.vst3` directory to your VST3 folder (probably `C:\Program Files\Common Files\VST3`)
 
-### MacOS
+### MacOS (last built for macOS Monterey version 12.3)
 - Download the latest **Microbiome_MacOS_AU** zip from the [releases page](https://github.com/dsmaugy/microbiome/releases)
 - Open the zip and extract the `Microbiome.component` directory `/Library/Audio/Plug-Ins/Components`
 - If that does not work, the AU can also be installed under `Users/<your username>/Library/Audio/Plug-Ins/Components`
